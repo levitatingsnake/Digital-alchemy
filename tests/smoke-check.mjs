@@ -137,10 +137,10 @@ api.state.history=[{id:'persist-1',title:'Round-trip',time:'2026-10-20',ops:['Se
 api.state.trace=[{op:'Separate',before:[10,20,30,40],after:[11,21,31,41],score:72}];
 api.state.learnedRules=[{name:'Round-trip rule',delta:[1,1,1,1],ds:0}];
 api.state.integrityReports=[{passed:true}];api.state.prometheusReports=[{verdict:'ROBUST IN THIS TEST'}];api.state.lawForgeReports=[{generation:1}];api.state.blindSpotReports=[{type:'anomaly-challenge-protocol'}];
-vm.runInContext('persist()',sandbox,{timeout:3000});
+api.persist();
 const savedPayload=JSON.parse(savedWorkspace);
 api.state.values=[0,0,0,0];api.state.history=[];api.state.trace=[];api.state.learnedRules=[];api.state.integrityReports=[];api.state.prometheusReports=[];api.state.lawForgeReports=[];api.state.blindSpotReports=[];
-vm.runInContext('load()',sandbox,{timeout:3000});
+api.load();
 assertModel(JSON.stringify(api.state.values)==='[11,22,33,44]' && api.state.stability===6, 'workspace values and stability survive save/load round trip');
 assertModel(api.state.history.length===1 && api.state.trace.length===1 && api.state.learnedRules.length===1, 'experiment ledger, trace and saved rules survive save/load round trip');
 assertModel(['integrityReports','prometheusReports','lawForgeReports','blindSpotReports'].every(k=>api.state[k].length===1), 'all research report families survive save/load round trip');
