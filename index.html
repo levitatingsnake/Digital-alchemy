@@ -72,14 +72,23 @@ function applyCandidate(r,label,sampleCount){
  saveExperiment(label,before,[label],{values:state.values.slice(),stability:state.stability});
  renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Hypothesis tested and recorded');
 }
+function validateRule(rule){
+ const samples=Array.from({length:24},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
+ const gains=samples.map(s=>{const next={values:s.values.map((x,i)=>clamp(x+rule.delta[i])),stability:Math.max(0,Math.min(10,s.stability+rule.ds))};return score(next)-score(s)});
+ const losses=gains.filter(x=>x<0);
+ return {mean:+(gains.reduce((a,b)=>a+b,0)/gains.length).toFixed(2),winRate:Math.round(gains.filter(x=>x>0).length/gains.length*100),worst:losses.length?Math.min(...losses):0};
+}
 function renderKeptRules(){
  const root=document.getElementById('keptRules');if(!root)return;
  if(!state.learnedRules.length){root.innerHTML='<p class="sub">Your rule library is empty. Keep a promising hypothesis to preserve it on this device.</p>';return}
- root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3>'+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain</p><button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
+ root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3>'+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain · worst loss '+r.worst+'</p><button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
  root.querySelectorAll('[data-apply-kept]').forEach(btn=>btn.addEventListener('click',()=>{
   const r=state.learnedRules[+btn.dataset.applyKept],before={values:state.values.slice(),stability:state.stability};
   const next={values:state.values.map((x,i)=>clamp(x+r.delta[i])),stability:Math.max(0,Math.min(10,state.stability+r.ds))};
+  const beforeScore=score(state),afterScore=score(next);
   applyCandidate({next},'Saved '+r.name,24);
+  const predicted=beforeScore===afterScore?'Alignment unchanged':afterScore>beforeScore?'Alignment improved by '+(afterScore-beforeScore)+' points':'Alignment fell by '+(beforeScore-afterScore)+' points';
+  showToast(r.name+' applied · '+predicted);
  }));
  root.querySelectorAll('[data-remove-kept]').forEach(btn=>btn.addEventListener('click',()=>{
   state.learnedRules.splice(+btn.dataset.removeKept,1);persist();renderKeptRules();showToast('Rule discarded');
