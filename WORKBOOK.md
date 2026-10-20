@@ -229,6 +229,14 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Controlled mutation testing (2026-10-20)
+
+- Added `tests/mutation-check.mjs`, which runs the unmodified symbolic model as a control, then introduces three deliberate faults in isolated in-memory source copies.
+- Mutations tested: widen the component clamp ceiling from 100 to 1000; make the objective score return `NaN`; remove state cloning so an operation mutates its input.
+- Each mutation must be rejected by the matching invariant check. The production `index.html` is never modified by the test.
+- Added the mutation check to the overnight GitHub Actions workflow.
+- This is a small, targeted mutation test, not comprehensive mutation coverage of the whole application.
+
 ### Search-depth comparison (2026-10-20)
 
 - Extended the benchmark report to compare greedy/depth-one, depth-two, depth-three, and deduplicated depth-three search on the same 400 fixed cases.
