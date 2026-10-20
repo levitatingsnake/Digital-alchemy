@@ -43,6 +43,10 @@ const required = [
   ['Paired baseline comparison button wiring', "getElementById('compareBaseline').addEventListener('click',compareAgainstBaseline)"],
   ['Pattern Vault panel', '00D / PATTERN VAULT'],
   ['Experiment Designer panel', '00E / EXPERIMENT DESIGNER'],
+  ['Rule Adjudicator panel', '00G / RULE ADJUDICATOR'],
+  ['Rule adjudication button wiring', "getElementById('adjudicateRules').addEventListener('click',adjudicateRuleDisagreement)"],
+  ['Rule disagreement adjudication function', 'function buildRuleDisagreementAdjudication(rules,goal)'],
+  ['Adjudication explicitly states model-internal evidence boundary', 'not independent real-world validation'],
   ['Anomaly Lab panel', '00C / ANOMALY LAB'],
   ['Portfolio quick proof demo button', 'id="runPortfolioDemo"'],
   ['Portfolio quick proof demo function', 'function runPortfolioDemo(){'],
@@ -133,12 +137,13 @@ const modelSource = [
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
+  functionBlock('buildRuleDisagreementAdjudication', 'adjudicateRuleDisagreement'),
   functionBlock('runDiscoveryCycle', 'designDiscriminatingExperiments'),
   functionBlock('persist', 'setStatus'),
   functionBlock('load', 'showToast'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRuleForGoal,buildRuleStabilityAudit,evaluateRecommendedProbes,buildNextExperimentPlan,buildDiscoveryEvidenceLedger,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRuleForGoal,buildRuleStabilityAudit,evaluateRecommendedProbes,buildNextExperimentPlan,buildDiscoveryEvidenceLedger,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,buildRuleDisagreementAdjudication,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -294,6 +299,21 @@ assertModel(paired.baseline.meanGain===0 && paired.sampleCount===3, 'paired comp
 assertModel(paired.rules.length===2 && paired.pairwise.length===1 && paired.pairwise[0].aWins+paired.pairwise[0].bWins+paired.pairwise[0].ties===3, 'competing rules are compared head-to-head on identical states');
 assertModel(paired.rules.every(r=>Number.isFinite(r.mean)&&r.worst>=-100&&r.worst<=100&&r.winRate>=0&&r.winRate<=100), 'paired comparison reports bounded metrics for each rule');
 assertModel(JSON.stringify(pairedSamples)===pairedBefore, 'paired comparison leaves benchmark samples unchanged');
+const adjudicationRules=[
+ {name:'push-sulphur',delta:[12,0,0,0],ds:0},
+ {name:'pull-sulphur',delta:[-12,0,0,0],ds:0},
+ {name:'stabilise',delta:[0,0,0,0],ds:2}
+];
+const adjudicationA=api.buildRuleDisagreementAdjudication(adjudicationRules,'balanced');
+const adjudicationB=api.buildRuleDisagreementAdjudication(adjudicationRules,'balanced');
+assertModel(adjudicationA.type==='rule-disagreement-adjudication' && adjudicationA.discoveryCount===256 && adjudicationA.holdoutCount===256, 'rule adjudication uses separate 256-state discovery and holdout sets');
+assertModel(JSON.stringify(adjudicationA)===JSON.stringify(adjudicationB), 'rule adjudication is deterministic for fixed candidates and goal');
+assertModel(adjudicationA.discoveryRank.length===3 && adjudicationA.holdoutRank.length===3, 'rule adjudication ranks all competing candidates on both samples');
+assertModel(adjudicationA.probes.length>0 && adjudicationA.probes.length<=5 && adjudicationA.probes.every(p=>p.spread>0 && p.sample.values.length===4), 'rule adjudication returns concrete states with non-zero prediction disagreement');
+assertModel(['LEADING RULE RETAINED ON HOLDOUT','DISCOVERY LEADER CONTRADICTED ON HOLDOUT','HOLDOUT TIE','NO CLEAR SEPARATION'].includes(adjudicationA.verdict), 'rule adjudication reports an explicit holdout outcome');
+assertModel(adjudicationA.reason.includes('not independent real-world validation'), 'rule adjudication clearly limits the scope of its evidence');
+assertModel(api.buildRuleDisagreementAdjudication([adjudicationRules[0]],'balanced').verdict==='INSUFFICIENT CANDIDATES', 'rule adjudication rejects a single candidate');
+
 const holdA = api.buildPrometheusHoldout();
 const holdB = api.buildPrometheusHoldout();
 assertModel(holdA.length === 128, 'holdout contains 128 samples');
