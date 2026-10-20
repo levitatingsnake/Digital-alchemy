@@ -250,7 +250,9 @@ function buildDiscoveryCycleAudit(before,after,reportsBefore,reportsAfter,goal,r
  const created=reportsAfter.filter(r=>!reportsBefore.has(r));
  const createdTypes=new Set(created.filter(r=>r.goal===goal).map(r=>r.type));
  const missing=required.filter(type=>!createdTypes.has(type));
- const statePreserved=before.values===JSON.stringify(after.values)&&before.stability===after.stability&&before.goal===after.goal&&before.rules===JSON.stringify(after.learnedRules);
+ const customTargetPreserved=before.customTarget===undefined||before.customTarget===JSON.stringify(after.customTarget);
+ const customStabilityPreserved=before.customStability===undefined||before.customStability===after.customStability;
+ const statePreserved=before.values===JSON.stringify(after.values)&&before.stability===after.stability&&before.goal===after.goal&&before.rules===JSON.stringify(after.learnedRules)&&customTargetPreserved&&customStabilityPreserved;
  return {timestamp,type:'discovery-cycle-audit',goal,ruleCount,requiredReports:required,missingReports:missing,stageErrors:stageErrors.slice(),statePreserved,passed:missing.length===0&&stageErrors.length===0&&statePreserved};
 }
 function buildRuleDisagreementAdjudication(rules,goal){
@@ -280,14 +282,14 @@ function runDiscoveryCycle(){
  const root=document.getElementById('discoveryCycleResults');
  if(state.learnedRules.length<2){root.innerHTML='<div class="routebox"><b>Cycle requires at least two saved rules.</b><p class="sub" style="margin:5px 0 0">Preserve two or more competing candidates, then run the cycle again. This gives the experiment designer something meaningful to compare.</p></div>';showToast('Discovery cycle needs two saved rules');return}
  const start=state.learnedRules.length,goal=state.goal;
- const before={values:JSON.stringify(state.values),stability:state.stability,goal:state.goal,rules:JSON.stringify(state.learnedRules)};
+ const before={values:JSON.stringify(state.values),stability:state.stability,goal:state.goal,rules:JSON.stringify(state.learnedRules),customTarget:JSON.stringify(state.customTarget),customStability:state.customStability};
  const reportsBefore=new Set(state.blindSpotReports);
  root.innerHTML='<div class="routebox"><b>Discovery cycle running</b><p class="sub" style="margin:5px 0 0">Stages 1–3: pattern scan, discriminating probes, adversarial challenge. Stages 4–10: holdout trial, paired baseline, cross-goal audit, rule stability, evidence ledger, next-experiment selection, and competing-rule adjudication. A final integrity check verifies core report creation and preservation of your working state.</p></div>';
  const stageErrors=[];
  for(const [stage,run] of [['conditional-pattern-scan',scanConditionalPatterns],['discriminating-experiment-design',designDiscriminatingExperiments],['anomaly-challenge-protocol',runAnomalyProtocol],['heldout-prometheus-trial',runPrometheusTrial],['paired-baseline-comparison',compareAgainstBaseline],['cross-goal-robustness-audit',auditAcrossGoals],['rule-stability-audit',runRuleStabilityAudit],['discovery-evidence-ledger',compileDiscoveryEvidenceLedger],['next-experiment-selection',selectNextExperiment],['rule-disagreement-adjudication',adjudicateRuleDisagreement]]){
   try{run()}catch(error){stageErrors.push({stage,message:String(error&&error.message||error).slice(0,240)});}
  }
- const audit=buildDiscoveryCycleAudit(before,{values:state.values,stability:state.stability,goal:state.goal,learnedRules:state.learnedRules},reportsBefore,state.blindSpotReports,goal,start,new Date().toISOString(),stageErrors);
+ const audit=buildDiscoveryCycleAudit(before,{values:state.values,stability:state.stability,goal:state.goal,learnedRules:state.learnedRules,customTarget:state.customTarget,customStability:state.customStability},reportsBefore,state.blindSpotReports,goal,start,new Date().toISOString(),stageErrors);
  const {missingReports:missing,statePreserved,passed}=audit;
  const adjudication=state.blindSpotReports.find(r=>r&&r.type==='rule-disagreement-adjudication'&&!reportsBefore.has(r));
  state.blindSpotReports.unshift(audit);state.blindSpotReports=state.blindSpotReports.slice(0,20);persist();
