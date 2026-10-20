@@ -41,6 +41,7 @@ const required = [
   ['Malformed archive entries are filtered', 'x.history.filter(validHistoryEntry)'],
   ['Oversized archives are bounded on restore', '.slice(-100)'],
   ['Discovery cycle requires fresh reports from this run', 'buildDiscoveryCycleAudit(before,'],
+  ['Discovery cycle summary uses audit contract', 'audit.requiredReports.length-missing.length'],
   ['Local persistence of research reports', 'blindSpotReports:state.blindSpotReports'],
   ['Export of research reports', 'blindSpotReports:current.blindSpotReports,methodology:']
 ];
