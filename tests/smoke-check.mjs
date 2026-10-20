@@ -108,6 +108,25 @@ for (const sample of [...holdA.slice(0,32), ...familiesA.flatMap(x=>x.samples.sl
     operationChecks++;
   }
 }
+const boundaryStates = [
+  {values:[0,0,0,0],stability:0},
+  {values:[100,100,100,100],stability:10},
+  {values:[0,100,0,100],stability:5},
+  {values:[100,0,100,0],stability:10},
+  {values:[50,50,50,50],stability:5}
+];
+for (const goal of ['balanced','concentrated','purified','stable','custom']) {
+  for (const sample of boundaryStates) {
+    const value = api.score(sample, goal);
+    assertModel(Number.isFinite(value) && value >= 0 && value <= 100, `alignment score stays within 0-100 for ${goal}`);
+  }
+}
+const edgeSample = {values:[0,100,0,100],stability:0};
+const edgeBefore = JSON.stringify(edgeSample);
+for (const op of api.ops) api.apply(edgeSample, op);
+assertModel(JSON.stringify(edgeSample) === edgeBefore, 'operations do not mutate their input state');
+const customScore = api.score({values:[65,35,70,8],stability:8}, 'custom');
+assertModel(customScore === 100, 'custom intention scores 100 at its exact target');
 const rule = {name:'smoke-test-rule',delta:[8,-4,3,-7],ds:1};
 const measureA = api.measurePrometheusRule(rule,holdA), measureB = api.measurePrometheusRule(rule,holdB);
 assertModel(JSON.stringify(measureA) === JSON.stringify(measureB), 'saved-rule scoring is repeatable on identical samples');
