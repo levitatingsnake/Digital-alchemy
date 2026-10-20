@@ -29,7 +29,7 @@ function clone(x){return JSON.parse(JSON.stringify(x))}
 function score(s,g=state.goal){const t=goals[g];let d=0;for(let i=0;i<4;i++)d+=Math.abs(s.values[i]-t.target[i])/100;d+=Math.abs(s.stability-t.stab)/10;return Math.round(Math.max(0,100-(d/5*100)))}
 function apply(s,op){
  let n=clone(s),v=n.values,explain='';
- if(op==='Separate'){let avg=(v[0]+v[1])/2;v[0]=clamp(v[0]+(v[0]>=v[1]?8:-8));v[1]=clamp(v[1]+(v[1]>=v[0]?-8:8));v[3]=clamp(v[3]+5);n.stability=Math.max(0,n.stability-1);explain='Pushed Sulphur and Mercury apart, increased Void by 5, and reduced stability by 1.'}
+ if(op==='Separate'){const sulphurHigher=v[0]>=v[1];v[0]=clamp(v[0]+(sulphurHigher?8:-8));v[1]=clamp(v[1]+(sulphurHigher?-8:8));v[3]=clamp(v[3]+5);n.stability=Math.max(0,n.stability-1);explain='Pushed Sulphur and Mercury apart, increased Void by 5, and reduced stability by 1.'}
  if(op==='Conjoin'){let avg=(v[0]+v[1])/2;v[0]=clamp(v[0]+(avg-v[0])*.35);v[1]=clamp(v[1]+(avg-v[1])*.35);v[2]=clamp(v[2]-3);v[3]=clamp(v[3]-5);n.stability=Math.min(10,n.stability+1);explain='Moved Sulphur and Mercury toward their mean, reduced Salt and Void slightly, and raised stability.'}
  if(op==='Distill'){v[0]=clamp(v[0]-4);v[1]=clamp(v[1]-3);v[2]=clamp(v[2]+8);v[3]=clamp(v[3]-7);n.stability=Math.min(10,n.stability+1);explain='Reduced the volatile components, increased Salt by 8, reduced Void by 7, and raised stability.'}
  if(op==='Fix'){v[0]=clamp(v[0]-2);v[1]=clamp(v[1]-2);v[2]=clamp(v[2]+4);v[3]=clamp(v[3]-4);n.stability=Math.min(10,n.stability+2);explain='Anchored the substrate: slightly reduced volatility, added Salt, lowered Void, and raised stability by 2.'}
@@ -49,13 +49,15 @@ function saveExperiment(title,start,ops,end){state.history.push({id:Date.now().t
 function invoke(op){if(running)return;const before=clone(state),r=apply(state,op);state.values=r.state.values;state.stability=r.state.stability;state.route=null;addTrace(op,before,r.state,r.explain);saveExperiment(op,before,[op],r.state);renderStats();updateSummary();renderTrace();document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none';}
 function key(s){return [...s.values,s.stability].join(',')}
 function findRoute(){
- const start={values:state.values.slice(),stability:state.stability};const initialScore=score(start);const maxDepth=6;let queue=[{s:start,path:[]}],seen=new Set([key(start)]),best=queue[0],bestScore=initialScore,found=null;let examined=0;
+ const start={values:state.values.slice(),stability:state.stability};const initialScore=score(start);const maxDepth=6;
+ if(initialScore>=95){state.route=null;document.getElementById('routeResult').textContent='Already at '+initialScore+'% alignment. Your current state meets the 95% target, so no operations are needed. Change the goal or adjust the substrate to explore another route.';document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none';return}
+ let queue=[{s:start,path:[]}],seen=new Set([key(start)]),best=queue[0],bestScore=initialScore,found=null;let examined=0;
  while(queue.length){const cur=queue.shift(),sc=score(cur.s);examined++;if(sc>bestScore){best=cur;bestScore=sc}if(sc>=95&&cur.path.length){found=cur;break}if(cur.path.length>=maxDepth)continue;
  for(const op of ops){const ns=apply(cur.s,op).state,k=key(ns);if(seen.has(k))continue;seen.add(k);queue.push({s:ns,path:cur.path.concat(op)})}
  if(examined>15000)break;
  }
  const candidate=found||best;
- if(!candidate.path.length){document.getElementById('routeResult').textContent='The current state is already the best match found within the search. Try a different goal or adjust the substrate.';document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none';state.route=null;return}
+ if(!candidate.path.length){document.getElementById('routeResult').textContent='No improving sequence was found within six operations. Try a different goal or adjust the substrate.';document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none';state.route=null;return}
  state.route={path:candidate.path,goal:state.goal,start:clone(start),end:clone(candidate.s),score:score(candidate.s),found:!!found};document.getElementById('routeResult').textContent=(found?'Found a route reaching at least 95% alignment. ':'Best route found within six operations. ')+'Checked '+examined.toLocaleString()+' candidate states; projected alignment '+score(candidate.s)+'%.';
  document.getElementById('routePath').innerHTML=candidate.path.map((o,i)=>'<span class="chip">'+(i+1)+'. '+o+'</span>').join('');document.getElementById('runRoute').style.display='block';
 }
@@ -64,7 +66,7 @@ function replayHistory(id){const h=state.history.find(x=>x.id===id);if(!h)return
 function restoreHistory(id){const h=state.history.find(x=>x.id===id);if(!h)return;state.values=h.end.values.slice();state.stability=h.end.stability;state.goal=h.goal||state.goal;state.route=null;renderStats();updateSummary();persist();showToast('Saved final state restored')}
 document.querySelectorAll('[data-op]').forEach(b=>b.addEventListener('click',()=>invoke(b.dataset.op)));
 document.getElementById('goal').addEventListener('change',e=>{state.goal=e.target.value;state.route=null;updateSummary();persist();document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none'});
-document.getElementById('stability').addEventListener('input',e=>{state.stability=+e.target.value;updateSummary();state.route=null;persist()});
+document.getElementById('stability').addEventListener('input',e=>{state.stability=+e.target.value;updateSummary();state.route=null;document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none';document.getElementById('routeResult').textContent='Substrate changed. Find a fresh route.';persist()});
 document.getElementById('findRoute').addEventListener('click',findRoute);
 document.getElementById('runRoute').addEventListener('click',runRoute);
 document.getElementById('resetState').addEventListener('click',()=>{if(!confirm('Reset the substrate to its starting values? Your experiment archive will remain.'))return;state.values=[50,50,50,20];state.stability=4;state.route=null;renderStats();updateSummary();persist();showToast('Substrate reset')});
