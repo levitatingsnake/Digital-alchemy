@@ -1,0 +1,55 @@
+name: Digital Alchemy Overnight Lab
+
+on:
+  schedule:
+    # 02:30 New Zealand daylight time (UTC+13); adjust seasonally if needed.
+    - cron: '30 13 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/overnight-lab.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digital-alchemy-overnight-lab
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    name: Run deterministic discovery benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run existing smoke checks
+        run: node tests/smoke-check.mjs
+      - name: Run overnight benchmark
+        run: node tests/overnight-benchmark.mjs
+      - name: Publish concise report to job summary
+        if: always()
+        run: |
+          if [ -f reports/overnight-latest.md ]; then
+            cat reports/overnight-latest.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## Digital Alchemy Overnight Lab" >> "$GITHUB_STEP_SUMMARY"
+            echo "Benchmark did not produce a report. Inspect the failed step logs." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Store machine-readable and human-readable reports
+        if: always() && hashFiles('reports/overnight-latest.json', 'reports/overnight-latest.md') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: digital-alchemy-overnight-lab-${{ github.run_number }}
+          path: |
+            reports/overnight-latest.json
+            reports/overnight-latest.md
+          retention-days: 30
