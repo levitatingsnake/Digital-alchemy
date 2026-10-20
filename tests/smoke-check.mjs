@@ -91,9 +91,11 @@ const modelSource = [
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
   functionBlock('runDiscoveryCycle', 'designDiscriminatingExperiments'),
+  functionBlock('persist', 'setStatus'),
+  functionBlock('load', 'showToast'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -126,6 +128,23 @@ sandbox.designDiscriminatingExperiments=()=>{cycleStageCalls.push('discriminatin
 vm.runInContext('runDiscoveryCycle()',sandbox,{timeout:3000});
 const failedRunAudit=api.state.blindSpotReports.find(r=>r.type==='discovery-cycle-audit');
 assertModel(cycleStageCalls.length===3 && failedRunAudit && failedRunAudit.passed===false && failedRunAudit.stageErrors[0].stage==='discriminating-experiment-design', 'full discovery cycle records stage exceptions and continues remaining stages');
+let savedWorkspace = null;
+sandbox.localStorage = {getItem:()=>savedWorkspace,setItem:(_key,value)=>{savedWorkspace=value;}};
+sandbox.setStatus = () => {};
+api.state.values=[11,22,33,44];api.state.stability=6;api.state.goal='balanced';
+api.state.customTarget=[65,35,70,8];api.state.customStability=8;
+api.state.history=[{id:'persist-1',title:'Round-trip',time:'2026-10-20',ops:['Separate'],start:{values:[10,20,30,40],stability:5},end:{values:[11,21,31,41],stability:5},score:72}];
+api.state.trace=[{op:'Separate',before:[10,20,30,40],after:[11,21,31,41],score:72}];
+api.state.learnedRules=[{name:'Round-trip rule',delta:[1,1,1,1],ds:0}];
+api.state.integrityReports=[{passed:true}];api.state.prometheusReports=[{verdict:'ROBUST IN THIS TEST'}];api.state.lawForgeReports=[{generation:1}];api.state.blindSpotReports=[{type:'anomaly-challenge-protocol'}];
+vm.runInContext('persist()',sandbox,{timeout:3000});
+const savedPayload=JSON.parse(savedWorkspace);
+api.state.values=[0,0,0,0];api.state.history=[];api.state.trace=[];api.state.learnedRules=[];api.state.integrityReports=[];api.state.prometheusReports=[];api.state.lawForgeReports=[];api.state.blindSpotReports=[];
+vm.runInContext('load()',sandbox,{timeout:3000});
+assertModel(JSON.stringify(api.state.values)==='[11,22,33,44]' && api.state.stability===6, 'workspace values and stability survive save/load round trip');
+assertModel(api.state.history.length===1 && api.state.trace.length===1 && api.state.learnedRules.length===1, 'experiment ledger, trace and saved rules survive save/load round trip');
+assertModel(['integrityReports','prometheusReports','lawForgeReports','blindSpotReports'].every(k=>api.state[k].length===1), 'all research report families survive save/load round trip');
+assertModel(savedPayload.customTarget.length===4 && savedPayload.customStability===8, 'custom goal settings are included in local persistence');
 const cycleGoal = 'balanced';
 const cycleTypes = ['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
 const cycleReports = cycleTypes.map(type=>({type,goal:cycleGoal}));
