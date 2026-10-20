@@ -214,9 +214,9 @@ function runDiscoveryCycle(){
  const start=state.learnedRules.length,goal=state.goal;
  const before={values:JSON.stringify(state.values),stability:state.stability,goal:state.goal,rules:JSON.stringify(state.learnedRules)};
  const reportsBefore=new Set(state.blindSpotReports);
- root.innerHTML='<div class="routebox"><b>Discovery cycle running</b><p class="sub" style="margin:5px 0 0">Stage 1: conditional patterns · Stage 2: discriminating probes · Stage 3: adversarial challenge. A final integrity check will verify report creation and preservation of your working state.</p></div>';
+ root.innerHTML='<div class="routebox"><b>Discovery cycle running</b><p class="sub" style="margin:5px 0 0">Stages 1–3: pattern scan, discriminating probes, adversarial challenge. Stages 4–9: holdout trial, paired baseline, cross-goal audit, rule stability, evidence ledger, and next-experiment selection. A final integrity check verifies core report creation and preservation of your working state.</p></div>';
  const stageErrors=[];
- for(const [stage,run] of [['conditional-pattern-scan',scanConditionalPatterns],['discriminating-experiment-design',designDiscriminatingExperiments],['anomaly-challenge-protocol',runAnomalyProtocol]]){
+ for(const [stage,run] of [['conditional-pattern-scan',scanConditionalPatterns],['discriminating-experiment-design',designDiscriminatingExperiments],['anomaly-challenge-protocol',runAnomalyProtocol],['heldout-prometheus-trial',runPrometheusTrial],['paired-baseline-comparison',compareAgainstBaseline],['cross-goal-robustness-audit',auditAcrossGoals],['rule-stability-audit',runRuleStabilityAudit],['discovery-evidence-ledger',compileDiscoveryEvidenceLedger],['next-experiment-selection',selectNextExperiment]]){
   try{run()}catch(error){stageErrors.push({stage,message:String(error&&error.message||error).slice(0,240)});}
  }
  const audit=buildDiscoveryCycleAudit(before,{values:state.values,stability:state.stability,goal:state.goal,learnedRules:state.learnedRules},reportsBefore,state.blindSpotReports,goal,start,new Date().toISOString(),stageErrors);
