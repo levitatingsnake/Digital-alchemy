@@ -28,6 +28,8 @@ const required = [
   ['Paired baseline comparison button', 'id="compareBaseline"'],
   ['Cross-goal audit button', 'id="crossGoalAudit"'],
   ['Discovery Evidence Ledger button', 'id="compileEvidenceLedger"'],
+  ['Next experiment selector button', 'id="selectNextExperiment"'],
+  ['Next experiment selector wiring', "getElementById('selectNextExperiment').addEventListener('click',selectNextExperiment)"],
   ['Discovery Evidence Ledger button wiring', "getElementById('compileEvidenceLedger').addEventListener('click',compileDiscoveryEvidenceLedger)"],
   ['Cross-goal audit button wiring', "getElementById('crossGoalAudit').addEventListener('click',auditAcrossGoals)"],
   ['Paired baseline comparison button wiring', "getElementById('compareBaseline').addEventListener('click',compareAgainstBaseline)"],
@@ -96,6 +98,7 @@ const modelSource = [
   functionBlock('buildBaselineComparison', 'buildCrossGoalAudit'),
   functionBlock('buildCrossGoalAudit', 'compareAgainstBaseline'),
   functionBlock('buildDiscoveryEvidenceLedger', 'compileDiscoveryEvidenceLedger'),
+  functionBlock('buildNextExperimentPlan', 'selectNextExperiment'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
@@ -104,7 +107,7 @@ const modelSource = [
   functionBlock('load', 'showToast'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,buildDiscoveryEvidenceLedger,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,buildNextExperimentPlan,buildDiscoveryEvidenceLedger,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -114,6 +117,16 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
+const activeRules=[{name:'fragile-rule',delta:[-8,2,0,0],ds:-2},{name:'untested-rule',delta:[0,0,8,-3],ds:1},{name:'promising-rule',delta:[1,1,-1,1],ds:0}];
+const activeLedger={rules:[{name:'fragile-rule',status:'FRAGILE OR CONTRADICTED',measurementCount:4,positiveMeasurements:1,negativeMeasurements:3},{name:'promising-rule',status:'REPEATEDLY POSITIVE IN RECORDED TESTS',measurementCount:5,positiveMeasurements:5,negativeMeasurements:0}]};
+const activeSamples=Array.from({length:64},(_,i)=>({values:[(i*17)%101,(i*31)%101,(i*47)%101,(i*61)%101],stability:i%11}));
+const activeSamplesBefore=JSON.stringify(activeSamples);
+const activeA=api.buildNextExperimentPlan(activeRules,activeSamples,activeLedger,'balanced');
+const activeB=api.buildNextExperimentPlan(activeRules,activeSamples,activeLedger,'balanced');
+assertModel(activeA.priorityRules[0].name==='fragile-rule'&&activeA.priorityRules[1].name==='untested-rule', 'next experiment selector prioritises fragile and under-tested rules');
+assertModel(activeA.probes.length===8&&activeA.probes.every((p,i)=>i===0||activeA.probes[i-1].spread>=p.spread), 'next experiment selector returns eight probes ranked by prediction disagreement');
+assertModel(new Set(activeA.probes.map(p=>p.sample.values.join(',')+'/'+p.sample.stability)).size===activeA.probes.length, 'next experiment selector keeps probe states distinct');
+assertModel(JSON.stringify(activeA)===JSON.stringify(activeB)&&JSON.stringify(activeSamples)===activeSamplesBefore, 'next experiment plan is deterministic and does not mutate candidate samples');
 const ledgerProm=[
  {type:'prometheus-trial',timestamp:'t1',results:[{name:'rule-a',holdoutMean:2,holdoutWinRate:70,worst:-2,verdict:'ROBUST IN THIS TEST'},{name:'rule-b',holdoutMean:-1,holdoutWinRate:30,worst:-12,verdict:'DOES NOT GENERALISE'}]},
  {type:'paired-baseline-comparison',timestamp:'t2',rules:[{name:'rule-a',mean:1.5,winRate:65,worst:-3},{name:'rule-b',mean:-0.5,winRate:40,worst:-10}]},
