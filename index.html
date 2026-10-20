@@ -162,12 +162,20 @@ function runDiscoveryCycle(){
  const root=document.getElementById('discoveryCycleResults');
  if(state.learnedRules.length<2){root.innerHTML='<div class="routebox"><b>Cycle requires at least two saved rules.</b><p class="sub" style="margin:5px 0 0">Preserve two or more competing candidates, then run the cycle again. This gives the experiment designer something meaningful to compare.</p></div>';showToast('Discovery cycle needs two saved rules');return}
  const start=state.learnedRules.length,goal=state.goal;
- root.innerHTML='<div class="routebox"><b>Discovery cycle running</b><p class="sub" style="margin:5px 0 0">Stage 1: conditional patterns · Stage 2: discriminating probes · Stage 3: adversarial challenge. Your current state and saved rules will not be changed.</p></div>';
+ const before={values:JSON.stringify(state.values),stability:state.stability,goal:state.goal,rules:JSON.stringify(state.learnedRules)};
+ const reportIds=new Set(state.blindSpotReports.map(r=>r.type));
+ root.innerHTML='<div class="routebox"><b>Discovery cycle running</b><p class="sub" style="margin:5px 0 0">Stage 1: conditional patterns · Stage 2: discriminating probes · Stage 3: adversarial challenge. A final integrity check will verify report creation and preservation of your working state.</p></div>';
  scanConditionalPatterns();
  designDiscriminatingExperiments();
  runAnomalyProtocol();
- const latest=state.blindSpotReports.filter(x=>x.goal===goal).slice(0,3);
- root.innerHTML='<div class="routebox"><b>Cycle complete · '+start+' saved rules · goal: '+esc(goalConfig(goal).label)+'</b><p class="sub" style="margin:5px 0 0">Three analysis stages have run. Reports are saved locally and included in JSON export. The current symbolic state and rule library were not modified.</p></div><div class="traceitem"><b>Stage 1 · Conditional pattern scan</b><p>Searches for state features associated with different rule outcomes, then checks selected patterns on held-out synthetic states.</p></div><div class="traceitem"><b>Stage 2 · Discriminating experiment design</b><p>Ranks synthetic probes where saved rules disagree most strongly in predicted alignment gain.</p></div><div class="traceitem"><b>Stage 3 · Anomaly challenge</b><p>Compares rule behaviour in a targeted weak region against a broad synthetic control set.</p></div><p class="sub">Evidence boundary: all three stages operate inside the current symbolic scoring model. A complete run is a connected research workflow, not proof of real-world discovery. Export your data to preserve a portable record.</p>';
+ const created=state.blindSpotReports.filter(r=>!reportIds.has(r.type));
+ const required=['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
+ const missing=required.filter(type=>!state.blindSpotReports.some(r=>r.type===type&&r.goal===goal));
+ const statePreserved=before.values===JSON.stringify(state.values)&&before.stability===state.stability&&before.goal===state.goal&&before.rules===JSON.stringify(state.learnedRules);
+ const passed=missing.length===0&&statePreserved;
+ const audit={timestamp:new Date().toISOString(),type:'discovery-cycle-audit',goal,ruleCount:start,requiredReports:required,missingReports:missing,statePreserved,passed};
+ state.blindSpotReports.unshift(audit);state.blindSpotReports=state.blindSpotReports.slice(0,20);persist();
+ root.innerHTML='<div class="routebox"><b>Cycle complete · '+start+' saved rules · '+(passed?'INTEGRITY CHECK PASSED':'INTEGRITY CHECK NEEDS REVIEW')+'</b><p class="sub" style="margin:5px 0 0">Goal: '+esc(goalConfig(goal).label)+'. Required reports present: '+(required.length-missing.length)+' / '+required.length+'. Current values, stability, goal and saved rule library preserved: '+(statePreserved?'yes':'no')+'. Reports are saved locally and included in JSON export.</p></div><div class="traceitem"><b>Stage 1 · Conditional pattern scan</b><p>Searches for state features associated with different rule outcomes, then checks selected patterns on held-out synthetic states.</p></div><div class="traceitem"><b>Stage 2 · Discriminating experiment design</b><p>Ranks synthetic probes where saved rules disagree most strongly in predicted alignment gain.</p></div><div class="traceitem"><b>Stage 3 · Anomaly challenge</b><p>Compares rule behaviour in a targeted weak region against a broad synthetic control set.</p></div><p class="sub">Evidence boundary: this audit checks that expected report types exist and your working state remains unchanged. It does not prove the scientific validity of the patterns. All three stages operate inside the current symbolic scoring model.</p>';
  showToast('Discovery cycle complete');
 }
 function designDiscriminatingExperiments(){
