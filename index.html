@@ -55,7 +55,7 @@ function discoverRules(){
   const r=top[+btn.dataset.hypothesis],before=clone(state);
   state.values=r.next.values.slice();state.stability=r.next.stability;state.route=null;
   addTrace('Hypothesis '+(+btn.dataset.hypothesis+1),before,state,'Tested a generated candidate rule with component shifts '+r.delta.join(', ')+'. Alignment changed from '+score(before)+'% to '+score(state)+'%. This is an experimental heuristic, not a physical law.');
-  saveExperiment('Hypothesis test '+(+btn.dataset.hypothesis+1),before,['Hypothesis '+(+btn.dataset.hypothesis+1)],state);
+  saveExperiment('Hypothesis test '+(+btn.dataset.hypothesis+1),before,['Hypothesis '+(+btn.dataset.hypothesis+1)],{values:state.values.slice(),stability:state.stability});
   renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Hypothesis tested and recorded');
  }));
 }
