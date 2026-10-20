@@ -229,6 +229,16 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Complete nine-stage research cycle (2026-10-20)
+
+- Expanded the existing Discovery Cycle button into a nine-stage orchestrator.
+- Stages: conditional pattern scan; discriminating experiment design; adversarial anomaly challenge; held-out Prometheus trial; paired comparison against do-nothing; cross-goal robustness audit; rule stability audit; evidence-ledger compilation; next-experiment selection.
+- Each stage is isolated with error capture, so one failure is recorded and the remaining stages are still attempted.
+- The existing cycle integrity audit still requires fresh outputs from the three foundational discovery stages, rejects stale reports, and verifies that the current substrate, stability, goal, and saved rule library remain unchanged.
+- Prometheus trial reports now carry an explicit `prometheus-trial` type, allowing the report generator and evidence ledger to recognise them reliably.
+- Smoke tests now mock and verify all nine stages, including continuation after a simulated stage failure.
+- All generated evidence remains synthetic and scoring-model-dependent; this workflow is a repeatable internal research protocol, not external validation.
+
 ### Evidence-aware research report export (2026-10-20)
 
 - Added a **Research report** export alongside the existing full JSON experiment export.
