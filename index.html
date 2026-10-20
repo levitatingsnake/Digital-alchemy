@@ -163,7 +163,7 @@ document.getElementById('runRoute').addEventListener('click',runRoute);
 document.getElementById('resetState').addEventListener('click',()=>{if(!confirm('Reset the substrate to its starting values? Your experiment archive will remain.'))return;state.values=[50,50,50,20];state.stability=4;state.route=null;renderStats();updateSummary();persist();showToast('Substrate reset')});
 document.getElementById('clearTrace').addEventListener('click',()=>{state.trace=[];renderTrace();persist()});
 document.getElementById('clearHistory').addEventListener('click',()=>{if(!confirm('Delete the saved experiment archive on this device?'))return;state.history=[];renderHistory();persist()});
-document.getElementById('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'Digital Alchemy Lab',version:1,exportedAt:new Date().toISOString(),state:{values:state.values,stability:state.stability,goal:state.goal},history:state.history,trace:state.trace},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='digital-alchemy-experiments.json';a.click();URL.revokeObjectURL(a.href);showToast('Export prepared')});
-load();renderStats();renderTargetControls();updateSummary();renderTrace();renderHistory();
+document.getElementById('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'Digital Alchemy Lab',version:1,exportedAt:new Date().toISOString(),state:{values:state.values,stability:state.stability,goal:state.goal},history:state.history,trace:state.trace,learnedRules:state.learnedRules},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='digital-alchemy-experiments.json';a.click();URL.revokeObjectURL(a.href);showToast('Export prepared')});
+load();renderStats();renderTargetControls();updateSummary();renderTrace();renderHistory();renderKeptRules();
 })();
 </script></body></html>
