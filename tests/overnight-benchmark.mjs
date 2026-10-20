@@ -137,6 +137,12 @@ function searchWithStateDeduplication(start, goal, maxDepth = 3) {
   };
 }
 
+function replayRoute(start, route) {
+  let current = start;
+  for (const op of route) current = api.apply(current, op).state;
+  return current;
+}
+
 function greedyOneStep(start, goal) {
   let best = { score: api.score(start, goal), route: [], state: start };
   for (const op of api.ops) {
@@ -170,6 +176,12 @@ function runBenchmark() {
     const searched = search(testCase.start, testCase.goal, 3);
     const deduplicated = searchWithStateDeduplication(testCase.start, testCase.goal, 3);
     assert(deduplicated.score === searched.score, `state deduplication preserves optimal bounded-search score for ${testCase.id}`);
+    const replayedSearchState = replayRoute(testCase.start, searched.route);
+    const replayedDeduplicatedState = replayRoute(testCase.start, deduplicated.route);
+    assert(stateKey(replayedSearchState) === stateKey(searched.state), `selected search route reproduces its recorded state for ${testCase.id}`);
+    assert(api.score(replayedSearchState, testCase.goal) === searched.score, `selected search route reproduces its recorded score for ${testCase.id}`);
+    assert(stateKey(replayedDeduplicatedState) === stateKey(deduplicated.state), `deduplicated route reproduces its recorded state for ${testCase.id}`);
+    assert(api.score(replayedDeduplicatedState, testCase.goal) === deduplicated.score, `deduplicated route reproduces its recorded score for ${testCase.id}`);
     return {
       id: testCase.id,
       seed: testCase.seed,
