@@ -37,6 +37,9 @@ const required = [
   ['Saved history validation', 'x.history.filter(validHistoryEntry)'],
   ['Saved trace validation', 'x.trace.filter(validTraceEntry)'],
   ['Saved rule validation', 'x.learnedRules.filter(validRule)'],
+  ['Saved snapshot validation', 'function validSnapshot(x)'],
+  ['Malformed archive entries are filtered', 'x.history.filter(validHistoryEntry)'],
+  ['Oversized archives are bounded on restore', '.slice(-100)'],
   ['Discovery cycle requires fresh reports from this run', 'const missing=required.filter(type=>!createdTypes.has(type))'],
   ['Local persistence of research reports', 'blindSpotReports:state.blindSpotReports'],
   ['Export of research reports', 'blindSpotReports:state.blindSpotReports,methodology:']
@@ -80,7 +83,8 @@ const modelSource = [
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies};'
+  functionBlock('validVector', 'load'),
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -90,6 +94,18 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
+const goodSnapshot = {values:[10,20,30,40],stability:5};
+const goodHistory = {id:'abc',title:'Test',time:'2026-10-20',ops:['Separate'],start:goodSnapshot,end:goodSnapshot,score:50};
+assertModel(api.validSnapshot(goodSnapshot), 'valid saved snapshot is accepted');
+assertModel(!api.validSnapshot({values:[10,20,NaN,40],stability:5}), 'snapshot containing NaN is rejected');
+assertModel(!api.validSnapshot({values:[10,20,30,101],stability:5}), 'snapshot outside model bounds is rejected');
+assertModel(api.validHistoryEntry(goodHistory), 'well-formed history record is accepted');
+assertModel(!api.validHistoryEntry({...goodHistory,ops:['not-an-operation']}), 'history record with unknown operation is rejected');
+assertModel(!api.validHistoryEntry({...goodHistory,end:{values:[1],stability:5}}), 'history record with malformed ending state is rejected');
+assertModel(api.validTraceEntry({op:'Separate',before:[1,2,3,4],after:[2,3,4,5],score:50}), 'well-formed trace record is accepted');
+assertModel(!api.validTraceEntry({op:'Separate',before:[1,2],after:[2,3,4,5],score:50}), 'trace record with malformed vector is rejected');
+assertModel(api.validRule({name:'rule',delta:[1,2,3,4],ds:1}), 'well-formed saved rule is accepted');
+assertModel(!api.validRule({name:'rule',delta:[1,2,3,NaN],ds:1}), 'saved rule containing NaN is rejected');
 const holdA = api.buildPrometheusHoldout();
 const holdB = api.buildPrometheusHoldout();
 assertModel(holdA.length === 128, 'holdout contains 128 samples');
