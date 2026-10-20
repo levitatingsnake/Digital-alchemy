@@ -726,14 +726,24 @@ function renderKeptRules(){
   out.innerHTML='<p class="sub">Library re-tested against 64 repeatable sample states per rule using the current goal. Rankings are goal-relative and deterministic, not proof of a universal law.</p>'+ranked.map((x,rank)=>'<div class="traceitem"><b>#'+(rank+1)+' · '+x.r.name+'</b><p>'+x.stats.winRate+'% positive outcomes · '+(x.stats.mean>=0?'+':'')+x.stats.mean+' mean alignment gain · worst loss '+x.stats.worst+' points</p><p>Rule: S '+signed(x.r.delta[0])+' · M '+signed(x.r.delta[1])+' · Salt '+signed(x.r.delta[2])+' · Void '+signed(x.r.delta[3])+' · stability '+signed(x.r.ds)+'</p></div>').join('');
   showToast('Compared '+ranked.length+' saved rules across 64 states each');
  });
- root.querySelectorAll('[data-apply-kept]').forEach(btn=>btn.addEventListener('click',()=>{
-  const r=state.learnedRules[+btn.dataset.applyKept],before={values:state.values.slice(),stability:state.stability};
-  const next={values:state.values.map((x,i)=>clamp(x+r.delta[i])),stability:Math.max(0,Math.min(10,state.stability+r.ds))};
-  const beforeScore=score(state),afterScore=score(next);
-  applyCandidate({next},'Saved '+r.name,24);
-  const predicted=beforeScore===afterScore?'Alignment unchanged':afterScore>beforeScore?'Alignment improved by '+(afterScore-beforeScore)+' points':'Alignment fell by '+(beforeScore-afterScore)+' points';
-  showToast(r.name+' applied · '+predicted);
- }));
+ root.onclick=function(event){
+  const btn=event.target.closest('[data-apply-kept]');
+  if(btn&&root.contains(btn)){
+   event.preventDefault();
+   const index=Number(btn.getAttribute('data-apply-kept')),r=state.learnedRules[index];
+   if(!r||!Array.isArray(r.delta)||r.delta.length!==4||!Number.isFinite(r.ds)){showToast('This saved rule is invalid. Discard it and preserve the rule again.');return}
+   const next={values:state.values.map((x,i)=>clamp(x+r.delta[i])),stability:Math.max(0,Math.min(10,state.stability+r.ds))};
+   const beforeScore=score(state),afterScore=score(next);
+   try{
+    applyCandidate({next},'Saved '+r.name,24);
+    const predicted=beforeScore===afterScore?'Alignment unchanged':afterScore>beforeScore?'Alignment improved by '+(afterScore-beforeScore)+' points':'Alignment fell by '+(beforeScore-afterScore)+' points';
+    showToast(r.name+' applied · '+predicted);
+   }catch(error){console.error('Apply saved rule failed',error);showToast('Rule could not be applied. Check the experiment trace for details.')}
+   return;
+  }
+  const removeBtn=event.target.closest('[data-remove-kept]');
+  if(removeBtn&&root.contains(removeBtn)){event.preventDefault();const index=Number(removeBtn.getAttribute('data-remove-kept'));if(!state.learnedRules[index])return;state.learnedRules.splice(index,1);persist();renderKeptRules();showToast('Rule discarded');return}
+ };
  root.querySelectorAll('[data-remove-kept]').forEach(btn=>btn.addEventListener('click',()=>{
   state.learnedRules.splice(+btn.dataset.removeKept,1);persist();renderKeptRules();showToast('Rule discarded');
  }));
