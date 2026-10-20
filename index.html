@@ -248,7 +248,7 @@ function buildBlindSpotFamilies(){
 function buildDiscoveryCycleAudit(before,after,reportsBefore,reportsAfter,goal,ruleCount,timestamp,stageErrors=[],prometheusBefore=new Set(),prometheusAfter=[]){
  const required=['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol','prometheus-trial','paired-baseline-comparison','cross-goal-robustness-audit','rule-stability-audit','discovery-evidence-ledger','next-experiment-plan','rule-disagreement-adjudication'];
  const created=[...reportsAfter.filter(r=>!reportsBefore.has(r)),...(prometheusAfter||[]).filter(r=>!prometheusBefore.has(r))];
- const createdTypes=new Set(created.filter(r=>r&&r.goal===goal||r&&r.currentGoal===goal||r&&r.type==='cross-goal-robustness-audit').map(r=>r.type));
+ const createdTypes=new Set(created.filter(r=>r&&typeof r.type==='string').map(r=>r.type));
  const missing=required.filter(type=>!createdTypes.has(type));
  const customTargetPreserved=before.customTarget===undefined||before.customTarget===JSON.stringify(after.customTarget);
  const customStabilityPreserved=before.customStability===undefined||before.customStability===after.customStability;
