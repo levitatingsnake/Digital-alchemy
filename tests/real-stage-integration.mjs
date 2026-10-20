@@ -7,7 +7,7 @@ const scriptStart = html.indexOf('<script>');
 const scriptEnd = html.indexOf('</script>', scriptStart);
 assert.ok(scriptStart >= 0 && scriptEnd > scriptStart, 'application inline script exists');
 let script = html.slice(scriptStart + '<script>'.length, scriptEnd);
-const bridge = 'globalThis.__digitalAlchemyTest = { state, runDiscoveryCycle };\\n';
+const bridge = 'globalThis.__digitalAlchemyTest = { state, runDiscoveryCycle };\n';
 const close = script.lastIndexOf('})();');
 assert.ok(close >= 0, 'application IIFE can be located');
 script = script.slice(0, close) + bridge + script.slice(close);
