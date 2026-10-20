@@ -229,6 +229,14 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Alternative route evidence (2026-10-20)
+
+- Test briefs now compare the primary route with the strongest distinct endpoint states found by a separate bounded search through four operations.
+- Each alternative reports its operation sequence, endpoint component values, stability, model alignment, and score-point change from the starting state.
+- The panel reports how many states were checked and clearly distinguishes model score from real-world effectiveness.
+- Search is deterministic under the current model and bounded to keep interaction responsive; it is not exhaustive over unlimited sequences.
+- Smoke checks now cover the comparison function, alternative panel, and score delta.
+
 ### Intention-to-test-brief workflow (2026-10-20)
 
 - Added a plain-language intention field and an explicit model-interpretation selector.
