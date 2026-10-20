@@ -250,7 +250,7 @@ function buildRuleRefinement(rule,samples){
   if(axis<4)candidate.delta[axis]=Math.max(-24,Math.min(24,candidate.delta[axis]+step));
   else candidate.ds=Math.max(-5,Math.min(5,candidate.ds+(step<0?-1:1)));
   if(candidate.delta.every((v,i)=>v===rule.delta[i])&&candidate.ds===rule.ds)continue;
-  if(variants.some(v=>v.delta.join(',')===candidate.delta.join(',')&&v.ds===candidate.ds))continue;
+  if(variants.some(v=>v.candidate.delta.join(',')===candidate.delta.join(',')&&v.candidate.ds===candidate.ds))continue;
   const stats=measurePrometheusRule(candidate,samples);
   variants.push({candidate,stats});
  }
