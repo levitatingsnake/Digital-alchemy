@@ -91,7 +91,7 @@ const exportHelper = applicationScript.slice(exportHelperStart, exportHelperEnd)
 const modelSource = [
   applicationScript.slice(coreStart, coreEnd),
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
-  functionBlock('buildBaselineComparison', 'compareAgainstBaseline'),
+  functionBlock('buildBaselineComparison', 'buildCrossGoalAudit'),
   functionBlock('buildCrossGoalAudit', 'compareAgainstBaseline'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
