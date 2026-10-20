@@ -27,6 +27,8 @@ const required = [
   ['Discovery Cycle panel', '00F / DISCOVERY CYCLE'],
   ['Paired baseline comparison button', 'id="compareBaseline"'],
   ['Cross-goal audit button', 'id="crossGoalAudit"'],
+  ['Discovery Evidence Ledger button', 'id="compileEvidenceLedger"'],
+  ['Discovery Evidence Ledger button wiring', "getElementById('compileEvidenceLedger').addEventListener('click',compileDiscoveryEvidenceLedger)"],
   ['Cross-goal audit button wiring', "getElementById('crossGoalAudit').addEventListener('click',auditAcrossGoals)"],
   ['Paired baseline comparison button wiring', "getElementById('compareBaseline').addEventListener('click',compareAgainstBaseline)"],
   ['Pattern Vault panel', '00D / PATTERN VAULT'],
@@ -93,6 +95,7 @@ const modelSource = [
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
   functionBlock('buildBaselineComparison', 'buildCrossGoalAudit'),
   functionBlock('buildCrossGoalAudit', 'compareAgainstBaseline'),
+  functionBlock('buildDiscoveryEvidenceLedger', 'compileDiscoveryEvidenceLedger'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
@@ -101,7 +104,7 @@ const modelSource = [
   functionBlock('load', 'showToast'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,buildDiscoveryEvidenceLedger,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -111,6 +114,17 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
+const ledgerProm=[
+ {type:'prometheus-trial',timestamp:'t1',results:[{name:'rule-a',holdoutMean:2,holdoutWinRate:70,worst:-2,verdict:'ROBUST IN THIS TEST'},{name:'rule-b',holdoutMean:-1,holdoutWinRate:30,worst:-12,verdict:'DOES NOT GENERALISE'}]},
+ {type:'paired-baseline-comparison',timestamp:'t2',rules:[{name:'rule-a',mean:1.5,winRate:65,worst:-3},{name:'rule-b',mean:-0.5,winRate:40,worst:-10}]},
+ {type:'cross-goal-robustness-audit',timestamp:'t3',summaries:[{name:'rule-a',meanAcrossGoals:1.2,positiveGoals:4,weakestGoal:'Purified',weakestMean:-0.2,goals:[{worst:-3},{worst:-2}]},{name:'rule-b',meanAcrossGoals:-1,positiveGoals:1,weakestGoal:'Stable',weakestMean:-4,goals:[{worst:-12},{worst:-10}]}]}
+];
+const ledgerBlind=[{timestamp:'t4',rules:[{name:'rule-a',weakestMean:-2,weakest:'Low-value states'},{name:'rule-b',weakestMean:-12,weakest:'Saturation boundaries'}]}];
+const ledger=api.buildDiscoveryEvidenceLedger(ledgerProm,ledgerBlind,[{name:'rule-a'},{name:'rule-b'},{name:'untested'}]);
+assertModel(ledger.type==='discovery-evidence-ledger'&&ledger.ruleCount===3, 'evidence ledger includes saved rules and historical evidence');
+assertModel(ledger.rules.find(r=>r.name==='rule-a').measurementCount===3&&ledger.rules.find(r=>r.name==='rule-a').sources.includes('Cross-goal audit'), 'evidence ledger aggregates multiple test families for each rule');
+assertModel(ledger.rules.find(r=>r.name==='rule-b').status==='FRAGILE OR CONTRADICTED'&&ledger.rules.find(r=>r.name==='untested').status==='INSUFFICIENT EVIDENCE', 'evidence ledger flags counterevidence and avoids overstating untested rules');
+assertModel(api.buildDiscoveryEvidenceLedger([{type:'discovery-evidence-ledger',rules:[{name:'rule-a',mean:99}]}],[],[]).ruleCount===0, 'evidence ledger does not recursively count its own saved snapshots');
 const crossGoalRules=[{name:'toward-salt',delta:[-2,-2,5,-4],ds:1},{name:'toward-void',delta:[1,1,-1,6],ds:-1}];
 const crossGoalSamples=api.buildPrometheusHoldout();
 const crossGoalSamplesBefore=JSON.stringify(crossGoalSamples);
