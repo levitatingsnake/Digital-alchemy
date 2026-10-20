@@ -146,6 +146,15 @@ assertModel(JSON.stringify(api.state.values)==='[11,22,33,44]' && api.state.stab
 assertModel(api.state.history.length===1 && api.state.trace.length===1 && api.state.learnedRules.length===1, 'experiment ledger, trace and saved rules survive save/load round trip');
 assertModel(['integrityReports','prometheusReports','lawForgeReports','blindSpotReports'].every(k=>api.state[k].length===1), 'all research report families survive save/load round trip');
 assertModel(savedPayload.customTarget.length===4 && savedPayload.customStability===8, 'custom goal settings are included in local persistence');
+const stateBeforeCorruptLoad=JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal});
+savedWorkspace='{not valid JSON';
+api.load();
+assertModel(JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal})===stateBeforeCorruptLoad, 'corrupt local save is caught without replacing the current working state');
+const validStoredSnapshot={values:[1,2,3,4],stability:5};
+savedWorkspace=JSON.stringify({values:[9,8,7,6],stability:7,goal:'balanced',history:[{id:'good',title:'Good',time:'2026-10-20',ops:['Separate'],start:validStoredSnapshot,end:validStoredSnapshot,score:80},{id:'bad',title:'Bad',time:'now',ops:['unknown'],start:validStoredSnapshot,end:validStoredSnapshot,score:80}],trace:[{op:'Separate',before:[1,2,3,4],after:[2,3,4,5],score:70},{op:'Bad',before:[1,2],after:[2,3,4,5],score:70}],learnedRules:[{name:'Good rule',delta:[1,1,1,1],ds:0},{name:'Bad rule',delta:[1,2],ds:0}],integrityReports:[],prometheusReports:[],lawForgeReports:[],blindSpotReports:[]});
+api.load();
+assertModel(api.state.values.join(',')==='9,8,7,6' && api.state.history.length===1 && api.state.history[0].id==='good', 'restore accepts valid saved data while filtering malformed history');
+assertModel(api.state.trace.length===1 && api.state.learnedRules.length===1, 'restore filters malformed trace entries and rules');
 const cycleGoal = 'balanced';
 const cycleTypes = ['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
 const cycleReports = cycleTypes.map(type=>({type,goal:cycleGoal}));
