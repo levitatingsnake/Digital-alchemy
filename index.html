@@ -86,14 +86,21 @@ function renderKeptRules(){
  }));
  const combine=document.getElementById('combineRules');
  if(combine)combine.addEventListener('click',()=>{
+  if(state.learnedRules.length>=30){showToast('Rule library full. Discard a rule before combining.');return}
   const a=state.learnedRules[state.learnedRules.length-2],b=state.learnedRules[state.learnedRules.length-1];
-  const delta=a.delta.map((x,i)=>Math.max(-12,Math.min(12,x+b.delta[i]))); // bounded combined shift
-  const next={values:state.values.map((x,i)=>clamp(x+Math.max(-12,Math.min(12,delta[i])))),stability:Math.max(0,Math.min(10,state.stability+Math.max(-2,Math.min(2,a.ds+b.ds))))};
-  const before=clone(state);
-  state.values=next.values;state.stability=next.stability;state.route=null;
-  addTrace('Combined rule experiment',before,state,'Combined '+a.name+' and '+b.name+' by adding their component shifts, bounded to +/-12, and their stability effects, bounded to +/-2. The combination is exploratory and has not yet been independently validated.');
-  saveExperiment('Combined rule experiment',before,[a.name,b.name],{values:state.values.slice(),stability:state.stability});
-  renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Combined rule tested on current state');
+  const delta=a.delta.map((x,i)=>Math.max(-12,Math.min(12,x+b.delta[i])));
+  const ds=Math.max(-2,Math.min(2,a.ds+b.ds));
+  const samples=Array.from({length:24},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
+  const evaluate=s=>({values:s.values.map((x,i)=>clamp(x+delta[i])),stability:Math.max(0,Math.min(10,s.stability+ds))});
+  const gains=samples.map(s=>score(evaluate(s))-score(s)),mean=gains.reduce((sum,x)=>sum+x,0)/gains.length;
+  const wins=gains.filter(x=>x>0).length,losses=gains.filter(x=>x<0);
+  const rule={name:'Hybrid '+(state.learnedRules.length+1),delta,ds,mean:+mean.toFixed(2),winRate:Math.round(wins/gains.length*100),worst:losses.length?Math.min(...losses):0,parentRules:[a.name,b.name]};
+  if(state.learnedRules.some(x=>x.delta.join(',')===delta.join(',')&&x.ds===ds)){showToast('That combination already exists in your library');return}
+  state.learnedRules.push(rule);persist();renderKeptRules();
+  const report=document.createElement('div');report.className='traceitem';
+  report.innerHTML='<b>'+rule.name+' created from '+a.name+' + '+b.name+'</b><p>Validated on '+samples.length+' repeatable sample states · '+rule.winRate+'% win rate · '+(rule.mean>=0?'+':'')+rule.mean+' mean gain · worst loss '+rule.worst+' points.</p><p>The hybrid is now saved as a candidate. It has not been applied to your current state.</p>';
+  const results=document.getElementById('discoveryResults');results.prepend(report);
+  showToast('Hybrid tested and saved as a candidate');
  });
 }
 function signed(n){return n>0?'+'+n:String(n)}
