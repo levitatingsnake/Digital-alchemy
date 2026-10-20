@@ -859,10 +859,11 @@ function key(s){return [...s.values,s.stability].join(',')}
 function findRoute(){
  const start={values:state.values.slice(),stability:state.stability};const initialScore=score(start);const maxDepth=6;
  if(initialScore>=95){state.route=null;document.getElementById('routeResult').textContent='Already at '+initialScore+'% alignment. Your current state meets the 95% target, so no operations are needed. Change the goal or adjust the substrate to explore another route.';document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none';return}
- let queue=[{s:start,path:[]}],seen=new Set([key(start)]),best=queue[0],bestScore=initialScore,found=null;let examined=0;
- while(queue.length){const cur=queue.shift(),sc=score(cur.s);examined++;if(sc>bestScore){best=cur;bestScore=sc}if(sc>=95&&cur.path.length){found=cur;break}if(cur.path.length>=maxDepth)continue;
+ let queue=[{s:start,path:[]}],head=0,seen=new Set([key(start)]),best=queue[0],bestScore=initialScore,found=null;let examined=0;
+ // A moving queue cursor avoids Array.shift() reindexing the entire frontier on every step.
+ // This matters on mobile browsers when the route search explores thousands of states.
+ while(head<queue.length&&examined<15000){const cur=queue[head++],sc=score(cur.s);examined++;if(sc>bestScore){best=cur;bestScore=sc}if(sc>=95&&cur.path.length){found=cur;break}if(cur.path.length>=maxDepth)continue;
  for(const op of ops){const ns=apply(cur.s,op).state,k=key(ns);if(seen.has(k))continue;seen.add(k);queue.push({s:ns,path:cur.path.concat(op)})}
- if(examined>15000)break;
  }
  const candidate=found||best;
  if(!candidate.path.length){document.getElementById('routeResult').textContent='No improving sequence was found within six operations. Try a different goal or adjust the substrate.';document.getElementById('routePath').innerHTML='';document.getElementById('runRoute').style.display='none';state.route=null;return}
