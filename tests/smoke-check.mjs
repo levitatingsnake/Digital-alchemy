@@ -105,7 +105,7 @@ function assertModel(condition, message) {
 }
 const cycleRoot = {innerHTML:''};
 sandbox.document = {getElementById:()=>cycleRoot};
-sandbox.goalConfig = goal => ({label:String(goal)});
+sandbox.goalConfig = goal => api.goals[goal || api.state.goal];
 sandbox.esc = value => String(value);
 sandbox.persist = () => {};
 sandbox.showToast = () => {};
