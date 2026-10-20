@@ -182,13 +182,13 @@ function buildBlindSpotFamilies(){
  ];
  return defs.map((f,index)=>{let seed=(0xB11D0001+Math.imul(index+1,0x9E3779B9))>>>0;const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};return {...f,samples:Array.from({length:64},()=>f.make(rand))}});
 }
-function buildDiscoveryCycleAudit(before,after,reportsBefore,reportsAfter,goal,ruleCount,timestamp){
+function buildDiscoveryCycleAudit(before,after,reportsBefore,reportsAfter,goal,ruleCount,timestamp,stageErrors=[]){
  const required=['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
  const created=reportsAfter.filter(r=>!reportsBefore.has(r));
  const createdTypes=new Set(created.filter(r=>r.goal===goal).map(r=>r.type));
  const missing=required.filter(type=>!createdTypes.has(type));
  const statePreserved=before.values===JSON.stringify(after.values)&&before.stability===after.stability&&before.goal===after.goal&&before.rules===JSON.stringify(after.learnedRules);
- return {timestamp,type:'discovery-cycle-audit',goal,ruleCount,requiredReports:required,missingReports:missing,statePreserved,passed:missing.length===0&&statePreserved};
+ return {timestamp,type:'discovery-cycle-audit',goal,ruleCount,requiredReports:required,missingReports:missing,stageErrors:stageErrors.slice(),statePreserved,passed:missing.length===0&&stageErrors.length===0&&statePreserved};
 }
 function runDiscoveryCycle(){
  const root=document.getElementById('discoveryCycleResults');
@@ -197,13 +197,14 @@ function runDiscoveryCycle(){
  const before={values:JSON.stringify(state.values),stability:state.stability,goal:state.goal,rules:JSON.stringify(state.learnedRules)};
  const reportsBefore=new Set(state.blindSpotReports);
  root.innerHTML='<div class="routebox"><b>Discovery cycle running</b><p class="sub" style="margin:5px 0 0">Stage 1: conditional patterns · Stage 2: discriminating probes · Stage 3: adversarial challenge. A final integrity check will verify report creation and preservation of your working state.</p></div>';
- scanConditionalPatterns();
- designDiscriminatingExperiments();
- runAnomalyProtocol();
- const audit=buildDiscoveryCycleAudit(before,{values:state.values,stability:state.stability,goal:state.goal,learnedRules:state.learnedRules},reportsBefore,state.blindSpotReports,goal,start,new Date().toISOString());
+ const stageErrors=[];
+ for(const [stage,run] of [['conditional-pattern-scan',scanConditionalPatterns],['discriminating-experiment-design',designDiscriminatingExperiments],['anomaly-challenge-protocol',runAnomalyProtocol]]){
+  try{run()}catch(error){stageErrors.push({stage,message:String(error&&error.message||error).slice(0,240)});}
+ }
+ const audit=buildDiscoveryCycleAudit(before,{values:state.values,stability:state.stability,goal:state.goal,learnedRules:state.learnedRules},reportsBefore,state.blindSpotReports,goal,start,new Date().toISOString(),stageErrors);
  const {missingReports:missing,statePreserved,passed}=audit;
  state.blindSpotReports.unshift(audit);state.blindSpotReports=state.blindSpotReports.slice(0,20);persist();
- root.innerHTML='<div class="routebox"><b>Cycle complete · '+start+' saved rules · '+(passed?'INTEGRITY CHECK PASSED':'INTEGRITY CHECK NEEDS REVIEW')+'</b><p class="sub" style="margin:5px 0 0">Goal: '+esc(goalConfig(goal).label)+'. Required reports present: '+(audit.requiredReports.length-missing.length)+' / '+audit.requiredReports.length+'. Current values, stability, goal and saved rule library preserved: '+(statePreserved?'yes':'no')+'. Reports are saved locally and included in JSON export.</p></div><div class="traceitem"><b>Stage 1 · Conditional pattern scan</b><p>Searches for state features associated with different rule outcomes, then checks selected patterns on held-out synthetic states.</p></div><div class="traceitem"><b>Stage 2 · Discriminating experiment design</b><p>Ranks synthetic probes where saved rules disagree most strongly in predicted alignment gain.</p></div><div class="traceitem"><b>Stage 3 · Anomaly challenge</b><p>Compares rule behaviour in a targeted weak region against a broad synthetic control set.</p></div><p class="sub">Evidence boundary: this audit checks that expected report types exist and your working state remains unchanged. It does not prove the scientific validity of the patterns. All three stages operate inside the current symbolic scoring model.</p>';
+ root.innerHTML='<div class="routebox"><b>Cycle complete · '+start+' saved rules · '+(passed?'INTEGRITY CHECK PASSED':'INTEGRITY CHECK NEEDS REVIEW')+'</b><p class="sub" style="margin:5px 0 0">Goal: '+esc(goalConfig(goal).label)+'. Required reports present: '+(audit.requiredReports.length-missing.length)+' / '+audit.requiredReports.length+'. Current values, stability, goal and saved rule library preserved: '+(statePreserved?'yes':'no')+'. Reports are saved locally and included in JSON export.</p>'+(audit.stageErrors.length?'<p class="sub" style="margin:5px 0 0;color:var(--red)">Stage errors: '+esc(audit.stageErrors.map(e=>e.stage+': '+e.message).join(' · '))+'</p>':'')+'</div><div class="traceitem"><b>Stage 1 · Conditional pattern scan</b><p>Searches for state features associated with different rule outcomes, then checks selected patterns on held-out synthetic states.</p></div><div class="traceitem"><b>Stage 2 · Discriminating experiment design</b><p>Ranks synthetic probes where saved rules disagree most strongly in predicted alignment gain.</p></div><div class="traceitem"><b>Stage 3 · Anomaly challenge</b><p>Compares rule behaviour in a targeted weak region against a broad synthetic control set.</p></div><p class="sub">Evidence boundary: this audit checks that expected report types exist and your working state remains unchanged. It does not prove the scientific validity of the patterns. All three stages operate inside the current symbolic scoring model.</p>';
  showToast('Discovery cycle complete');
 }
 function designDiscriminatingExperiments(){
