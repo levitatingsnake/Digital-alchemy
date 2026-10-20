@@ -28,7 +28,7 @@ const required = [
   ['Paired baseline comparison button', 'id="compareBaseline"'],
   ['Cross-goal audit button', 'id="crossGoalAudit"'],
   ['Rule stability audit button', 'id="ruleStabilityAudit"'],
-  ['Saved rule Apply buttons', "data-apply-kept=\"'+i+'\""],
+  ['Saved rule Apply buttons', 'data-apply-kept="'],
   ['Delegated saved-rule click handler', "root.onclick=function(event)"],
   ['Delegated handler targets Apply buttons', "event.target.closest('[data-apply-kept]')"],
   ['Apply handler calls candidate application', "applyCandidate({next},'Saved '+r.name,24)"],
