@@ -229,12 +229,12 @@ function runIntegrityTests(){
  root.innerHTML='<div class="routebox"><b>'+passed+'/'+checks.length+' integrity checks passed</b><p class="sub" style="margin:5px 0 0">Completed '+new Date(report.timestamp).toLocaleString()+' · no symbolic state was changed.</p></div>'+checks.map(x=>'<div class="traceitem"><b>'+(x.ok?'✓ ':'✗ ')+esc(x.name)+'</b><p>'+esc(x.detail)+'</p></div>').join('')+'<div class="routebox"><b>Previous test runs</b>'+(state.integrityReports.length>1?state.integrityReports.slice(1,6).map(r=>'<p class="sub" style="margin:6px 0 0">'+esc(new Date(r.timestamp).toLocaleString())+' · '+r.passed+'/'+(r.passed+r.failed)+' passed · '+r.operationEvaluations+' operation checks</p>').join(''):'<p class="sub" style="margin:5px 0 0">This is the first saved run on this device.</p>')+'</div><p class="sub">Scope note: these tests check implementation consistency and numeric safety. They do not prove that the symbolic operations describe reality, that a discovered rule generalises beyond the tested samples, or that a predicted outcome will occur in the real world.</p>';
  showToast(failed?'Integrity tests found '+failed+' issue(s)':'Integrity tests passed');
 }
-function buildPrometheusHoldout(){
- let seed=0x5EEDC0DE;
+function buildPrometheusHoldout(seed=0x5EEDC0DE,excludeSamples=[]){
  const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+ const key=s=>[...s.values,s.stability].join(',');
  const training=new Set(Array.from({length:64},(_,i)=>[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101,(i*7+3)%11].join(',')));
- const samples=[],seen=new Set();
- while(samples.length<128){const sample={values:[Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101)],stability:Math.floor(rand()*11)},k=[...sample.values,sample.stability].join(',');if(training.has(k)||seen.has(k))continue;seen.add(k);samples.push(sample)}
+ const excluded=new Set(excludeSamples.map(key)),samples=[],seen=new Set();
+ while(samples.length<128){const sample={values:[Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101)],stability:Math.floor(rand()*11)},k=key(sample);if(training.has(k)||seen.has(k)||excluded.has(k))continue;seen.add(k);samples.push(sample)}
  return samples;
 }
 function measurePrometheusRule(rule,samples){
@@ -243,8 +243,8 @@ function measurePrometheusRule(rule,samples){
  return {mean,winRate:Math.round(wins/nums.length*100),worst:Math.min(...nums),counterexample:{state:counter.sample.values.slice(),stability:counter.sample.stability,gain:counter.gain,next:counter.next.values.slice(),nextStability:counter.next.stability}};
 }
 let pendingRuleRefinement=null;
-function buildRuleRefinement(rule,samples){
- const baseline=measurePrometheusRule(rule,samples),variants=[];
+function buildRuleRefinement(rule,samples,validationSamples=samples){
+ const tuningBaseline=measurePrometheusRule(rule,samples),variants=[];
  for(let axis=0;axis<5;axis++)for(const step of [-8,-4,-2,2,4,8]){
   const candidate={...rule,name:rule.name+' / variant',delta:rule.delta.slice(),ds:rule.ds};
   if(axis<4)candidate.delta[axis]=Math.max(-24,Math.min(24,candidate.delta[axis]+step));
@@ -256,17 +256,19 @@ function buildRuleRefinement(rule,samples){
  }
  variants.sort((a,b)=>b.stats.mean-a.stats.mean||b.stats.winRate-a.stats.winRate||b.stats.worst-a.stats.worst);
  const best=variants[0]||null;
- const improved=!!best&&best.stats.mean>=baseline.mean+0.5&&best.stats.winRate>=baseline.winRate&&best.stats.worst>=baseline.worst-2;
- return {type:'paired-rule-refinement',sampleCount:samples.length,baseline,best:best?{delta:best.candidate.delta.slice(),ds:best.candidate.ds,stats:best.stats}:null,variantsTested:variants.length,improved,criterion:'mean gain improves by at least 0.5 points, win rate does not fall, and worst-case gain is no more than 2 points worse'};
+ const baseline=measurePrometheusRule(rule,validationSamples);
+ const validationBest=best?measurePrometheusRule(best.candidate,validationSamples):null;
+ const improved=!!best&&validationBest.mean>=baseline.mean+0.5&&validationBest.winRate>=baseline.winRate&&validationBest.worst>=baseline.worst-2;
+ return {type:'paired-rule-refinement',sampleCount:samples.length,validationSampleCount:validationSamples.length,tuningBaseline,baseline,best:best?{delta:best.candidate.delta.slice(),ds:best.candidate.ds,tuningStats:best.stats,stats:validationBest}:null,variantsTested:variants.length,improved,criterion:'on an independent validation set, mean gain improves by at least 0.5 points, win rate does not fall, and worst-case gain is no more than 2 points worse'};
 }
 function runRuleRefinement(){
  const root=document.getElementById('ruleRefinementResults'),select=document.getElementById('refinementRuleSelect');
  if(!state.learnedRules.length){root.innerHTML='<div class="routebox"><b>No saved rules yet.</b><p class="sub">Use Discover rules or Synthesize strategy, then preserve a candidate first.</p></div>';showToast('Save a rule before refining');return}
  const index=Number(select.value);
  if(!Number.isInteger(index)||index<0||index>=state.learnedRules.length){root.innerHTML='<div class="routebox"><b>Choose a saved rule first.</b></div>';return}
- const original=state.learnedRules[index],samples=buildPrometheusHoldout(),report=buildRuleRefinement(original,samples);
+ const original=state.learnedRules[index],samples=buildPrometheusHoldout(0x5EEDC0DE),validationSamples=buildPrometheusHoldout(0xA11D0A7A,samples),report=buildRuleRefinement(original,samples,validationSamples);
  pendingRuleRefinement=report.improved?{baseName:original.name,delta:report.best.delta.slice(),ds:report.best.ds,stats:report.best.stats,sampleCount:report.sampleCount,goal:state.goal}:null;
- root.innerHTML='<div class="routebox"><b>'+(report.improved?'✓ VALIDATED IMPROVEMENT FOUND':'No revision cleared the improvement threshold')+'</b><p class="sub" style="margin:5px 0 0">Compared '+report.variantsTested+' deterministic variants against the same '+report.sampleCount+' holdout states. Goal: '+esc(state.goal)+'. Original rule remains unchanged.</p></div><div class="traceitem"><b>Original rule</b><p>Mean gain '+(report.baseline.mean>=0?'+':'')+report.baseline.mean+' · '+report.baseline.winRate+'% win rate · worst '+report.baseline.worst+'</p></div>'+(report.best?'<div class="traceitem"><b>Best revision found</b><p>S '+signed(report.best.delta[0])+' · M '+signed(report.best.delta[1])+' · Salt '+signed(report.best.delta[2])+' · Void '+signed(report.best.delta[3])+' · stability '+signed(report.best.ds)+'</p><p>Mean gain '+(report.best.stats.mean>=0?'+':'')+report.best.stats.mean+' · '+report.best.stats.winRate+'% win rate · worst '+report.best.stats.worst+'</p><p>'+esc(report.criterion)+'.</p></div>':'<p class="sub">No distinct variants were available.</p>')+(report.improved?'<button class="primary smallbtn" id="preserveRefinedRule">Preserve improved candidate</button>':'<p class="sub">Nothing was added to your library. Try another rule or goal; the threshold is deliberately conservative.</p>');
+ root.innerHTML='<div class="routebox"><b>'+(report.improved?'✓ VALIDATED IMPROVEMENT FOUND':'No revision cleared the improvement threshold')+'</b><p class="sub" style="margin:5px 0 0">Selected from '+report.variantsTested+' deterministic variants on '+report.sampleCount+' tuning states, then checked against '+report.validationSampleCount+' independent validation states. Goal: '+esc(state.goal)+'. Original rule remains unchanged.</p></div><div class="traceitem"><b>Original rule on independent validation</b><p>Mean gain '+(report.baseline.mean>=0?'+':'')+report.baseline.mean+' · '+report.baseline.winRate+'% win rate · worst '+report.baseline.worst+'</p></div>'+(report.best?'<div class="traceitem"><b>Best revision found</b><p>S '+signed(report.best.delta[0])+' · M '+signed(report.best.delta[1])+' · Salt '+signed(report.best.delta[2])+' · Void '+signed(report.best.delta[3])+' · stability '+signed(report.best.ds)+'</p><p>Mean gain '+(report.best.stats.mean>=0?'+':'')+report.best.stats.mean+' · '+report.best.stats.winRate+'% win rate · worst '+report.best.stats.worst+'</p><p>'+esc(report.criterion)+'.</p></div>':'<p class="sub">No distinct variants were available.</p>')+(report.improved?'<button class="primary smallbtn" id="preserveRefinedRule">Preserve improved candidate</button>':'<p class="sub">Nothing was added to your library. Try another rule or goal; the threshold is deliberately conservative.</p>');
  const save=document.getElementById('preserveRefinedRule');
  if(save)save.addEventListener('click',()=>{
   if(!pendingRuleRefinement||state.learnedRules.length>=30){showToast(state.learnedRules.length>=30?'Rule library full':'Run a refinement first');return}
