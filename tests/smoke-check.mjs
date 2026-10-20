@@ -90,9 +90,10 @@ const modelSource = [
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
+  functionBlock('runDiscoveryCycle', 'designDiscriminatingExperiments'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,buildDiscoveryCycleAudit,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -102,6 +103,29 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
+const cycleRoot = {innerHTML:''};
+sandbox.document = {getElementById:()=>cycleRoot};
+sandbox.goalConfig = goal => ({label:String(goal)});
+sandbox.esc = value => String(value);
+sandbox.persist = () => {};
+sandbox.showToast = () => {};
+let cycleStageCalls = [];
+const resetCycleState = () => {
+  api.state.values=[10,20,30,40]; api.state.stability=5; api.state.goal='balanced';
+  api.state.learnedRules=[{name:'rule-a'},{name:'rule-b'}]; api.state.blindSpotReports=[];
+  cycleStageCalls=[];
+  sandbox.scanConditionalPatterns=()=>{cycleStageCalls.push('conditional-pattern-scan');api.state.blindSpotReports.push({type:'conditional-pattern-scan',goal:api.state.goal});};
+  sandbox.designDiscriminatingExperiments=()=>{cycleStageCalls.push('discriminating-experiment-design');api.state.blindSpotReports.push({type:'discriminating-experiment-design',goal:api.state.goal});};
+  sandbox.runAnomalyProtocol=()=>{cycleStageCalls.push('anomaly-challenge-protocol');api.state.blindSpotReports.push({type:'anomaly-challenge-protocol',goal:api.state.goal});};
+};
+resetCycleState();
+vm.runInContext('runDiscoveryCycle()',sandbox,{timeout:3000});
+assertModel(cycleStageCalls.length===3 && api.state.blindSpotReports.some(r=>r.type==='discovery-cycle-audit'&&r.passed===true), 'full discovery-cycle orchestration passes when all stages report and preserve state');
+resetCycleState();
+sandbox.designDiscriminatingExperiments=()=>{cycleStageCalls.push('discriminating-experiment-design');throw new Error('simulated stage failure');};
+vm.runInContext('runDiscoveryCycle()',sandbox,{timeout:3000});
+const failedRunAudit=api.state.blindSpotReports.find(r=>r.type==='discovery-cycle-audit');
+assertModel(cycleStageCalls.length===3 && failedRunAudit && failedRunAudit.passed===false && failedRunAudit.stageErrors[0].stage==='discriminating-experiment-design', 'full discovery cycle records stage exceptions and continues remaining stages');
 const cycleGoal = 'balanced';
 const cycleTypes = ['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
 const cycleReports = cycleTypes.map(type=>({type,goal:cycleGoal}));
