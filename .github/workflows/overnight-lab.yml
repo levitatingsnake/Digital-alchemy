@@ -35,6 +35,8 @@ jobs:
         run: node tests/smoke-check.mjs
       - name: Run adversarial boundary checks
         run: node tests/adversarial-boundaries.mjs
+      - name: Run controlled mutation checks
+        run: node tests/mutation-check.mjs
       - name: Run overnight benchmark
         run: node tests/overnight-benchmark.mjs
       - name: Publish concise report to job summary
