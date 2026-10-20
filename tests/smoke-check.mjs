@@ -269,8 +269,8 @@ assertModel(api.state.trace.length===1 && api.state.learnedRules.length===1, 're
 const cycleGoal = 'balanced';
 const cycleTypes = ['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
 const cycleReports = cycleTypes.map(type=>({type,goal:cycleGoal}));
-const cycleBefore = {values:'[10,20,30,40]',stability:5,goal:cycleGoal,rules:'[]'};
-const cycleAfter = {values:[10,20,30,40],stability:5,goal:cycleGoal,learnedRules:[]};
+const cycleBefore = {values:'[10,20,30,40]',stability:5,goal:cycleGoal,rules:'[]',customTarget:'[65,35,70,8]',customStability:8};
+const cycleAfter = {values:[10,20,30,40],stability:5,goal:cycleGoal,learnedRules:[],customTarget:[65,35,70,8],customStability:8};
 const freshCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
 assertModel(freshCycleAudit.passed && freshCycleAudit.missingReports.length===0 && freshCycleAudit.statePreserved, 'discovery cycle audit passes with all fresh reports and preserved state');
 const failedStageAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z',[{stage:'anomaly-challenge-protocol',message:'simulated failure'}]);
@@ -281,6 +281,10 @@ const incompleteCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter
 assertModel(!incompleteCycleAudit.passed && incompleteCycleAudit.missingReports.includes('anomaly-challenge-protocol'), 'discovery cycle audit identifies missing stage reports');
 const mutatedCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,{...cycleAfter,stability:9},new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
 assertModel(!mutatedCycleAudit.passed && !mutatedCycleAudit.statePreserved, 'discovery cycle audit detects working-state mutation');
+const mutatedCustomTargetAudit = api.buildDiscoveryCycleAudit(cycleBefore,{...cycleAfter,customTarget:[1,2,3,4]},new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
+assertModel(!mutatedCustomTargetAudit.passed && !mutatedCustomTargetAudit.statePreserved, 'discovery cycle audit detects custom target mutation');
+const mutatedCustomStabilityAudit = api.buildDiscoveryCycleAudit(cycleBefore,{...cycleAfter,customStability:2},new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
+assertModel(!mutatedCustomStabilityAudit.passed && !mutatedCustomStabilityAudit.statePreserved, 'discovery cycle audit detects custom stability mutation');
 const exportState = {values:[1,2,3,4],stability:5,goal:'balanced',history:[{id:'h1'}],trace:[{op:'Separate'}],learnedRules:[{name:'r1'}],integrityReports:[{passed:true}],prometheusReports:[{verdict:'test'}],lawForgeReports:[{generation:1}],blindSpotReports:[{type:'audit'}]};
 const exported = api.createExportPayload(exportState,{name:'Balanced'},'2026-10-20T00:00:00.000Z');
 const exportedRoundTrip = JSON.parse(JSON.stringify(exported));
