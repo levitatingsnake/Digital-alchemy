@@ -176,13 +176,14 @@ assertModel(activeA.priorityRules[0].name==='fragile-rule'&&activeA.priorityRule
 assertModel(activeA.probes.length===8&&activeA.probes.every((p,i)=>i===0||activeA.probes[i-1].spread>=p.spread), 'next experiment selector returns eight probes ranked by prediction disagreement');
 assertModel(new Set(activeA.probes.map(p=>p.sample.values.join(',')+'/'+p.sample.stability)).size===activeA.probes.length, 'next experiment selector keeps probe states distinct');
 assertModel(JSON.stringify(activeA)===JSON.stringify(activeB)&&JSON.stringify(activeSamples)===activeSamplesBefore, 'next experiment plan is deterministic and does not mutate candidate samples');
-const refineSamples=api.buildPrometheusHoldout(),refineSamplesBefore=JSON.stringify(refineSamples);
+const refineSamples=api.buildPrometheusHoldout(0x5EEDC0DE),refineValidation=api.buildPrometheusHoldout(0xA11D0A7A,refineSamples),refineSamplesBefore=JSON.stringify(refineSamples);
 const refineRule={name:'refine-me',delta:[-8,2,0,0],ds:-2};
 const refineRuleBefore=JSON.stringify(refineRule);
 const refinementA=api.buildRuleRefinement(refineRule,refineSamples);
 const refinementB=api.buildRuleRefinement(refineRule,refineSamples);
-assertModel(refinementA.type==='paired-rule-refinement'&&refinementA.sampleCount===128&&refinementA.variantsTested>0, 'rule refinement evaluates bounded candidate variants on a deterministic holdout');
+assertModel(refinementA.type==='paired-rule-refinement'&&refinementA.sampleCount===128&&refinementA.validationSampleCount===128&&refinementA.variantsTested>0, 'rule refinement evaluates bounded candidate variants on a deterministic holdout');
 assertModel(JSON.stringify(refinementA)===JSON.stringify(refinementB), 'paired rule refinement is repeatable on identical rules and holdout states');
+assertModel(refineValidation.every(s=>!new Set(refineSamples.map(x=>[...x.values,x.stability].join(',')).concat()).has([...s.values,s.stability].join(','))), 'refinement tuning and validation states do not overlap');
 assertModel(JSON.stringify(refineRule)===refineRuleBefore&&JSON.stringify(refineSamples)===refineSamplesBefore, 'rule refinement never mutates the original rule or holdout samples');
 assertModel(!refinementA.improved||(refinementA.best.stats.mean>=refinementA.baseline.mean+0.5&&refinementA.best.stats.winRate>=refinementA.baseline.winRate&&refinementA.best.stats.worst>=refinementA.baseline.worst-2), 'refinement only labels a candidate improved when every stated threshold is met');
 const ledgerProm=[
