@@ -40,7 +40,7 @@ const required = [
   ['Saved snapshot validation', 'function validSnapshot(x)'],
   ['Malformed archive entries are filtered', 'x.history.filter(validHistoryEntry)'],
   ['Oversized archives are bounded on restore', '.slice(-100)'],
-  ['Discovery cycle requires fresh reports from this run', 'const missing=required.filter(type=>!createdTypes.has(type))'],
+  ['Discovery cycle requires fresh reports from this run', 'buildDiscoveryCycleAudit(before,'],
   ['Local persistence of research reports', 'blindSpotReports:state.blindSpotReports'],
   ['Export of research reports', 'blindSpotReports:current.blindSpotReports,methodology:']
 ];
@@ -87,9 +87,10 @@ const modelSource = [
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
+  functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,buildDiscoveryCycleAudit,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -99,6 +100,19 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
+const cycleGoal = 'balanced';
+const cycleTypes = ['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
+const cycleReports = cycleTypes.map(type=>({type,goal:cycleGoal}));
+const cycleBefore = {values:'[10,20,30,40]',stability:5,goal:cycleGoal,rules:'[]'};
+const cycleAfter = {values:[10,20,30,40],stability:5,goal:cycleGoal,learnedRules:[]};
+const freshCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
+assertModel(freshCycleAudit.passed && freshCycleAudit.missingReports.length===0 && freshCycleAudit.statePreserved, 'discovery cycle audit passes with all fresh reports and preserved state');
+const staleCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(cycleReports),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
+assertModel(!staleCycleAudit.passed && staleCycleAudit.missingReports.length===3, 'discovery cycle audit rejects stale reports from earlier runs');
+const incompleteCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports.slice(0,2),cycleGoal,2,'2026-10-20T00:00:00.000Z');
+assertModel(!incompleteCycleAudit.passed && incompleteCycleAudit.missingReports.includes('anomaly-challenge-protocol'), 'discovery cycle audit identifies missing stage reports');
+const mutatedCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,{...cycleAfter,stability:9},new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
+assertModel(!mutatedCycleAudit.passed && !mutatedCycleAudit.statePreserved, 'discovery cycle audit detects working-state mutation');
 const exportState = {values:[1,2,3,4],stability:5,goal:'balanced',history:[{id:'h1'}],trace:[{op:'Separate'}],learnedRules:[{name:'r1'}],integrityReports:[{passed:true}],prometheusReports:[{verdict:'test'}],lawForgeReports:[{generation:1}],blindSpotReports:[{type:'audit'}]};
 const exported = api.createExportPayload(exportState,{name:'Balanced'},'2026-10-20T00:00:00.000Z');
 const exportedRoundTrip = JSON.parse(JSON.stringify(exported));
