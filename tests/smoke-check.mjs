@@ -45,6 +45,8 @@ const required = [
   ['Experiment Designer panel', '00E / EXPERIMENT DESIGNER'],
   ['Rule Adjudicator panel', '00G / RULE ADJUDICATOR'],
   ['Rule adjudication button wiring', "getElementById('adjudicateRules').addEventListener('click',adjudicateRuleDisagreement)"],
+  ['Discovery cycle exposes stage ten results', 'Stage 10 · Competing-rule adjudication'],
+  ['Discovery cycle describes all ten stages', 'Stages 4–10: holdout trial'],
   ['Rule disagreement adjudication function', 'function buildRuleDisagreementAdjudication(rules,goal)'],
   ['Adjudication explicitly states model-internal evidence boundary', 'not independent real-world validation'],
   ['Anomaly Lab panel', '00C / ANOMALY LAB'],
@@ -220,11 +222,12 @@ const resetCycleState = () => {
   sandbox.runRuleStabilityAudit=()=>cycleStageCalls.push('rule-stability-audit');
   sandbox.compileDiscoveryEvidenceLedger=()=>cycleStageCalls.push('discovery-evidence-ledger');
   sandbox.selectNextExperiment=()=>cycleStageCalls.push('next-experiment-selection');
-  sandbox.adjudicateRuleDisagreement=()=>cycleStageCalls.push('rule-disagreement-adjudication');
+  sandbox.adjudicateRuleDisagreement=()=>{cycleStageCalls.push('rule-disagreement-adjudication');api.state.blindSpotReports.unshift({type:'rule-disagreement-adjudication',verdict:'LEADING RULE RETAINED ON HOLDOUT',discoveryLeader:'rule-a',holdoutLeader:'rule-a',meanGap:1.25,probes:[{},{}]});};
 };
 resetCycleState();
 vm.runInContext('runDiscoveryCycle()',sandbox,{timeout:3000});
 assertModel(cycleStageCalls.length===10 && api.state.blindSpotReports.some(r=>r.type==='discovery-cycle-audit'&&r.passed===true), 'full discovery-cycle orchestration passes when all stages report and preserve state');
+assertModel(cycleRoot.innerHTML.includes('Stage 10 · Competing-rule adjudication') && cycleRoot.innerHTML.includes('LEADING RULE RETAINED ON HOLDOUT') && cycleRoot.innerHTML.includes('rule-a'), 'discovery cycle summary surfaces the adjudication verdict and leaders');
 resetCycleState();
 sandbox.designDiscriminatingExperiments=()=>{cycleStageCalls.push('discriminating-experiment-design');throw new Error('simulated stage failure');};
 vm.runInContext('runDiscoveryCycle()',sandbox,{timeout:3000});
