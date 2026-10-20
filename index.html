@@ -341,6 +341,17 @@ function buildCrossGoalAudit(rules,samples){
  });
  return {sampleCount:samples.length,goalCount:goalIds.length,goals:goalResults,summaries};
 }
+function auditAcrossGoals(){
+ const root=document.getElementById('prometheusResults');
+ if(!state.learnedRules.length){root.innerHTML='<div class="routebox"><b>No preserved rules to audit.</b><p class="sub" style="margin:5px 0 0">Discover and preserve rules first.</p></div>';showToast('Cross-goal audit needs saved rules');return}
+ const original={values:state.values.slice(),stability:state.stability,goal:state.goal,customTarget:state.customTarget.slice(),customStability:state.customStability,rules:JSON.stringify(state.learnedRules)};
+ const report=buildCrossGoalAudit(state.learnedRules,buildPrometheusHoldout());
+ report.type='cross-goal-robustness-audit';report.timestamp=new Date().toISOString();report.currentGoal=state.goal;
+ report.workspacePreserved=state.values.every((v,i)=>v===original.values[i])&&state.stability===original.stability&&state.goal===original.goal&&state.customTarget.every((v,i)=>v===original.customTarget[i])&&state.customStability===original.customStability&&JSON.stringify(state.learnedRules)===original.rules;
+ state.prometheusReports.unshift(report);state.prometheusReports=state.prometheusReports.slice(0,20);persist();
+ root.innerHTML='<div class="traceitem"><b>Cross-goal robustness audit</b><p>'+report.sampleCount+' identical held-out synthetic states × '+report.goalCount+' model goals.</p><p class="sub">The same states and rule transformations are scored against Balanced, Concentrated, Purified, Stable and Custom targets. This tests sensitivity to the model’s scoring objective, not real-world generalisation.</p><p><b>Workspace unchanged:</b> '+(report.workspacePreserved?'yes':'NO, investigate')+'</p></div>'+report.summaries.map(r=>{const weak=r.goals.find(g=>g.label===r.weakestGoal);return '<div class="traceitem"><b>'+esc(r.name)+'</b><p>Mean across goals '+(r.meanAcrossGoals>=0?'+':'')+r.meanAcrossGoals+' · positive-mean goals '+r.positiveGoals+'/5 · non-negative '+r.nonNegativeGoals+'/5</p><p>Weakest goal: '+esc(r.weakestGoal)+' · mean gain '+r.weakestMean+'</p><p>'+r.goals.map(g=>esc(g.label)+': '+(g.mean>=0?'+':'')+g.mean+' ('+g.winRate+'% wins, worst '+g.worst+')').join(' · ')+'</p><p class="sub">Worst example for weakest goal: ['+weak.counterexample.state.join(' / ')+'] stability '+weak.counterexample.stability+' · gain '+weak.counterexample.gain+'</p></div>'}).join('');
+ showToast('Cross-goal audit complete');
+}
 function compareAgainstBaseline(){
  const root=document.getElementById('prometheusResults');
  if(!state.learnedRules.length){root.innerHTML='<div class="routebox"><b>No preserved rules to compare.</b><p class="sub" style="margin:5px 0 0">Discover and preserve at least two candidate rules to compare them against the do-nothing baseline.</p></div>';showToast('Baseline comparison needs saved rules');return}
