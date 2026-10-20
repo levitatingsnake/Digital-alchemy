@@ -28,6 +28,7 @@ const required = [
   ['Experiment Designer panel', '00E / EXPERIMENT DESIGNER'],
   ['Anomaly Lab panel', '00C / ANOMALY LAB'],
   ['Discovery cycle function', 'function runDiscoveryCycle()'],
+  ['Reproducibility audit function', 'function runReproducibilityAudit()'],
   ['Conditional pattern scanner', 'function scanConditionalPatterns()'],
   ['Discriminating experiment designer', 'function designDiscriminatingExperiments()'],
   ['Anomaly challenge protocol', 'function runAnomalyProtocol()'],
@@ -45,6 +46,7 @@ for (const [label, needle] of required) {
 }
 for (const [label, needle] of [
   ['Discovery cycle button wiring', "getElementById('runDiscoveryCycle').addEventListener('click',runDiscoveryCycle)"],
+  ['Reproducibility audit button wiring', "getElementById('runReproducibility').addEventListener('click',runReproducibilityAudit)"],
   ['Pattern scanner button wiring', "getElementById('scanPatterns').addEventListener('click',scanConditionalPatterns)"],
   ['Experiment designer button wiring', "getElementById('designExperiments').addEventListener('click',designDiscriminatingExperiments)"],
   ['Anomaly Lab button wiring', "getElementById('runAnomalyProtocol').addEventListener('click',runAnomalyProtocol)"]
