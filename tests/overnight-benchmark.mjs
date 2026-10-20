@@ -300,7 +300,7 @@ const lines = [
   `| Transition-attempt reduction vs naive search | ${first.overall.transitionAttemptReductionPct}% |`,
   `| Cases with identical deduplicated and naive scores | ${first.overall.dedupSearchScoreMatches} / ${first.method.caseCount} |`,
   '',
-  '## Results by goal',
+  '## Overall strategy comparison',
   '',
   '| Search strategy | Mean score | Mean gain vs no-op | Cases improved | Improvement rate |',
   '|---|---:|---:|---:|---:|',
