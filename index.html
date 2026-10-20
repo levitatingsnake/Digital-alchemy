@@ -72,6 +72,45 @@ function applyCandidate(r,label,sampleCount){
  saveExperiment(label,before,[label],{values:state.values.slice(),stability:state.stability});
  renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Hypothesis tested and recorded');
 }
+let lastRulePlans=[];
+function findRulePlans(){
+ if(!state.learnedRules.length){showToast('Keep at least one rule first');return}
+ const start={values:state.values.slice(),stability:state.stability},startScore=score(start);
+ let beam=[{s:start,path:[]}],all=[{s:start,path:[],score:startScore}];
+ for(let depth=1;depth<=5;depth++){
+  const generated=[];
+  for(const node of beam)for(let i=0;i<state.learnedRules.length;i++){
+   const r=state.learnedRules[i],s={values:node.s.values.map((x,j)=>clamp(x+r.delta[j])),stability:Math.max(0,Math.min(10,node.s.stability+r.ds))};
+   generated.push({s,path:node.path.concat([{name:r.name,delta:r.delta.slice(),ds:r.ds}]),score:score(s)});
+  }
+  const unique=new Map();
+  for(const item of generated){const k=[...item.s.values,item.s.stability].join(',');const old=unique.get(k);if(!old||item.score>old.score)unique.set(k,item)}
+  beam=[...unique.values()].sort((a,b)=>b.score-a.score||a.path.length-b.path.length).slice(0,60);
+  all.push(...beam);
+ }
+ const uniqueFinal=new Map();
+ for(const item of all){const k=[...item.s.values,item.s.stability].join(',');const old=uniqueFinal.get(k);if(!old||item.score>old.score||(item.score===old.score&&item.path.length<old.path.length))uniqueFinal.set(k,item)}
+ lastRulePlans=[...uniqueFinal.values()].filter(x=>x.path.length).sort((a,b)=>b.score-a.score||a.path.length-b.path.length).slice(0,5);
+ const root=document.getElementById('discoveryResults');
+ root.innerHTML='<p class="sub">Searched up to five saved-rule applications using a bounded beam search. Results are predictions under your current goal, not guarantees. Current alignment: '+startScore+'%.</p>'+lastRulePlans.map((p,i)=>'<div class="traceitem"><b>Plan '+(i+1)+' · '+p.score+'% predicted alignment</b><p>Change: '+(p.score-startScore>=0?'+':'')+(p.score-startScore)+' points · '+p.path.length+' steps</p><p>'+p.path.map((r,j)=>(j+1)+'. '+esc(r.name)).join(' → ')+'</p><p>Predicted state: '+p.s.values.join(' / ')+' · stability '+p.s.stability+'</p><button class="smallbtn" data-run-plan="'+i+'">Run this plan</button></div>').join('')||'<p class="sub">No usable plans found. Keep some rules and try again.</p>';
+ root.querySelectorAll('[data-run-plan]').forEach(btn=>btn.addEventListener('click',()=>runRulePlan(+btn.dataset.runPlan)));
+}
+function runRulePlan(index){
+ const plan=lastRulePlans[index];if(!plan)return;
+ const beforeAll={values:state.values.slice(),stability:state.stability},titles=[];
+ for(const rule of plan.path){
+  const before={values:state.values.slice(),stability:state.stability};
+  state.values=state.values.map((x,i)=>clamp(x+rule.delta[i]));
+  state.stability=Math.max(0,Math.min(10,state.stability+rule.ds));
+  addTrace('Plan: '+rule.name,before,state,'Applied saved rule as part of a predicted multi-step plan.');
+  titles.push(rule.name);
+ }
+ state.route=null;
+ saveExperiment('Rule plan: '+titles.join(' → '),beforeAll,titles,{values:state.values.slice(),stability:state.stability});
+ renderStats();updateSummary();renderTrace();invalidateRoute();persist();
+ document.getElementById('discoveryResults').innerHTML='<p class="sub">Plan executed and recorded. Alignment changed from '+score(beforeAll)+'% to '+score(state)+'%. Review the experiment trace and archive to inspect the result.</p>';
+ showToast('Rule plan executed and recorded');
+}
 function validateRule(rule,count=64){
  const samples=Array.from({length:count},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
  const gains=samples.map(s=>{const next={values:s.values.map((x,i)=>clamp(x+rule.delta[i])),stability:Math.max(0,Math.min(10,s.stability+rule.ds))};return score(next)-score(s)});
@@ -81,7 +120,9 @@ function validateRule(rule,count=64){
 function renderKeptRules(){
  const root=document.getElementById('keptRules');if(!root)return;
  if(!state.learnedRules.length){root.innerHTML='<p class="sub">Your rule library is empty. Keep a promising hypothesis to preserve it on this device.</p>';return}
- root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3><button class="smallbtn" id="retestLibrary">Re-test library (64 states)</button> '+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain · worst loss '+r.worst+'</p><button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
+ root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3><button class="smallbtn" id="retestLibrary">Re-test library (64 states)</button> <button class="smallbtn" id="findRulePlans">Find a path to my goal</button> '+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain · worst loss '+r.worst+'</p><button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
+ const planButton=document.getElementById('findRulePlans');
+ if(planButton)planButton.addEventListener('click',findRulePlans);
  const retest=document.getElementById('retestLibrary');
  if(retest)retest.addEventListener('click',()=>{
   const ranked=state.learnedRules.map((r,i)=>({r,i,stats:validateRule(r,64)})).sort((a,b)=>b.stats.mean-a.stats.mean||b.stats.winRate-a.stats.winRate||b.stats.worst-a.stats.worst);
