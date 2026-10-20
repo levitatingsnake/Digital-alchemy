@@ -205,7 +205,7 @@ function runLawForge(){
   }).sort((a,b)=>b.holdMean-a.holdMean||b.holdWin-a.holdWin);
   all.push(...ranked);
   const elite=ranked.slice(0,3);
-  profiles.splice(0,profiles.length,...elite.map((p,i)=>({name:'Gen '+(generation+1)+' descendant '+(i+1),step:Math.max(2,Math.min(12,Math.round(p.step*(.65+rand()*.7)))),risk:Math.max(0,Math.min(1,p.risk+(rand()-.5)*.3)),novelty:Math.max(0,Math.min(1,p.novelty+(rand()-.5)*.35))})),...ranked.slice(3,5).map((p,i)=>({name:'Mutant '+(generation+1)+'-'+i,step:Math.max(2,Math.min(12,Math.round(p.step*(.6+rand()*.9)))),risk:rand(),novelty:rand()})));
+  profiles.splice(0,profiles.length,...elite.map((p,i)=>({name:'Gen '+(generation+1)+' descendant '+(i+1),step:Math.max(2,Math.min(12,Math.round(p.step*(.65+rand()*.7)))),risk:Math.max(0,Math.min(1,p.risk+(rand()-.5)*.3)),novelty:Math.max(0,Math.min(1,p.novelty+(rand()-.5)*.35))})),...ranked.slice(3,6).map((p,i)=>({name:'Mutant '+(generation+1)+'-'+i,step:Math.max(2,Math.min(12,Math.round(p.step*(.6+rand()*.9)))),risk:rand(),novelty:rand()})));
  }
  const final=all.slice(-6).sort((a,b)=>b.holdMean-a.holdMean||b.holdWin-a.holdWin);
  const best=all.slice().sort((a,b)=>b.holdMean-a.holdMean||b.holdWin-a.holdWin)[0];
