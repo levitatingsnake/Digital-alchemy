@@ -229,6 +229,12 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Search-route replay integrity (2026-10-20)
+
+- The benchmark now replays every selected naive and deduplicated route from its original starting state.
+- Each replay must reproduce both the recorded final state and the recorded objective score across all 400 benchmark cases.
+- This guards against a misleading result where a search reports a high score or route that cannot actually be reproduced by executing its listed operations.
+
 ### Controlled mutation testing (2026-10-20)
 
 - Added `tests/mutation-check.mjs`, which runs the unmodified symbolic model as a control, then introduces three deliberate faults in isolated in-memory source copies.
