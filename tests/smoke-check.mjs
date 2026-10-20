@@ -26,6 +26,8 @@ console.log('PASS: inline JavaScript parses.');
 const required = [
   ['Discovery Cycle panel', '00F / DISCOVERY CYCLE'],
   ['Paired baseline comparison button', 'id="compareBaseline"'],
+  ['Cross-goal audit button', 'id="crossGoalAudit"'],
+  ['Cross-goal audit button wiring', "getElementById('crossGoalAudit').addEventListener('click',auditAcrossGoals)"],
   ['Paired baseline comparison button wiring', "getElementById('compareBaseline').addEventListener('click',compareAgainstBaseline)"],
   ['Pattern Vault panel', '00D / PATTERN VAULT'],
   ['Experiment Designer panel', '00E / EXPERIMENT DESIGNER'],
@@ -90,6 +92,7 @@ const modelSource = [
   applicationScript.slice(coreStart, coreEnd),
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
   functionBlock('buildBaselineComparison', 'compareAgainstBaseline'),
+  functionBlock('buildCrossGoalAudit', 'compareAgainstBaseline'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
@@ -98,7 +101,7 @@ const modelSource = [
   functionBlock('load', 'showToast'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -108,6 +111,16 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
+const crossGoalRules=[{name:'toward-salt',delta:[-2,-2,5,-4],ds:1},{name:'toward-void',delta:[1,1,-1,6],ds:-1}];
+const crossGoalSamples=api.buildPrometheusHoldout();
+const crossGoalSamplesBefore=JSON.stringify(crossGoalSamples);
+const crossGoalStateBefore=JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal,customTarget:api.state.customTarget,customStability:api.state.customStability,rules:api.state.learnedRules});
+const crossGoalA=api.buildCrossGoalAudit(crossGoalRules,crossGoalSamples);
+const crossGoalB=api.buildCrossGoalAudit(crossGoalRules,crossGoalSamples);
+assertModel(crossGoalA.goalCount===5 && crossGoalA.goals.map(g=>g.goal).join(',')==='balanced,concentrated,purified,stable,custom', 'cross-goal audit covers all five defined goal types');
+assertModel(crossGoalA.summaries.length===2 && crossGoalA.summaries.every(r=>r.goals.length===5&&Number.isFinite(r.meanAcrossGoals)&&r.positiveGoals>=0&&r.positiveGoals<=5), 'cross-goal audit produces bounded per-rule and across-goal metrics');
+assertModel(JSON.stringify(crossGoalA)===JSON.stringify(crossGoalB), 'cross-goal audit is deterministic on identical rules and samples');
+assertModel(JSON.stringify(crossGoalSamples)===crossGoalSamplesBefore && JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal,customTarget:api.state.customTarget,customStability:api.state.customStability,rules:api.state.learnedRules})===crossGoalStateBefore, 'cross-goal audit does not mutate samples or workspace state');
 const cycleRoot = {innerHTML:''};
 sandbox.document = {getElementById:()=>cycleRoot};
 sandbox.goalConfig = goal => api.goals[goal || api.state.goal];
