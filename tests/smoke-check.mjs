@@ -130,6 +130,7 @@ const failedRunAudit=api.state.blindSpotReports.find(r=>r.type==='discovery-cycl
 assertModel(cycleStageCalls.length===3 && failedRunAudit && failedRunAudit.passed===false && failedRunAudit.stageErrors[0].stage==='discriminating-experiment-design', 'full discovery cycle records stage exceptions and continues remaining stages');
 let savedWorkspace = null;
 sandbox.localStorage = {getItem:()=>savedWorkspace,setItem:(_key,value)=>{savedWorkspace=value;}};
+sandbox.KEY = 'digital-alchemy-test';
 sandbox.setStatus = () => {};
 api.state.values=[11,22,33,44];api.state.stability=6;api.state.goal='balanced';
 api.state.customTarget=[65,35,70,8];api.state.customStability=8;
