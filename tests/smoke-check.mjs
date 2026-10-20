@@ -217,7 +217,7 @@ sandbox.showToast = () => {};
 let cycleStageCalls = [];
 const resetCycleState = () => {
   api.state.values=[10,20,30,40]; api.state.stability=5; api.state.goal='balanced';
-  api.state.learnedRules=[{name:'rule-a'},{name:'rule-b'}]; api.state.blindSpotReports=[];
+  api.state.learnedRules=[{name:'rule-a'},{name:'rule-b'}]; api.state.blindSpotReports=[]; api.state.prometheusReports=[];
   cycleStageCalls=[];
   sandbox.scanConditionalPatterns=()=>{cycleStageCalls.push('conditional-pattern-scan');api.state.blindSpotReports.push({type:'conditional-pattern-scan',goal:api.state.goal});};
   sandbox.designDiscriminatingExperiments=()=>{cycleStageCalls.push('discriminating-experiment-design');api.state.blindSpotReports.push({type:'discriminating-experiment-design',goal:api.state.goal});};
@@ -226,7 +226,7 @@ const resetCycleState = () => {
   sandbox.compareAgainstBaseline=()=>{cycleStageCalls.push('paired-baseline-comparison');api.state.prometheusReports.push({type:'paired-baseline-comparison',goal:api.state.goal});};
   sandbox.auditAcrossGoals=()=>{cycleStageCalls.push('cross-goal-robustness-audit');api.state.prometheusReports.push({type:'cross-goal-robustness-audit',goal:api.state.goal});};
   sandbox.runRuleStabilityAudit=()=>{cycleStageCalls.push('rule-stability-audit');api.state.prometheusReports.push({type:'rule-stability-audit',goal:api.state.goal});};
-  sandbox.compileDiscoveryEvidenceLedger=()=>{cycleStageCalls.push('discovery-evidence-ledger');api.state.blindSpotReports.push({type:'discovery-evidence-ledger',goal:api.state.goal});};
+  sandbox.compileDiscoveryEvidenceLedger=()=>{cycleStageCalls.push('discovery-evidence-ledger');api.state.prometheusReports.push({type:'discovery-evidence-ledger'});};
   sandbox.selectNextExperiment=()=>{cycleStageCalls.push('next-experiment-selection');api.state.blindSpotReports.push({type:'next-experiment-plan',goal:api.state.goal});};
   sandbox.adjudicateRuleDisagreement=()=>{cycleStageCalls.push('rule-disagreement-adjudication');api.state.blindSpotReports.unshift({type:'rule-disagreement-adjudication',verdict:'LEADING RULE RETAINED ON HOLDOUT',discoveryLeader:'rule-a',holdoutLeader:'rule-a',meanGap:1.25,probes:[{},{}]});};
 };
