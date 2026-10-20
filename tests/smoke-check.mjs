@@ -84,7 +84,8 @@ const modelSource = [
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('validVector', 'load'),
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule};'
+  functionBlock('createExportPayload', "document.getElementById('export').addEventListener"),
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -94,6 +95,14 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
+const exportState = {values:[1,2,3,4],stability:5,goal:'balanced',history:[{id:'h1'}],trace:[{op:'Separate'}],learnedRules:[{name:'r1'}],integrityReports:[{passed:true}],prometheusReports:[{verdict:'test'}],lawForgeReports:[{generation:1}],blindSpotReports:[{type:'audit'}]};
+const exported = api.createExportPayload(exportState,{name:'Balanced'},'2026-10-20T00:00:00.000Z');
+const exportedRoundTrip = JSON.parse(JSON.stringify(exported));
+assertModel(exportedRoundTrip.schemaVersion === 4 && exportedRoundTrip.app === 'Digital Alchemy Lab', 'export has app identity and schema version');
+assertModel(exportedRoundTrip.exportedAt === '2026-10-20T00:00:00.000Z', 'export preserves supplied timestamp');
+assertModel(JSON.stringify(exportedRoundTrip.currentState.values) === JSON.stringify([1,2,3,4]) && exportedRoundTrip.currentState.goalConfig.name === 'Balanced', 'export includes current state and goal configuration');
+for (const key of ['experimentLedger','trace','learnedRules','integrityReports','prometheusReports','lawForgeReports','blindSpotReports']) assertModel(Array.isArray(exportedRoundTrip[key]) && exportedRoundTrip[key].length === 1, 'export includes '+key);
+assertModel(Array.isArray(exportedRoundTrip.methodology.limitations) && exportedRoundTrip.methodology.limitations.length >= 5, 'export carries methodology limitations');
 const goodSnapshot = {values:[10,20,30,40],stability:5};
 const goodHistory = {id:'abc',title:'Test',time:'2026-10-20',ops:['Separate'],start:goodSnapshot,end:goodSnapshot,score:50};
 assertModel(api.validSnapshot(goodSnapshot), 'valid saved snapshot is accepted');
