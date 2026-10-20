@@ -100,9 +100,22 @@ function discoverRules(){
  }));
  renderKeptRules();
 }
+function recordObservedRule(name,before,after){
+ const rule=state.learnedRules.find(r=>r.name===name);
+ if(!rule)return;
+ const gain=score(after)-score(before);
+ rule.observedApplications=(rule.observedApplications||0)+1;
+ rule.observedGainTotal=+(Number(rule.observedGainTotal||0)+gain).toFixed(2);
+ rule.observedWins=(rule.observedWins||0)+(gain>0?1:0);
+ rule.observedLosses=(rule.observedLosses||0)+(gain<0?1:0);
+ rule.observedDraws=(rule.observedDraws||0)+(gain===0?1:0);
+ rule.observedMean=+(rule.observedGainTotal/rule.observedApplications).toFixed(2);
+ rule.lastObservedGain=gain;
+}
 function applyCandidate(r,label,sampleCount){
  const before=clone(state),next={values:r.next.values.slice(),stability:r.next.stability};
  state.values=next.values;state.stability=next.stability;state.route=null;
+ if(label.startsWith('Saved '))recordObservedRule(label.slice(6),before,state);
  addTrace(label,before,state,'Applied a candidate rule tested across '+sampleCount+' sample states. Alignment changed from '+score(before)+'% to '+score(state)+'%. This is an experimental heuristic, not a physical law.');
  saveExperiment(label,before,[label],{values:state.values.slice(),stability:state.stability});
  renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Hypothesis tested and recorded');
@@ -147,6 +160,7 @@ function runRulePlan(index){
   const before={values:state.values.slice(),stability:state.stability};
   state.values=state.values.map((x,i)=>clamp(x+rule.delta[i]));
   state.stability=Math.max(0,Math.min(10,state.stability+rule.ds));
+  recordObservedRule(rule.name,before,state);
   addTrace('Plan: '+rule.name,before,state,'Applied saved rule as part of a predicted multi-step plan.');
   titles.push(rule.name);
  }
@@ -165,7 +179,7 @@ function validateRule(rule,count=64){
 function renderKeptRules(){
  const root=document.getElementById('keptRules');if(!root)return;
  if(!state.learnedRules.length){root.innerHTML='<p class="sub">Your rule library is empty. Keep a promising hypothesis to preserve it on this device.</p>';return}
- root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3><button class="smallbtn" id="retestLibrary">Re-test library (64 states)</button> <button class="smallbtn" id="findRulePlans">Find a path to my goal</button> '+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain · worst loss '+r.worst+'</p><button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
+ root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3><button class="smallbtn" id="retestLibrary">Re-test library (64 states)</button> <button class="smallbtn" id="findRulePlans">Find a path to my goal</button> '+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain · worst loss '+r.worst+'</p>'+(r.observedApplications?'<p><b>Observed here:</b> '+r.observedApplications+' application(s) · '+(r.observedMean>=0?'+':'')+r.observedMean+' average alignment change · '+r.observedWins+' improved / '+r.observedDraws+' unchanged / '+r.observedLosses+' declined · latest '+(r.lastObservedGain>=0?'+':'')+r.lastObservedGain+'</p>':'<p class="sub">No real application results recorded yet.</p>')+'<button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
  const planButton=document.getElementById('findRulePlans');
  if(planButton)planButton.addEventListener('click',findRulePlans);
  const retest=document.getElementById('retestLibrary');
