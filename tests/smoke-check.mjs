@@ -220,15 +220,16 @@ const resetCycleState = () => {
   sandbox.runRuleStabilityAudit=()=>cycleStageCalls.push('rule-stability-audit');
   sandbox.compileDiscoveryEvidenceLedger=()=>cycleStageCalls.push('discovery-evidence-ledger');
   sandbox.selectNextExperiment=()=>cycleStageCalls.push('next-experiment-selection');
+  sandbox.adjudicateRuleDisagreement=()=>cycleStageCalls.push('rule-disagreement-adjudication');
 };
 resetCycleState();
 vm.runInContext('runDiscoveryCycle()',sandbox,{timeout:3000});
-assertModel(cycleStageCalls.length===9 && api.state.blindSpotReports.some(r=>r.type==='discovery-cycle-audit'&&r.passed===true), 'full discovery-cycle orchestration passes when all stages report and preserve state');
+assertModel(cycleStageCalls.length===10 && api.state.blindSpotReports.some(r=>r.type==='discovery-cycle-audit'&&r.passed===true), 'full discovery-cycle orchestration passes when all stages report and preserve state');
 resetCycleState();
 sandbox.designDiscriminatingExperiments=()=>{cycleStageCalls.push('discriminating-experiment-design');throw new Error('simulated stage failure');};
 vm.runInContext('runDiscoveryCycle()',sandbox,{timeout:3000});
 const failedRunAudit=api.state.blindSpotReports.find(r=>r.type==='discovery-cycle-audit');
-assertModel(cycleStageCalls.length===9 && failedRunAudit && failedRunAudit.passed===false && failedRunAudit.stageErrors[0].stage==='discriminating-experiment-design', 'full discovery cycle records stage exceptions and continues remaining stages');
+assertModel(cycleStageCalls.length===10 && failedRunAudit && failedRunAudit.passed===false && failedRunAudit.stageErrors[0].stage==='discriminating-experiment-design', 'full discovery cycle records stage exceptions and continues remaining stages');
 let savedWorkspace = null;
 sandbox.localStorage = {getItem:()=>savedWorkspace,setItem:(_key,value)=>{savedWorkspace=value;}};
 sandbox.KEY = 'digital-alchemy-test';
