@@ -135,7 +135,7 @@ const modelSource = [
   functionBlock('buildNextExperimentPlan', 'selectNextExperiment'),
   functionBlock('evaluateRecommendedProbes', 'runSelectedProbes'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
-  functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
+  functionBlock('buildBlindSpotFamilies', 'adjudicateRuleDisagreement'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
   functionBlock('buildRuleDisagreementAdjudication', 'adjudicateRuleDisagreement'),
   functionBlock('runDiscoveryCycle', 'designDiscriminatingExperiments'),
