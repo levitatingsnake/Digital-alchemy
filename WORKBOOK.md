@@ -309,3 +309,12 @@ The result supports a limited conclusion: deeper search improves the current mod
 - Checks every declared goal and every operation against finite/bounded scoring, input immutability, four-component shape, clamped integer values, bounded stability, and non-empty operation explanations.
 - The workflow should be treated as the source of truth for pass/fail. Do not claim these checks passed until the new run completes.
 
+
+### Competing-rule adjudication (2026-10-21)
+
+- Added a Rule Adjudicator panel and a tenth stage in the Discovery Cycle.
+- The adjudicator ranks all saved candidate rules on 256 deterministic discovery states, then evaluates the same candidates on a separate 256-state holdout generated from a different fixed seed.
+- It reports whether the discovery leader stays top-ranked, is contradicted by the holdout ranking, ties, or has no clear separation. It also displays up to five concrete states with the largest spread between candidate-rule predictions.
+- The report is deterministic for the same saved rules and goal, records the two seeds, and checks that the user's working substrate, goal, and saved rules remain unchanged.
+- Important limit: both samples are scored by the same symbolic objective used to define candidate gains. The holdout can expose ranking instability within this model, but it is not independent real-world validation and cannot establish practical usefulness.
+- Smoke checks cover deterministic output, separate sample counts, complete candidate rankings, non-zero disagreement probes, explicit verdicts, insufficient-candidate handling, and the stated evidence boundary.
