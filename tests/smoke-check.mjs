@@ -222,12 +222,12 @@ const resetCycleState = () => {
   sandbox.scanConditionalPatterns=()=>{cycleStageCalls.push('conditional-pattern-scan');api.state.blindSpotReports.push({type:'conditional-pattern-scan',goal:api.state.goal});};
   sandbox.designDiscriminatingExperiments=()=>{cycleStageCalls.push('discriminating-experiment-design');api.state.blindSpotReports.push({type:'discriminating-experiment-design',goal:api.state.goal});};
   sandbox.runAnomalyProtocol=()=>{cycleStageCalls.push('anomaly-challenge-protocol');api.state.blindSpotReports.push({type:'anomaly-challenge-protocol',goal:api.state.goal});};
-  sandbox.runPrometheusTrial=()=>cycleStageCalls.push('heldout-prometheus-trial');
-  sandbox.compareAgainstBaseline=()=>cycleStageCalls.push('paired-baseline-comparison');
-  sandbox.auditAcrossGoals=()=>cycleStageCalls.push('cross-goal-robustness-audit');
-  sandbox.runRuleStabilityAudit=()=>cycleStageCalls.push('rule-stability-audit');
-  sandbox.compileDiscoveryEvidenceLedger=()=>cycleStageCalls.push('discovery-evidence-ledger');
-  sandbox.selectNextExperiment=()=>cycleStageCalls.push('next-experiment-selection');
+  sandbox.runPrometheusTrial=()=>{cycleStageCalls.push('heldout-prometheus-trial');api.state.prometheusReports.push({type:'prometheus-trial',goal:api.state.goal});};
+  sandbox.compareAgainstBaseline=()=>{cycleStageCalls.push('paired-baseline-comparison');api.state.prometheusReports.push({type:'paired-baseline-comparison',goal:api.state.goal});};
+  sandbox.auditAcrossGoals=()=>{cycleStageCalls.push('cross-goal-robustness-audit');api.state.prometheusReports.push({type:'cross-goal-robustness-audit',goal:api.state.goal});};
+  sandbox.runRuleStabilityAudit=()=>{cycleStageCalls.push('rule-stability-audit');api.state.prometheusReports.push({type:'rule-stability-audit',goal:api.state.goal});};
+  sandbox.compileDiscoveryEvidenceLedger=()=>{cycleStageCalls.push('discovery-evidence-ledger');api.state.blindSpotReports.push({type:'discovery-evidence-ledger',goal:api.state.goal});};
+  sandbox.selectNextExperiment=()=>{cycleStageCalls.push('next-experiment-selection');api.state.blindSpotReports.push({type:'next-experiment-plan',goal:api.state.goal});};
   sandbox.adjudicateRuleDisagreement=()=>{cycleStageCalls.push('rule-disagreement-adjudication');api.state.blindSpotReports.unshift({type:'rule-disagreement-adjudication',verdict:'LEADING RULE RETAINED ON HOLDOUT',discoveryLeader:'rule-a',holdoutLeader:'rule-a',meanGap:1.25,probes:[{},{}]});};
 };
 resetCycleState();
