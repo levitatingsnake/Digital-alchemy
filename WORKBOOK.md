@@ -229,6 +229,21 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Search-depth comparison (2026-10-20)
+
+- Extended the benchmark report to compare greedy/depth-one, depth-two, depth-three, and deduplicated depth-three search on the same 400 fixed cases.
+- GitHub Actions run completed successfully: [run 9](https://github.com/levitatingsnake/Digital-alchemy/actions/runs/39403419493).
+- Smoke checks, adversarial boundary checks, deterministic repeatability, score-equivalence assertions, report generation, and artifact upload all passed.
+
+| Strategy | Mean score | Mean gain vs no-op | Cases improved |
+|---|---:|---:|---:|
+| Greedy / depth one | 72.995 | +4.218 | 371 / 400 |
+| Bounded search, depth two | 76.270 | +7.492 | 390 / 400 |
+| Bounded search, depth three | 78.933 | +10.155 | 394 / 400 |
+| Deduplicated search, depth three | 78.933 | +10.155 | 394 / 400 |
+
+The result supports a limited conclusion: deeper search improves the current model's own score on this fixed benchmark. Deduplication preserves that score while reducing attempted transitions by 18.61%. This does not yet measure wall-clock speed, generalize to new problem domains, or validate the scoring function against real-world outcomes.
+
 ### Adversarial boundary checks (2026-10-20)
 - Added `tests/adversarial-boundaries.mjs` and wired it into the overnight workflow before the benchmark.
 - Exercises boundary and mixed states, including component values at 0, 1, 50, 99, and 100 and stability at 0 and 10.
