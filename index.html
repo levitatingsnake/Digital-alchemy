@@ -135,31 +135,27 @@ function runIntegrityTests(){
  root.innerHTML='<div class="routebox"><b>'+passed+'/'+checks.length+' integrity checks passed</b><p class="sub" style="margin:5px 0 0">Completed '+new Date(report.timestamp).toLocaleString()+' · no symbolic state was changed.</p></div>'+checks.map(x=>'<div class="traceitem"><b>'+(x.ok?'✓ ':'✗ ')+esc(x.name)+'</b><p>'+esc(x.detail)+'</p></div>').join('')+'<div class="routebox"><b>Previous test runs</b>'+(state.integrityReports.length>1?state.integrityReports.slice(1,6).map(r=>'<p class="sub" style="margin:6px 0 0">'+esc(new Date(r.timestamp).toLocaleString())+' · '+r.passed+'/'+(r.passed+r.failed)+' passed · '+r.operationEvaluations+' operation checks</p>').join(''):'<p class="sub" style="margin:5px 0 0">This is the first saved run on this device.</p>')+'</div><p class="sub">Scope note: these tests check implementation consistency and numeric safety. They do not prove that the symbolic operations describe reality, that a discovered rule generalises beyond the tested samples, or that a predicted outcome will occur in the real world.</p>';
  showToast(failed?'Integrity tests found '+failed+' issue(s)':'Integrity tests passed');
 }
-function runPrometheusTrial(){
- const root=document.getElementById('prometheusResults');
- if(!state.learnedRules.length){root.innerHTML='<div class="routebox"><b>No preserved rules to challenge yet.</b><p class="sub" style="margin:5px 0 0">Discover or synthesize rules first, then run Prometheus again.</p></div>';showToast('Prometheus needs at least one saved rule');return}
- // Independent deterministic PRNG. Samples matching the original training generator are excluded.
+function buildPrometheusHoldout(){
  let seed=0x5EEDC0DE;
  const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
  const training=new Set(Array.from({length:64},(_,i)=>[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101,(i*7+3)%11].join(',')));
  const samples=[],seen=new Set();
- while(samples.length<128){
-  const sample={values:[Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101)],stability:Math.floor(rand()*11)};
-  const k=[...sample.values,sample.stability].join(',');
-  if(training.has(k)||seen.has(k))continue;
-  seen.add(k);samples.push(sample);
- }
+ while(samples.length<128){const sample={values:[Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101)],stability:Math.floor(rand()*11)},k=[...sample.values,sample.stability].join(',');if(training.has(k)||seen.has(k))continue;seen.add(k);samples.push(sample)}
+ return samples;
+}
+function measurePrometheusRule(rule,samples){
+ const gains=samples.map(sample=>{const next={values:sample.values.map((v,i)=>clamp(v+rule.delta[i])),stability:Math.max(0,Math.min(10,sample.stability+rule.ds))};return {gain:score(next)-score(sample),sample,next}});
+ const nums=gains.map(x=>x.gain),mean=+(nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(2),wins=nums.filter(x=>x>0).length,counter=gains.slice().sort((a,b)=>a.gain-b.gain)[0];
+ return {mean,winRate:Math.round(wins/nums.length*100),worst:Math.min(...nums),counterexample:{state:counter.sample.values.slice(),stability:counter.sample.stability,gain:counter.gain,next:counter.next.values.slice(),nextStability:counter.next.stability}};
+}
+function runPrometheusTrial(){
+ const root=document.getElementById('prometheusResults');
+ if(!state.learnedRules.length){root.innerHTML='<div class="routebox"><b>No preserved rules to challenge yet.</b><p class="sub" style="margin:5px 0 0">Discover or synthesize rules first, then run Prometheus again.</p></div>';showToast('Prometheus needs at least one saved rule');return}
+ const samples=buildPrometheusHoldout();
  const results=state.learnedRules.map(rule=>{
-  const gains=samples.map(sample=>{
-   const next={values:sample.values.map((v,i)=>clamp(v+rule.delta[i])),stability:Math.max(0,Math.min(10,sample.stability+rule.ds))};
-   return {gain:score(next)-score(sample),sample,next};
-  });
-  const nums=gains.map(x=>x.gain),mean=+(nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(2);
-  const wins=nums.filter(x=>x>0).length,losses=nums.filter(x=>x<0),worst=Math.min(...nums);
-  const inSample=validateRule(rule,64),gap=+(mean-inSample.mean).toFixed(2);
-  const counter=gains.slice().sort((a,b)=>a.gain-b.gain)[0];
-  const verdict=mean>0&&wins/nums.length>=0.55&&worst>=-8?'ROBUST IN THIS TEST':mean>0?'PROMISING, FRAGILE':'DOES NOT GENERALISE';
-  return {name:rule.name,inSampleMean:inSample.mean,inSampleWinRate:inSample.winRate,holdoutMean:mean,holdoutWinRate:Math.round(wins/nums.length*100),worst,generalisationGap:gap,verdict,counterexample:{state:counter.sample.values.slice(),stability:counter.sample.stability,gain:counter.gain,next:counter.next.values.slice(),nextStability:counter.next.stability}};
+  const measured=measurePrometheusRule(rule,samples),inSample=validateRule(rule,64),gap=+(measured.mean-inSample.mean).toFixed(2);
+  const verdict=measured.mean>0&&measured.winRate>=55&&measured.worst>=-8?'ROBUST IN THIS TEST':measured.mean>0?'PROMISING, FRAGILE':'DOES NOT GENERALISE';
+  return {name:rule.name,inSampleMean:inSample.mean,inSampleWinRate:inSample.winRate,holdoutMean:measured.mean,holdoutWinRate:measured.winRate,worst:measured.worst,generalisationGap:gap,verdict,counterexample:measured.counterexample};
  }).sort((a,b)=>b.holdoutMean-a.holdoutMean||b.holdoutWinRate-a.holdoutWinRate);
  const report={id:Date.now().toString(36),timestamp:new Date().toISOString(),goal:state.goal,target:goalConfig().target.slice(),targetStability:goalConfig().stab,sampleCount:samples.length,seed:'0x5EEDC0DE',results};
  state.prometheusReports.unshift(report);state.prometheusReports=state.prometheusReports.slice(0,20);persist();
@@ -172,8 +168,7 @@ function runLawForge(){
  let seed=0xC0FFEE42;
  const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
  const train=Array.from({length:32},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
- const hold=[],seen=new Set(),known=new Set(Array.from({length:64},(_,i)=>[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101,(i*7+3)%11].join(',')));
- while(hold.length<128){const q={values:[0,0,0,0].map(()=>Math.floor(rand()*101)),stability:Math.floor(rand()*11)},k=[...q.values,q.stability].join(',');if(!known.has(k)&&!seen.has(k)){seen.add(k);hold.push(q)}}
+ const hold=buildPrometheusHoldout();
  const profiles=[
   {name:'Precise explorer',step:2,risk:.65,novelty:.1},
   {name:'Wide-range explorer',step:12,risk:.1,novelty:.15},
@@ -182,7 +177,7 @@ function runLawForge(){
   {name:'Novelty seeker',step:8,risk:.2,novelty:.7},
   {name:'Conservative mutator',step:4,risk:.55,novelty:.4}
  ];
- const evaluate=(rule,samples)=>{const gains=samples.map(q=>{const n={values:q.values.map((v,i)=>clamp(v+rule.delta[i])),stability:Math.max(0,Math.min(10,q.stability+rule.ds))};return {gain:score(n)-score(q),sample:q,next:n}});const vals=gains.map(x=>x.gain),losses=vals.filter(x=>x<0);return {mean:vals.reduce((a,b)=>a+b,0)/vals.length,winRate:vals.filter(x=>x>0).length/vals.length,worst:losses.length?Math.min(...losses):0,counter:gains.slice().sort((a,b)=>a.gain-b.gain)[0]}}
+ const evaluate=(rule,samples)=>{const m=measurePrometheusRule(rule,samples);return {mean:m.mean,winRate:m.winRate/100,worst:m.worst,counter:{sample:{values:m.counterexample.state,stability:m.counterexample.stability},gain:m.counterexample.gain}}}
  const knownRules=state.learnedRules.slice();
  const all=[];
  for(let generation=1;generation<=3;generation++){
