@@ -4,14 +4,16 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const html = fs.readFileSync('index.html', 'utf8');
-const scripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)];
-if (scripts.length !== 1) {
-  console.error(`Expected one inline application script, found ${scripts.length}.`);
+const scriptStart = html.indexOf('<script>');
+const scriptEnd = html.indexOf('</script>', scriptStart);
+if (scriptStart < 0 || scriptEnd < 0 || html.indexOf('<script>', scriptStart + 1) >= 0) {
+  console.error('Expected exactly one inline application script.');
   process.exit(1);
 }
+const applicationScript = html.slice(scriptStart + '<script>'.length, scriptEnd);
 
 const temporaryScript = path.join(os.tmpdir(), 'digital-alchemy-inline-check.js');
-fs.writeFileSync(temporaryScript, scripts[0][1]);
+fs.writeFileSync(temporaryScript, applicationScript);
 const syntax = spawnSync(process.execPath, ['--check', temporaryScript], { encoding: 'utf8' });
 fs.rmSync(temporaryScript, { force: true });
 if (syntax.status !== 0) {
