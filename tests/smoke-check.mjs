@@ -25,6 +25,8 @@ console.log('PASS: inline JavaScript parses.');
 
 const required = [
   ['Discovery Cycle panel', '00F / DISCOVERY CYCLE'],
+  ['Paired baseline comparison button', 'id="compareBaseline"'],
+  ['Paired baseline comparison button wiring', "getElementById('compareBaseline').addEventListener('click',compareAgainstBaseline)"],
   ['Pattern Vault panel', '00D / PATTERN VAULT'],
   ['Experiment Designer panel', '00E / EXPERIMENT DESIGNER'],
   ['Anomaly Lab panel', '00C / ANOMALY LAB'],
@@ -87,6 +89,7 @@ const exportHelper = applicationScript.slice(exportHelperStart, exportHelperEnd)
 const modelSource = [
   applicationScript.slice(coreStart, coreEnd),
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
+  functionBlock('buildBaselineComparison', 'compareAgainstBaseline'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('buildDiscoveryCycleAudit', 'runDiscoveryCycle'),
@@ -95,7 +98,7 @@ const modelSource = [
   functionBlock('load', 'showToast'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -190,6 +193,14 @@ assertModel(api.validTraceEntry({op:'Separate',before:[1,2,3,4],after:[2,3,4,5],
 assertModel(!api.validTraceEntry({op:'Separate',before:[1,2],after:[2,3,4,5],score:50}), 'trace record with malformed vector is rejected');
 assertModel(api.validRule({name:'rule',delta:[1,2,3,4],ds:1}), 'well-formed saved rule is accepted');
 assertModel(!api.validRule({name:'rule',delta:[1,2,3,NaN],ds:1}), 'saved rule containing NaN is rejected');
+const pairedRules=[{name:'increase-sulphur',delta:[5,0,0,0],ds:0},{name:'decrease-sulphur',delta:[-5,0,0,0],ds:0}];
+const pairedSamples=[{values:[10,20,30,40],stability:5},{values:[90,20,30,40],stability:5},{values:[50,50,50,50],stability:5}];
+const pairedBefore=JSON.stringify(pairedSamples);
+const paired=api.buildBaselineComparison(pairedRules,pairedSamples);
+assertModel(paired.baseline.meanGain===0 && paired.sampleCount===3, 'paired comparison includes an explicit do-nothing baseline');
+assertModel(paired.rules.length===2 && paired.pairwise.length===1 && paired.pairwise[0].aWins+paired.pairwise[0].bWins+paired.pairwise[0].ties===3, 'competing rules are compared head-to-head on identical states');
+assertModel(paired.rules.every(r=>Number.isFinite(r.mean)&&r.worst>=-100&&r.worst<=100&&r.winRate>=0&&r.winRate<=100), 'paired comparison reports bounded metrics for each rule');
+assertModel(JSON.stringify(pairedSamples)===pairedBefore, 'paired comparison leaves benchmark samples unchanged');
 const holdA = api.buildPrometheusHoldout();
 const holdB = api.buildPrometheusHoldout();
 assertModel(holdA.length === 128, 'holdout contains 128 samples');
