@@ -24,7 +24,7 @@
   <div id="intentBriefResult" class="intent-result" aria-live="polite"><div class="empty">Your brief will show the selected model target, current alignment, and any route the engine can find. Nothing is changed until you build it.</div></div>
 </section>
 <div class="grid">
-<section class="panel" id="substratePanel"><h2>01 / The substrate</h2><p class="sub">Adjust the starting material. Values are symbolic units from 0 to 100.</p><div class="stats" id="stats"></div><div class="stability"><label for="stability">Stability</label><input id="stability" class="range" type="range" min="0" max="10" value="4"><strong id="stabValue">4</strong></div><div class="scoreline"><div><div class="eyebrow">Current goal alignment</div><div class="score" id="score">--%</div></div><div style="text-align:right"><div class="eyebrow">Selected aim</div><strong id="goalName">Balanced</strong></div></div><div class="meter"><span id="meter"></span></div><div class="row" style="margin-top:15px"><button class="ghost" id="resetState">Reset substrate</button><button class="ghost" id="export">Export experiments</button></div></section>
+<section class="panel" id="substratePanel"><h2>01 / The substrate</h2><p class="sub">Adjust the starting material. Values are symbolic units from 0 to 100.</p><div class="stats" id="stats"></div><div class="stability"><label for="stability">Stability</label><input id="stability" class="range" type="range" min="0" max="10" value="4"><strong id="stabValue">4</strong></div><div class="scoreline"><div><div class="eyebrow">Current goal alignment</div><div class="score" id="score">--%</div></div><div style="text-align:right"><div class="eyebrow">Selected aim</div><strong id="goalName">Balanced</strong></div></div><div class="meter"><span id="meter"></span></div><div class="row" style="margin-top:15px"><button class="ghost" id="resetState">Reset substrate</button><button class="ghost" id="export">Export experiments</button><button class="ghost" id="exportReport">Research report</button></div></section>
 <section class="panel" id="intentionPanel"><h2>02 / Choose an outcome</h2><p class="sub">The engine scores distance from each goal's target profile.</p><select class="goal-select" id="goal"><option value="balanced">Balanced</option><option value="concentrated">Concentrated</option><option value="purified">Purified</option><option value="stable">Stable</option><option value="custom">Custom intention</option></select><div id="goalDescription" class="sub" style="margin-bottom:12px"></div><div id="customTarget" class="routebox" style="display:none;margin:0 0 18px"><h2>Define your target state</h2><p class="sub">Set the destination. The engine will search for a sequence that moves the substrate toward this profile.</p><div id="targetControls"></div><div class="stability"><label for="targetStability">Target stability</label><input id="targetStability" class="range" type="range" min="0" max="10" value="8"><strong id="targetStabilityValue">8</strong></div></div><h2>Invoke an operation</h2><p class="sub">Each operation has a deterministic, inspectable rule.</p><div class="ops"><button class="op" data-op="Separate"><span class="symbol">◈</span><b>Separate</b><small>Differentiate the volatile pair.</small></button><button class="op" data-op="Conjoin"><span class="symbol">⊙</span><b>Conjoin</b><small>Bring the primary pair together.</small></button><button class="op" data-op="Distill"><span class="symbol">♧</span><b>Distill</b><small>Refine the substrate.</small></button><button class="op" data-op="Fix"><span class="symbol">⌑</span><b>Fix</b><small>Trade volatility for stability.</small></button></div><div class="routebox" id="routePanel"><div class="row"><div><h2>Find a route</h2><p class="sub" style="margin:3px 0 0">Search up to 6 operations ahead.</p></div><button class="primary" id="findRoute">Find route</button></div><div id="routeResult" class="sub" style="margin:12px 0 0">Ready when you are. The route finder searches real operation sequences.</div><div class="routepath" id="routePath"></div><button id="runRoute" class="primary" style="width:100%;display:none">Execute recipe step by step</button></div><div class="routebox"><div class="row"><div><h2>Consult the Oracle</h2><p class="sub" style="margin:3px 0 0">Compare alternate futures, not just one recipe.</p></div><button class="primary" id="oracle">Explore futures</button></div><div id="oracleResult" class="sub" style="margin:12px 0 0">The Oracle will explore alternative sequences and rank them by alignment, efficiency and path diversity.</div><div id="oraclePaths" class="trace" style="margin-top:10px"></div></div></section>
 <section class="panel wide" id="discoveryPanel"><div class="row"><div><h2>05 / Rule discovery</h2><p class="sub">Generate and test candidate transformation hypotheses.</p></div><button class="primary smallbtn" id="discoverRules" style="flex:0 0 auto">Discover rules</button> <button class="primary smallbtn" id="synthesizeStrategy" style="flex:0 0 auto">Synthesize strategy</button></div><div id="discoveryResults"><div class="empty">Generate candidate rules, compare their predicted effects, and test one.</div></div><div id="keptRules" class="trace" style="margin-top:12px"><p class="sub">Your preserved rule library will appear here.</p></div></section>
 <section class="panel wide" id="evidencePanel"><div class="row"><div><h2>00 / PROJECT PROMETHEUS</h2><p class="sub">Self-adversarial discovery: test saved rules on a separate, reproducible holdout set and search for counterexamples.</p></div><button class="primary smallbtn" id="runPrometheus" style="flex:0 0 auto">Run Prometheus trial</button><button class="ghost smallbtn" id="compareBaseline" style="flex:0 0 auto">Compare against baseline</button><button class="ghost smallbtn" id="crossGoalAudit" style="flex:0 0 auto">Test across all goals</button><button class="ghost smallbtn" id="ruleStabilityAudit" style="flex:0 0 auto">Audit rule stability</button><button class="ghost smallbtn" id="compileEvidenceLedger" style="flex:0 0 auto">Compile evidence ledger</button><button class="ghost smallbtn" id="selectNextExperiment" style="flex:0 0 auto">Select next experiment</button><button class="ghost smallbtn" id="runSelectedProbes" style="flex:0 0 auto">Run selected probes</button><button class="ghost smallbtn" id="mapBlindSpots" style="flex:0 0 auto">Map model blind spots</button><button class="ghost smallbtn" id="probeWeaknesses" style="flex:0 0 auto">Probe weakest regions</button></div><div id="nextExperimentResults"><div class="empty">Use the evidence ledger to prioritise weak rules and select informative challenge states.</div></div><div id="evidenceLedgerResults"><div class="empty">Compile a ledger of saved test results, repeat performance, cross-goal resilience and recorded failures.</div></div><div id="ruleStabilityResults"><div class="empty">Test whether a rule survives small changes to its parameters.</div></div><div id="prometheusResults"><div class="empty">Prometheus will compare each saved rule against a held-out set of 128 synthetic states, identify its worst counterexample, and report whether its performance generalises beyond the original sample generator. No current state will be changed.</div></div><div id="blindSpotResults"><div class="empty">Map the model’s weak regions by testing saved rules against targeted synthetic state families.</div></div><div id="challengeResults"><div class="empty">Probe weak regions with targeted local search to seek worse counterexamples than random sampling found.</div></div></section><section class="panel wide"><div class="row"><div><h2>00C / ANOMALY LAB</h2><p class="sub">Construct controlled challenge protocols from the model’s weakest regions. Compare targeted states with a broad synthetic control set.</p></div><button class="primary smallbtn" id="runAnomalyProtocol" style="flex:0 0 auto">Generate challenge protocol</button></div><div id="anomalyResults"><div class="empty">The lab will identify a difficult region, generate a repeatable challenge set, and compare saved rules against a separate control sample.</div></div></section>
@@ -880,6 +880,83 @@ document.getElementById('clearHistory').addEventListener('click',()=>{if(!confir
 function createExportPayload(current,goalSettings,exportedAt){
  return {app:'Digital Alchemy Lab',schemaVersion:4,engineModel:'symbolic deterministic operations with Prometheus holdout validation and Law Forge method evolution',exportedAt,currentState:{values:current.values,stability:current.stability,goal:current.goal,goalConfig:goalSettings,intentText:current.intentText||''},experimentLedger:current.history,trace:current.trace,learnedRules:current.learnedRules,integrityReports:current.integrityReports,prometheusReports:current.prometheusReports,lawForgeReports:current.lawForgeReports,blindSpotReports:current.blindSpotReports,methodology:{sampleStates:'Deterministically generated from fixed arithmetic sequences',limitations:['Synthetic symbolic states only','Goal alignment is a model score, not real-world success probability','Prometheus uses a distinct deterministic holdout generator, but this does not prove real-world generalisation','Law Forge evolves heuristic search parameters in a symbolic model; it is not yet a general self-improving AI system','Integrity tests do not establish external validity','Local browser storage is device-specific and is not cloud-synchronised']}};
 }
+function buildResearchReport(current,goalSettings,createdAt){
+ const signed=n=>(n>0?'+':'')+n;
+ const lines=[
+  '# Digital Alchemy | Research Report','',
+  '> A reproducible report of the current symbolic model and locally saved experiments. Objective scores are model outputs, not real-world success probabilities.','',
+  '## 1. Experiment brief','',
+  '- **Generated:** '+createdAt,
+  '- **Intention:** '+(current.intentText?current.intentText.replace(/\\n/g,' '):'Not recorded'),
+  '- **Selected goal:** '+goalSettings.label+' ('+current.goal+')',
+  '- **Target profile:** '+goalSettings.target.map((v,i)=>names[i]+' '+v).join(' · '),
+  '- **Target stability:** '+goalSettings.stab,
+  '- **Starting/current state:** '+current.values.join(' / ')+'; stability '+current.stability,
+  '- **Current model alignment:** '+score(current)+'%',
+  '- **Saved experiments:** '+current.history.length,
+  '- **Saved candidate rules:** '+current.learnedRules.length,''
+ ];
+ if(current.route){
+  lines.push('### Current candidate route','','- **Operations:** '+current.route.path.join(' → '),'- **Predicted score:** '+current.route.score+'%', '- **Threshold reached:** '+(current.route.found?'yes':'no'),'');
+ }else lines.push('### Current candidate route','','No route is currently selected. Run route search from the app to create one.','');
+ lines.push('## 2. Evidence inventory','',
+  '- Reproducibility / integrity reports: '+current.integrityReports.length,
+  '- Prometheus and paired baseline reports: '+current.prometheusReports.length,
+  '- Law Forge search reports: '+current.lawForgeReports.length,
+  '- Blind-spot reports: '+current.blindSpotReports.length,'');
+ const latest=current.prometheusReports[0];
+ if(latest){
+  lines.push('### Latest saved Prometheus / baseline report','',
+   '- **Type:** '+(latest.type||'Recorded report'),
+   '- **Timestamp:** '+(latest.timestamp||'not recorded'),
+   '- **Goal:** '+(latest.goal||latest.currentGoal||current.goal));
+  if(Number.isFinite(latest.sampleCount))lines.push('- **Sample states:** '+latest.sampleCount);
+  if(Array.isArray(latest.results)){
+   lines.push('- **Rules/results reported:** '+latest.results.length);
+   for(const item of latest.results.slice(0,8)){
+    if(Number.isFinite(item.holdoutMean))lines.push('  - '+(item.name||'Unnamed rule')+': held-out mean '+signed(item.holdoutMean)+', win rate '+(item.holdoutWinRate??'n/a')+'%, worst outcome '+(item.worst??'n/a')+'.');
+    else if(Number.isFinite(item.mean))lines.push('  - '+(item.name||'Unnamed rule')+': mean '+signed(item.mean)+', win rate '+(item.winRate??'n/a')+'%, worst outcome '+(item.worst??'n/a')+'.');
+   }
+  }
+  lines.push('');
+ }else lines.push('### Latest saved Prometheus / baseline report','','No saved report yet. Run Prometheus and/or the paired baseline comparison before making claims about candidate-rule performance.','');
+ const law=current.lawForgeReports[0];
+ if(law){
+  lines.push('### Latest Law Forge report','',
+   '- **Timestamp:** '+(law.timestamp||'not recorded'),
+   '- **Goal:** '+(law.goal||current.goal),
+   '- **Held-out mean:** '+(law.best&&Number.isFinite(law.best.holdMean)?signed(law.best.holdMean):'not available'),
+   '- **Held-out win rate:** '+(law.best&&Number.isFinite(law.best.holdWin)?law.best.holdWin+'%':'not available'),
+   '- **Worst outcome:** '+(law.best&&Number.isFinite(law.best.worst)?law.best.worst:'not available'),'');
+ }else lines.push('### Latest Law Forge report','','No saved Law Forge report yet.','');
+ lines.push('## 3. Suggested next experiment','');
+ let next;
+ if(!current.learnedRules.length)next='Discover candidate rules, then preserve a small set for evaluation.';
+ else if(!current.prometheusReports.some(r=>r.type==='prometheus-trial'))next='Run a Prometheus trial on held-out synthetic states and inspect the worst counterexample for each rule.';
+ else if(!current.prometheusReports.some(r=>r.type==='paired-baseline-comparison'))next='Run the paired baseline comparison so candidate rules are measured against doing nothing on identical states.';
+ else if(!current.prometheusReports.some(r=>r.type==='cross-goal-robustness-audit'))next='Run the cross-goal robustness audit to test whether apparent gains depend on one chosen objective.';
+ else next='Use the weakest recorded goal or worst counterexample to design a targeted follow-up test, then compare it with the same baseline.';
+ lines.push('- '+next,'','## 4. Interpretation and limitations','',
+  '- The model is deterministic symbolic computation, not physical chemistry or a validated model of the real world.',
+  '- Alignment scores measure the app’s own objective function. They are not probabilities, causal evidence, or proof of practical benefit.',
+  '- Synthetic holdout tests can reveal fragility within this model, but do not establish external validity.',
+  '- The report includes only evidence saved in this browser at the time of export; local storage is not cloud-synchronised.',
+  '- A missing report means “not recorded here”, not “the method failed”.','',
+  '## 5. Reproduction notes','',
+  '- App: Digital Alchemy Lab',
+  '- Model: symbolic deterministic operations (Separate, Conjoin, Distill, Fix)',
+  '- Export timestamp: '+createdAt,
+  '- For the complete machine-readable ledger, use **Export experiments** to download the JSON archive.',''
+ );
+ return lines.join('\\n');
+}
+document.getElementById('exportReport').addEventListener('click',()=>{
+ const now=new Date().toISOString();
+ const markdown=buildResearchReport(state,goalConfig(),now);
+ const blob=new Blob([markdown],{type:'text/markdown;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='digital-alchemy-research-report.md';a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);showToast('Research report prepared');
+});
 document.getElementById('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(createExportPayload(state,goalConfig(),new Date().toISOString()),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='digital-alchemy-experiments.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);showToast('Export prepared')});
 load();document.getElementById('intentionText').value=state.intentText||'';document.getElementById('intentionGoal').value=state.goal;renderStats();renderTargetControls();updateSummary();renderTrace();renderHistory();renderKeptRules();
 })();
