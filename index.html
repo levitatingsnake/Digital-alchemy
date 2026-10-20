@@ -72,16 +72,25 @@ function applyCandidate(r,label,sampleCount){
  saveExperiment(label,before,[label],{values:state.values.slice(),stability:state.stability});
  renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Hypothesis tested and recorded');
 }
-function validateRule(rule){
- const samples=Array.from({length:24},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
+function validateRule(rule,count=64){
+ const samples=Array.from({length:count},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
  const gains=samples.map(s=>{const next={values:s.values.map((x,i)=>clamp(x+rule.delta[i])),stability:Math.max(0,Math.min(10,s.stability+rule.ds))};return score(next)-score(s)});
  const losses=gains.filter(x=>x<0);
- return {mean:+(gains.reduce((a,b)=>a+b,0)/gains.length).toFixed(2),winRate:Math.round(gains.filter(x=>x>0).length/gains.length*100),worst:losses.length?Math.min(...losses):0};
+ return {mean:+(gains.reduce((a,b)=>a+b,0)/gains.length).toFixed(2),winRate:Math.round(gains.filter(x=>x>0).length/gains.length*100),worst:losses.length?Math.min(...losses):0,sampleCount:count};
 }
 function renderKeptRules(){
  const root=document.getElementById('keptRules');if(!root)return;
  if(!state.learnedRules.length){root.innerHTML='<p class="sub">Your rule library is empty. Keep a promising hypothesis to preserve it on this device.</p>';return}
- root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3>'+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain · worst loss '+r.worst+'</p><button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
+ root.innerHTML='<h3>Preserved rules · '+state.learnedRules.length+'/30</h3><button class="smallbtn" id="retestLibrary">Re-test library (64 states)</button> '+state.learnedRules.map((r,i)=>'<div class="traceitem"><b>'+r.name+'</b><p>S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Validation: '+r.winRate+'% win rate · '+(r.mean>=0?'+':'')+r.mean+' mean gain · worst loss '+r.worst+'</p><button class="smallbtn" data-apply-kept="'+i+'">Apply rule</button> <button class="smallbtn" data-remove-kept="'+i+'">Discard</button></div>').join('')+(state.learnedRules.length>=2?'<button class="smallbtn" id="combineRules">Combine two rules</button>':'');
+ const retest=document.getElementById('retestLibrary');
+ if(retest)retest.addEventListener('click',()=>{
+  const ranked=state.learnedRules.map((r,i)=>({r,i,stats:validateRule(r,64)})).sort((a,b)=>b.stats.mean-a.stats.mean||b.stats.winRate-a.stats.winRate||b.stats.worst-a.stats.worst);
+  ranked.forEach(({r,stats})=>{r.mean=stats.mean;r.winRate=stats.winRate;r.worst=stats.worst;r.sampleCount=stats.sampleCount;});
+  persist();renderKeptRules();
+  const out=document.getElementById('discoveryResults');
+  out.innerHTML='<p class="sub">Library re-tested against 64 repeatable sample states per rule using the current goal. Rankings are goal-relative and deterministic, not proof of a universal law.</p>'+ranked.map((x,rank)=>'<div class="traceitem"><b>#'+(rank+1)+' · '+x.r.name+'</b><p>'+x.stats.winRate+'% positive outcomes · '+(x.stats.mean>=0?'+':'')+x.stats.mean+' mean alignment gain · worst loss '+x.stats.worst+' points</p><p>Rule: S '+signed(x.r.delta[0])+' · M '+signed(x.r.delta[1])+' · Salt '+signed(x.r.delta[2])+' · Void '+signed(x.r.delta[3])+' · stability '+signed(x.r.ds)+'</p></div>').join('');
+  showToast('Compared '+ranked.length+' saved rules across 64 states each');
+ });
  root.querySelectorAll('[data-apply-kept]').forEach(btn=>btn.addEventListener('click',()=>{
   const r=state.learnedRules[+btn.dataset.applyKept],before={values:state.values.slice(),stability:state.stability};
   const next={values:state.values.map((x,i)=>clamp(x+r.delta[i])),stability:Math.max(0,Math.min(10,state.stability+r.ds))};
