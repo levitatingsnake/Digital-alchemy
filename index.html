@@ -948,7 +948,7 @@ function buildResearchReport(current,goalSettings,createdAt){
   '- Export timestamp: '+createdAt,
   '- For the complete machine-readable ledger, use **Export experiments** to download the JSON archive.',''
  );
- return lines.join('\\n');
+ return lines.join('\n');
 }
 document.getElementById('exportReport').addEventListener('click',()=>{
  const now=new Date().toISOString();
