@@ -219,3 +219,13 @@ These are results inside the current symbolic scoring model only. They demonstra
 4. Track benchmark history and compare candidate algorithm versions.
 5. Only after stronger tests exist, introduce an AI-assisted code-change proposal workflow on a separate branch. Never automatically merge unreviewed changes into `main`.
 
+### Search-efficiency experiment (2026-10-20)
+- Added a state-deduplicated search variant to `tests/overnight-benchmark.mjs`.
+- GitHub Actions reran the smoke checks and benchmark successfully after the change.
+- The deduplicated variant matched the naive bounded search score on all 400 test cases.
+- Naive search attempted 33,600 transitions; deduplicated search attempted 27,348, a reduction of 18.61%.
+- The deduplicated run skipped expanding 7,518 duplicate states and scored 19,830 newly reached states.
+- Mean score remained 78.933, matching the naive depth-three search.
+
+Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
+
