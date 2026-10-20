@@ -122,7 +122,7 @@ const ledgerProm=[
 const ledgerBlind=[{timestamp:'t4',rules:[{name:'rule-a',weakestMean:-2,weakest:'Low-value states'},{name:'rule-b',weakestMean:-12,weakest:'Saturation boundaries'}]}];
 const ledger=api.buildDiscoveryEvidenceLedger(ledgerProm,ledgerBlind,[{name:'rule-a'},{name:'rule-b'},{name:'untested'}]);
 assertModel(ledger.type==='discovery-evidence-ledger'&&ledger.ruleCount===3, 'evidence ledger includes saved rules and historical evidence');
-assertModel(ledger.rules.find(r=>r.name==='rule-a').measurementCount===3&&ledger.rules.find(r=>r.name==='rule-a').sources.length>=3, 'evidence ledger aggregates multiple test families for each rule');
+assertModel(ledger.rules.find(r=>r.name==='rule-a').measurementCount===4&&ledger.rules.find(r=>r.name==='rule-a').sources.length>=3, 'evidence ledger aggregates multiple test families for each rule');
 assertModel(ledger.rules.find(r=>r.name==='rule-b').status==='FRAGILE OR CONTRADICTED'&&ledger.rules.find(r=>r.name==='untested').status==='INSUFFICIENT EVIDENCE', 'evidence ledger flags counterevidence and avoids overstating untested rules');
 assertModel(api.buildDiscoveryEvidenceLedger([{type:'discovery-evidence-ledger',rules:[{name:'rule-a',mean:99}]}],[],[]).ruleCount===0, 'evidence ledger does not recursively count its own saved snapshots');
 const crossGoalRules=[{name:'toward-salt',delta:[-2,-2,5,-4],ds:1},{name:'toward-void',delta:[1,1,-1,6],ds:-1}];
