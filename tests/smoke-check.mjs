@@ -34,6 +34,9 @@ const required = [
   ['Discriminating experiment designer', 'function designDiscriminatingExperiments()'],
   ['Anomaly challenge protocol', 'function runAnomalyProtocol()'],
   ['Cycle audit record', "type:'discovery-cycle-audit'"],
+  ['Saved history validation', 'x.history.filter(validHistoryEntry)'],
+  ['Saved trace validation', 'x.trace.filter(validTraceEntry)'],
+  ['Saved rule validation', 'x.learnedRules.filter(validRule)'],
   ['Discovery cycle requires fresh reports from this run', 'const missing=required.filter(type=>!createdTypes.has(type))'],
   ['Local persistence of research reports', 'blindSpotReports:state.blindSpotReports'],
   ['Export of research reports', 'blindSpotReports:state.blindSpotReports,methodology:']
