@@ -234,9 +234,10 @@ Interpretation: this is a positive internal optimisation result for the current 
 - Expanded the existing Discovery Cycle button into a ten-stage orchestrator.
 - Stages: conditional pattern scan; discriminating experiment design; adversarial anomaly challenge; held-out Prometheus trial; paired comparison against do-nothing; cross-goal robustness audit; rule stability audit; evidence-ledger compilation; next-experiment selection; competing-rule adjudication with a separate synthetic holdout.
 - Each stage is isolated with error capture, so one failure is recorded and the remaining stages are still attempted.
-- The cycle integrity audit now requires fresh report types from all ten stages across both report stores, rejects stale reports, records stage errors, and verifies that the substrate, stability, selected goal, custom target, custom stability setting, and saved rule library remain unchanged. These are report-contract and workspace-preservation checks, not a full browser end-to-end integration test or proof of scientific validity.
-- Prometheus trial reports now carry an explicit `prometheus-trial` type, allowing the report generator and evidence ledger to recognise them reliably.
-- Smoke tests mock and verify all ten stages, including continuation after a simulated stage failure and visibility of the adjudication result in the cycle summary.
+- The cycle integrity audit requires fresh report types from all ten stages across both report stores, rejects stale reports, records stage errors, and verifies that the substrate, stability, selected goal, custom target, custom stability setting, and saved rule library remain unchanged.
+- Added `tests/real-stage-integration.mjs`, which executes the actual application script in a lightweight Node DOM shim, runs all ten real stages with competing candidate rules, and asserts fresh evidence, no stage exceptions, a passing audit, workspace preservation, and a rendered cycle summary. This is a real-stage integration test, but not a visual browser test.
+- The smoke suite also retains mocked orchestration tests for simulated stage failure, continuation, and audit rejection, because the integration test's successful path alone does not prove every failure mode.
+- Prometheus trial reports carry an explicit `prometheus-trial` type, allowing the report generator and evidence ledger to recognise them reliably.
 - All generated evidence remains synthetic and scoring-model-dependent; this workflow is a repeatable internal research protocol, not external validation.
 
 ### Evidence-aware research report export (2026-10-20)
