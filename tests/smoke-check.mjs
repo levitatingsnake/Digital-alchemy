@@ -42,7 +42,7 @@ const required = [
   ['Oversized archives are bounded on restore', '.slice(-100)'],
   ['Discovery cycle requires fresh reports from this run', 'const missing=required.filter(type=>!createdTypes.has(type))'],
   ['Local persistence of research reports', 'blindSpotReports:state.blindSpotReports'],
-  ['Export of research reports', 'blindSpotReports:state.blindSpotReports,methodology:']
+  ['Export of research reports', 'blindSpotReports:current.blindSpotReports,methodology:']
 ];
 for (const [label, needle] of required) {
   if (!html.includes(needle)) {
