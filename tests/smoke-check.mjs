@@ -78,13 +78,17 @@ function functionBlock(name, nextName) {
 const coreStart = applicationScript.indexOf('const names=');
 const coreEnd = applicationScript.indexOf('function synthesizeStrategy()', coreStart);
 if (coreStart < 0 || coreEnd < 0) throw new Error('Cannot isolate core symbolic model.');
+const exportHelperStart = applicationScript.indexOf('function createExportPayload(');
+const exportHelperEnd = applicationScript.indexOf("document.getElementById('export').addEventListener", exportHelperStart);
+if (exportHelperStart < 0 || exportHelperEnd < 0) throw new Error('Cannot isolate export payload builder.');
+const exportHelper = applicationScript.slice(exportHelperStart, exportHelperEnd);
 const modelSource = [
   applicationScript.slice(coreStart, coreEnd),
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
   functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
   functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
   functionBlock('validVector', 'load'),
-  functionBlock('createExportPayload', "document.getElementById('export').addEventListener"),
+  exportHelper,
   'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
