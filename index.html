@@ -741,8 +741,6 @@ function renderKeptRules(){
    }catch(error){console.error('Apply saved rule failed',error);showToast('Rule could not be applied. Check the experiment trace for details.')}
    return;
   }
-  const removeBtn=event.target.closest('[data-remove-kept]');
-  if(removeBtn&&root.contains(removeBtn)){event.preventDefault();const index=Number(removeBtn.getAttribute('data-remove-kept'));if(!state.learnedRules[index])return;state.learnedRules.splice(index,1);persist();renderKeptRules();showToast('Rule discarded');return}
  };
  root.querySelectorAll('[data-remove-kept]').forEach(btn=>btn.addEventListener('click',()=>{
   state.learnedRules.splice(+btn.dataset.removeKept,1);persist();renderKeptRules();showToast('Rule discarded');
