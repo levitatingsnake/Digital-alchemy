@@ -89,6 +89,52 @@ function search(start, goal, maxDepth = 3) {
   return { ...best, startScore, candidatesEvaluated };
 }
 
+function searchWithStateDeduplication(start, goal, maxDepth = 3) {
+  const startScore = api.score(start, goal);
+  let best = { score: startScore, state: start, route: [] };
+  let frontier = [{ state: start, route: [] }];
+  const visited = new Set([stateKey(start)]);
+  let transitionAttempts = 0;
+  let uniqueStatesScored = 0;
+  let duplicateStatesSkipped = 0;
+
+  for (let depth = 1; depth <= maxDepth; depth++) {
+    const nextFrontier = [];
+    for (const node of frontier) {
+      for (const op of api.ops) {
+        transitionAttempts++;
+        const result = api.apply(node.state, op).state;
+        const key = stateKey(result);
+        const score = api.score(result, goal);
+        if (!Number.isFinite(score)) throw new Error('Non-finite score during deduplicated search.');
+        if (
+          score > best.score ||
+          (score === best.score && depth < best.route.length)
+        ) {
+          best = { score, state: result, route: [...node.route, op] };
+        }
+        if (visited.has(key)) {
+          duplicateStatesSkipped++;
+          continue;
+        }
+        visited.add(key);
+        uniqueStatesScored++;
+        nextFrontier.push({ state: result, route: [...node.route, op] });
+      }
+    }
+    frontier = nextFrontier;
+    if (!frontier.length) break;
+  }
+  return {
+    ...best,
+    startScore,
+    transitionAttempts,
+    uniqueStatesScored,
+    duplicateStatesSkipped,
+    uniqueStatesVisited: visited.size
+  };
+}
+
 function greedyOneStep(start, goal) {
   let best = { score: api.score(start, goal), route: [], state: start };
   for (const op of api.ops) {
@@ -120,6 +166,8 @@ function runBenchmark() {
   const rows = cases.map(testCase => {
     const greedy = greedyOneStep(testCase.start, testCase.goal);
     const searched = search(testCase.start, testCase.goal, 3);
+    const deduplicated = searchWithStateDeduplication(testCase.start, testCase.goal, 3);
+    assert(deduplicated.score === searched.score, `state deduplication preserves optimal bounded-search score for ${testCase.id}`);
     return {
       id: testCase.id,
       seed: testCase.seed,
@@ -130,7 +178,13 @@ function runBenchmark() {
       greedyRoute: greedy.route,
       searchScore: searched.score,
       searchRoute: searched.route,
-      candidatesEvaluated: searched.candidatesEvaluated
+      candidatesEvaluated: searched.candidatesEvaluated,
+      deduplicatedScore: deduplicated.score,
+      deduplicatedRoute: deduplicated.route,
+      deduplicatedTransitionAttempts: deduplicated.transitionAttempts,
+      deduplicatedUniqueStatesScored: deduplicated.uniqueStatesScored,
+      deduplicatedDuplicateStatesSkipped: deduplicated.duplicateStatesSkipped,
+      deduplicatedUniqueStatesVisited: deduplicated.uniqueStatesVisited
     };
   });
 
@@ -170,7 +224,13 @@ function runBenchmark() {
       searchTiesGreedy: rows.filter(row => row.searchScore === row.greedyScore).length,
       searchWorseThanGreedy: rows.filter(row => row.searchScore < row.greedyScore).length,
       totalCandidateEvaluations: rows.reduce((sum, row) => sum + row.candidatesEvaluated, 0),
-      averageRouteLength: +mean(rows.map(row => row.searchRoute.length)).toFixed(3)
+      averageRouteLength: +mean(rows.map(row => row.searchRoute.length)).toFixed(3),
+      deduplicatedMeanScore: +mean(rows.map(row => row.deduplicatedScore)).toFixed(3),
+      deduplicatedTransitionAttempts: rows.reduce((sum, row) => sum + row.deduplicatedTransitionAttempts, 0),
+      deduplicatedUniqueStatesScored: rows.reduce((sum, row) => sum + row.deduplicatedUniqueStatesScored, 0),
+      deduplicatedDuplicateStatesSkipped: rows.reduce((sum, row) => sum + row.deduplicatedDuplicateStatesSkipped, 0),
+      transitionAttemptReductionPct: +((1 - rows.reduce((sum, row) => sum + row.deduplicatedTransitionAttempts, 0) / rows.reduce((sum, row) => sum + row.candidatesEvaluated, 0)) * 100).toFixed(2),
+      dedupSearchScoreMatches: rows.filter(row => row.deduplicatedScore === row.searchScore).length
     },
     byGoal,
     examples: {
@@ -222,6 +282,12 @@ const lines = [
   `| Depth-3 mean gain vs no-op | ${first.overall.depth3Search.meanGainVsNoOp} |`,
   `| Cases search beats greedy | ${first.overall.searchBeatsGreedy} / ${first.method.caseCount} |`,
   `| Average selected route length | ${first.overall.averageRouteLength} |`,
+  `| Deduplicated search mean score | ${first.overall.deduplicatedMeanScore} |`,
+  `| Deduplicated transition attempts | ${first.overall.deduplicatedTransitionAttempts} |`,
+  `| Unique states scored by deduplicated search | ${first.overall.deduplicatedUniqueStatesScored} |`,
+  `| Duplicate states skipped | ${first.overall.deduplicatedDuplicateStatesSkipped} |`,
+  `| Transition-attempt reduction vs naive search | ${first.overall.transitionAttemptReductionPct}% |`,
+  `| Cases with identical deduplicated and naive scores | ${first.overall.dedupSearchScoreMatches} / ${first.method.caseCount} |`,
   '',
   '## Results by goal',
   '',
@@ -236,11 +302,13 @@ const lines = [
   `- Maximum route depth: ${first.method.maximumSearchDepth}.`,
   '- Baseline: leave the starting state unchanged.',
   '- Comparator: choose the best result among all single-operation routes.',
+  '- Deduplication variant: skip expanding any state already reached at a shallower or equal depth.',
+  '- Integrity check: deduplicated and naive search must return the same best score for every case.',
   '- Repeatability: the full experiment is executed twice and must produce identical results apart from the timestamp.',
   '',
   '## Interpretation',
   '',
-  'This is a bounded internal benchmark, not proof that the system solves arbitrary problems. A deeper search has access to all one-step routes, so it should never score below the greedy comparator. The useful question is how often multi-step combinations improve the score and whether that improvement justifies the extra search cost.',
+  'This is a bounded internal benchmark, not proof that the system solves arbitrary problems. A deeper search has access to all one-step routes, so it should never score below the greedy comparator. State deduplication is accepted only when it preserves the best score on every case; transition attempts are a proxy for search work, not a direct wall-clock speed measurement.',
   '',
   'Full case-level results and selected examples are in `overnight-latest.json`.'
 ];
