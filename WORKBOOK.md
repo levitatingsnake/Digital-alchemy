@@ -229,3 +229,9 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Adversarial boundary checks (2026-10-20)
+- Added `tests/adversarial-boundaries.mjs` and wired it into the overnight workflow before the benchmark.
+- Exercises boundary and mixed states, including component values at 0, 1, 50, 99, and 100 and stability at 0 and 10.
+- Checks every declared goal and every operation against finite/bounded scoring, input immutability, four-component shape, clamped integer values, bounded stability, and non-empty operation explanations.
+- The workflow should be treated as the source of truth for pass/fail. Do not claim these checks passed until the new run completes.
+
