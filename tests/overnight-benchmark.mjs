@@ -66,6 +66,7 @@ function search(start, goal, maxDepth = 3) {
   let best = { score: startScore, state: start, route: [] };
   let frontier = [{ state: start, route: [] }];
   let candidatesEvaluated = 0;
+  const bestScoreByDepth = {};
 
   for (let depth = 1; depth <= maxDepth; depth++) {
     const nextFrontier = [];
@@ -85,8 +86,9 @@ function search(start, goal, maxDepth = 3) {
       }
     }
     frontier = nextFrontier;
+    bestScoreByDepth[depth] = best.score;
   }
-  return { ...best, startScore, candidatesEvaluated };
+  return { ...best, startScore, candidatesEvaluated, bestScoreByDepth };
 }
 
 function searchWithStateDeduplication(start, goal, maxDepth = 3) {
@@ -179,6 +181,9 @@ function runBenchmark() {
       searchScore: searched.score,
       searchRoute: searched.route,
       candidatesEvaluated: searched.candidatesEvaluated,
+      depth1Score: searched.bestScoreByDepth[1],
+      depth2Score: searched.bestScoreByDepth[2],
+      depth3Score: searched.bestScoreByDepth[3],
       deduplicatedScore: deduplicated.score,
       deduplicatedRoute: deduplicated.route,
       deduplicatedTransitionAttempts: deduplicated.transitionAttempts,
@@ -194,7 +199,10 @@ function runBenchmark() {
       goal,
       cases: group.length,
       greedy: summarize(group, 'greedyScore'),
-      depth3Search: summarize(group, 'searchScore'),
+      depth1Search: summarize(group, 'depth1Score'),
+      depth2Search: summarize(group, 'depth2Score'),
+      depth3Search: summarize(group, 'depth3Score'),
+      depth3Deduplicated: summarize(group, 'deduplicatedScore'),
       searchBeatsGreedy: group.filter(row => row.searchScore > row.greedyScore).length
     };
   });
@@ -219,7 +227,10 @@ function runBenchmark() {
     overall: {
       baselineMeanScore: +mean(rows.map(row => row.startScore)).toFixed(3),
       greedy: summarize(rows, 'greedyScore'),
-      depth3Search: summarize(rows, 'searchScore'),
+      depth1Search: summarize(rows, 'depth1Score'),
+      depth2Search: summarize(rows, 'depth2Score'),
+      depth3Search: summarize(rows, 'depth3Score'),
+      depth3Deduplicated: summarize(rows, 'deduplicatedScore'),
       searchBeatsGreedy: rows.filter(row => row.searchScore > row.greedyScore).length,
       searchTiesGreedy: rows.filter(row => row.searchScore === row.greedyScore).length,
       searchWorseThanGreedy: rows.filter(row => row.searchScore < row.greedyScore).length,
@@ -291,9 +302,21 @@ const lines = [
   '',
   '## Results by goal',
   '',
-  '| Goal | Cases | Greedy mean | Greedy gain | Search mean | Search gain | Search beats greedy |',
+  '| Search strategy | Mean score | Mean gain vs no-op | Cases improved | Improvement rate |',
+  '|---|---:|---:|---:|---:|',
+  ...[
+    ['Greedy (depth 1)', first.overall.greedy],
+    ['Bounded search (depth 1)', first.overall.depth1Search],
+    ['Bounded search (depth 2)', first.overall.depth2Search],
+    ['Bounded search (depth 3)', first.overall.depth3Search],
+    ['Deduplicated search (depth 3)', first.overall.depth3Deduplicated]
+  ].map(([name, metrics]) => `| ${name} | ${metrics.meanScore} | ${metrics.meanGainVsNoOp} | ${metrics.casesImproved} | ${metrics.improvementRatePct}% |`),
+  '',
+  '### Results by goal',
+  '',
+  '| Goal | Cases | Greedy mean | Depth 1 | Depth 2 | Depth 3 | Deduplicated depth 3 |',
   '|---|---:|---:|---:|---:|---:|---:|',
-  ...first.byGoal.map(row => `| ${row.goal} | ${row.cases} | ${row.greedy.meanScore} | ${row.greedy.meanGainVsNoOp} | ${row.depth3Search.meanScore} | ${row.depth3Search.meanGainVsNoOp} | ${row.searchBeatsGreedy} |`),
+  ...first.byGoal.map(row => `| ${row.goal} | ${row.cases} | ${row.greedy.meanScore} | ${row.depth1Search.meanScore} | ${row.depth2Search.meanScore} | ${row.depth3Search.meanScore} | ${row.depth3Deduplicated.meanScore} |`),
   '',
   '## Method',
   '',
