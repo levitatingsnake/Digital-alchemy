@@ -87,7 +87,7 @@ function renderKeptRules(){
  const combine=document.getElementById('combineRules');
  if(combine)combine.addEventListener('click',()=>{
   const a=state.learnedRules[state.learnedRules.length-2],b=state.learnedRules[state.learnedRules.length-1];
-  const delta=a.delta.map((x,i)=>clamp(x+b.delta[i])-clamp(0)); // bounded combined shift
+  const delta=a.delta.map((x,i)=>Math.max(-12,Math.min(12,x+b.delta[i]))); // bounded combined shift
   const next={values:state.values.map((x,i)=>clamp(x+Math.max(-12,Math.min(12,delta[i])))),stability:Math.max(0,Math.min(10,state.stability+Math.max(-2,Math.min(2,a.ds+b.ds))))};
   const before=clone(state);
   state.values=next.values;state.stability=next.stability;state.route=null;
