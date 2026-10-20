@@ -120,14 +120,6 @@ function assertModel(condition, message) {
   if (!condition) throw new Error(message);
   console.log(`PASS: ${message}`);
 }
-const probePlan={goal:'balanced',seed:'0xAC71E202',timestamp:'plan-time',probes:activeA.probes};
-const probeWorkspaceBefore=JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal,rules:api.state.learnedRules});
-const probeOutcomes=api.evaluateRecommendedProbes(probePlan,activeRules);
-assertModel(probeOutcomes.type==='recommended-probe-results'&&probeOutcomes.rules.length===activeRules.length&&probeOutcomes.probeCount===8, 'selected probe executor returns outcomes for all saved rules and selected states');
-assertModel(probeOutcomes.rules.every(r=>r.results.length===8&&r.meanAbsolutePredictionError===0&&r.results.every(x=>x.predictionError===0)), 'selected probe replay checks every prediction against the deterministic scoring model');
-assertModel(JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal,rules:api.state.learnedRules})===probeWorkspaceBefore, 'selected probe replay does not mutate current workspace or rules');
-const ledgerWithProbe=api.buildDiscoveryEvidenceLedger([], [{type:'recommended-probe-results',rules:probeOutcomes.rules}], activeRules);
-assertModel(ledgerWithProbe.rules.find(r=>r.name==='fragile-rule').sources.includes('Recommended probe replay'), 'selected probe results feed back into the evidence ledger');
 const activeRules=[{name:'fragile-rule',delta:[-8,2,0,0],ds:-2},{name:'untested-rule',delta:[0,0,8,-3],ds:1},{name:'promising-rule',delta:[1,1,-1,1],ds:0}];
 const activeLedger={rules:[{name:'fragile-rule',status:'FRAGILE OR CONTRADICTED',measurementCount:4,positiveMeasurements:1,negativeMeasurements:3},{name:'promising-rule',status:'REPEATEDLY POSITIVE IN RECORDED TESTS',measurementCount:5,positiveMeasurements:5,negativeMeasurements:0}]};
 const activeSamples=Array.from({length:64},(_,i)=>({values:[(i*17)%101,(i*31)%101,(i*47)%101,(i*61)%101],stability:i%11}));
@@ -159,6 +151,14 @@ assertModel(crossGoalA.goalCount===5 && crossGoalA.goals.map(g=>g.goal).join(','
 assertModel(crossGoalA.summaries.length===2 && crossGoalA.summaries.every(r=>r.goals.length===5&&Number.isFinite(r.meanAcrossGoals)&&r.positiveGoals>=0&&r.positiveGoals<=5), 'cross-goal audit produces bounded per-rule and across-goal metrics');
 assertModel(JSON.stringify(crossGoalA)===JSON.stringify(crossGoalB), 'cross-goal audit is deterministic on identical rules and samples');
 assertModel(JSON.stringify(crossGoalSamples)===crossGoalSamplesBefore && JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal,customTarget:api.state.customTarget,customStability:api.state.customStability,rules:api.state.learnedRules})===crossGoalStateBefore, 'cross-goal audit does not mutate samples or workspace state');
+const probePlan={goal:'balanced',seed:'0xAC71E202',timestamp:'plan-time',probes:activeA.probes};
+const probeWorkspaceBefore=JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal,rules:api.state.learnedRules});
+const probeOutcomes=api.evaluateRecommendedProbes(probePlan,activeRules);
+assertModel(probeOutcomes.type==='recommended-probe-results'&&probeOutcomes.rules.length===activeRules.length&&probeOutcomes.probeCount===8, 'selected probe executor returns outcomes for all saved rules and selected states');
+assertModel(probeOutcomes.rules.every(r=>r.results.length===8&&r.meanAbsolutePredictionError===0&&r.results.every(x=>x.predictionError===0)), 'selected probe replay checks every prediction against the deterministic scoring model');
+assertModel(JSON.stringify({values:api.state.values,stability:api.state.stability,goal:api.state.goal,rules:api.state.learnedRules})===probeWorkspaceBefore, 'selected probe replay does not mutate current workspace or rules');
+const ledgerWithProbe=api.buildDiscoveryEvidenceLedger([], [{type:'recommended-probe-results',rules:probeOutcomes.rules}], activeRules);
+assertModel(ledgerWithProbe.rules.find(r=>r.name==='fragile-rule').sources.includes('Recommended probe replay'), 'selected probe results feed back into the evidence ledger');
 const cycleRoot = {innerHTML:''};
 sandbox.document = {getElementById:()=>cycleRoot};
 sandbox.goalConfig = goal => api.goals[goal || api.state.goal];
