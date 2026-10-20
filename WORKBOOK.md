@@ -229,6 +229,16 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Evidence-aware research report export (2026-10-20)
+
+- Added a **Research report** export alongside the existing full JSON experiment export.
+- The Markdown report captures the current intention, selected goal and target profile, current substrate and objective score, candidate route if present, and counts of saved experiment/evidence reports.
+- It summarises available recent Prometheus/baseline and Law Forge evidence where compatible metrics exist.
+- It proposes a next experiment based on which evidence categories are already saved, without fabricating missing results.
+- Includes explicit limitations around synthetic states, objective-score interpretation, external validity, browser-local storage, and missing reports.
+- Added smoke checks for the report builder, download wiring, limitation language and next-experiment recommendation.
+- The export is a point-in-time report from the current browser state; it does not claim to have independently validated the model.
+
 ### Alternative route evidence (2026-10-20)
 
 - Test briefs now compare the primary route with the strongest distinct endpoint states found by a separate bounded search through four operations.
