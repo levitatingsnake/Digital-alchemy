@@ -42,6 +42,7 @@ const required = [
   ['Oversized archives are bounded on restore', '.slice(-100)'],
   ['Discovery cycle requires fresh reports from this run', 'buildDiscoveryCycleAudit(before,'],
   ['Discovery cycle summary uses audit contract', 'audit.requiredReports.length-missing.length'],
+  ['Discovery cycle records stage failures', 'stageErrors:stageErrors.slice()'],
   ['Local persistence of research reports', 'blindSpotReports:state.blindSpotReports'],
   ['Export of research reports', 'blindSpotReports:current.blindSpotReports,methodology:']
 ];
@@ -108,6 +109,8 @@ const cycleBefore = {values:'[10,20,30,40]',stability:5,goal:cycleGoal,rules:'[]
 const cycleAfter = {values:[10,20,30,40],stability:5,goal:cycleGoal,learnedRules:[]};
 const freshCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
 assertModel(freshCycleAudit.passed && freshCycleAudit.missingReports.length===0 && freshCycleAudit.statePreserved, 'discovery cycle audit passes with all fresh reports and preserved state');
+const failedStageAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z',[{stage:'anomaly-challenge-protocol',message:'simulated failure'}]);
+assertModel(!failedStageAudit.passed && failedStageAudit.stageErrors.length===1 && failedStageAudit.stageErrors[0].stage==='anomaly-challenge-protocol', 'discovery cycle cannot pass when a stage reports an error');
 const staleCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(cycleReports),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
 assertModel(!staleCycleAudit.passed && staleCycleAudit.missingReports.length===3, 'discovery cycle audit rejects stale reports from earlier runs');
 const incompleteCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports.slice(0,2),cycleGoal,2,'2026-10-20T00:00:00.000Z');
