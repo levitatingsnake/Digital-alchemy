@@ -176,3 +176,46 @@ Digital Alchemy is ready to serve as the flagship portfolio project when a revie
 - see a clear, honest account of what works, what fails, and what should be built next.
 
 The target is not merely to look like advanced technology. It is to be an original, well-engineered, experimentally honest project that makes an AI engineering team curious enough to investigate further.
+
+## 11. Overnight experiment laboratory (implemented 2026-10-20)
+
+### Automation
+- GitHub Actions workflow: `.github/workflows/overnight-lab.yml`.
+- Scheduled daily at 13:30 UTC (02:30 during New Zealand daylight time; 01:30 during standard time).
+- Also runs when relevant application, test, or lab workflow files change on `main`, and can be launched manually from GitHub Actions.
+- Runs the existing smoke checks, then the deterministic benchmark on Node.js 24.
+- Publishes a readable report to the Actions run summary and uploads JSON + Markdown reports as a 30-day artifact.
+- The workflow has read-only repository permissions. It does not edit application code or merge changes.
+
+### Benchmark
+- Script: `tests/overnight-benchmark.mjs`.
+- Evaluates 400 deterministic starting states across five defined goals, four fixed operations, and four fixed seeds.
+- Compares the no-op baseline, best single-operation (greedy) choice, and exhaustive operation sequences up to depth three.
+- Evaluates 33,600 candidate transitions per run and repeats the benchmark to check reproducibility.
+- Records per-goal metrics, route choices, representative search advantages/regressions, and all case-level data.
+- Report paths created during each run: `reports/overnight-latest.md` and `reports/overnight-latest.json` (available as workflow artifacts rather than committed into the live branch).
+
+### First verified run
+The first GitHub Actions run completed successfully on 2026-10-20. The existing smoke checks and benchmark assertions passed.
+
+| Metric | First run |
+|---|---:|
+| Test cases | 400 |
+| Candidate evaluations | 33,600 |
+| No-op mean score | 68.778 |
+| Greedy mean score | 72.995 |
+| Greedy gain vs no-op | +4.218 |
+| Depth-three search mean score | 78.933 |
+| Depth-three gain vs no-op | +10.155 |
+| Cases where depth-three search beat greedy | 379 / 400 |
+| Average selected route length | 2.757 |
+
+These are results inside the current symbolic scoring model only. They demonstrate that multi-step search improves the model's own objective on this fixed test suite; they do not demonstrate real-world utility, scientific novelty, or general intelligence. Future benchmark changes must preserve a declared test method and compare results against these baselines.
+
+### Next laboratory upgrades
+1. Test whether beam search or state deduplication can reduce evaluations while preserving solution quality.
+2. Add boundary, constraint, and adversarial test suites.
+3. Add mutation tests so accidental changes to operation/scoring behaviour are detected.
+4. Track benchmark history and compare candidate algorithm versions.
+5. Only after stronger tests exist, introduce an AI-assisted code-change proposal workflow on a separate branch. Never automatically merge unreviewed changes into `main`.
+
