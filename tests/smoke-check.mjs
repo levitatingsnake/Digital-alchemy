@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import vm from 'node:vm';
 
 const html = fs.readFileSync('index.html', 'utf8');
 const scriptStart = html.indexOf('<script>');
@@ -59,4 +60,56 @@ for (const [label, needle] of [
   }
 }
 if (process.exitCode) process.exit(process.exitCode);
-console.log('All static smoke checks passed.');
+
+// Execute the pure model functions in an isolated Node VM. The UI and local storage are not loaded.
+function functionBlock(name, nextName) {
+  const start = applicationScript.indexOf(`function ${name}(`);
+  const end = applicationScript.indexOf(`function ${nextName}(`, start + 1);
+  if (start < 0 || end < 0) throw new Error(`Cannot isolate ${name}()`);
+  return applicationScript.slice(start, end);
+}
+const coreStart = applicationScript.indexOf('const names=');
+const coreEnd = applicationScript.indexOf('function synthesizeStrategy()', coreStart);
+if (coreStart < 0 || coreEnd < 0) throw new Error('Cannot isolate core symbolic model.');
+const modelSource = [
+  applicationScript.slice(coreStart, coreEnd),
+  functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
+  functionBlock('measurePrometheusRule', 'buildBlindSpotFamilies'),
+  functionBlock('buildBlindSpotFamilies', 'runDiscoveryCycle'),
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRule,buildBlindSpotFamilies};'
+].join('\n');
+const sandbox = {};
+vm.createContext(sandbox);
+vm.runInContext(modelSource, sandbox, { timeout: 3000 });
+const api = sandbox.testApi;
+function assertModel(condition, message) {
+  if (!condition) throw new Error(message);
+  console.log(`PASS: ${message}`);
+}
+const holdA = api.buildPrometheusHoldout();
+const holdB = api.buildPrometheusHoldout();
+assertModel(holdA.length === 128, 'holdout contains 128 samples');
+assertModel(JSON.stringify(holdA) === JSON.stringify(holdB), 'holdout generation is deterministic');
+assertModel(new Set(holdA.map(x => [...x.values, x.stability].join(','))).size === 128, 'holdout samples are unique');
+assertModel(holdA.every(x => x.values.length === 4 && x.values.every(v => v >= 0 && v <= 100) && x.stability >= 0 && x.stability <= 10), 'holdout values stay within valid bounds');
+const fixedTraining = new Set(Array.from({length:64},(_,i)=>[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101,(i*7+3)%11].join(',')));
+assertModel(holdA.every(x => !fixedTraining.has([...x.values,x.stability].join(','))), 'holdout excludes fixed training sequence');
+const familiesA = api.buildBlindSpotFamilies(), familiesB = api.buildBlindSpotFamilies();
+assertModel(familiesA.length === 5 && familiesA.every(x => x.samples.length === 64), 'five targeted challenge families contain 64 samples each');
+assertModel(JSON.stringify(familiesA.map(x=>({name:x.name,samples:x.samples}))) === JSON.stringify(familiesB.map(x=>({name:x.name,samples:x.samples}))), 'targeted challenge families are deterministic');
+let operationChecks = 0;
+for (const sample of [...holdA.slice(0,32), ...familiesA.flatMap(x=>x.samples.slice(0,4))]) {
+  for (const op of api.ops) {
+    const out = api.apply(sample, op).state;
+    assertModel(out.values.every(v => Number.isFinite(v) && v >= 0 && v <= 100) && Number.isFinite(out.stability) && out.stability >= 0 && out.stability <= 10, `operation ${op} stays in bounds`);
+    const repeated = api.apply(sample, op).state;
+    assertModel(JSON.stringify(out) === JSON.stringify(repeated), `operation ${op} is deterministic`);
+    operationChecks++;
+  }
+}
+const rule = {name:'smoke-test-rule',delta:[8,-4,3,-7],ds:1};
+const measureA = api.measurePrometheusRule(rule,holdA), measureB = api.measurePrometheusRule(rule,holdB);
+assertModel(JSON.stringify(measureA) === JSON.stringify(measureB), 'saved-rule scoring is repeatable on identical samples');
+assertModel(Number.isFinite(measureA.mean) && measureA.winRate >= 0 && measureA.winRate <= 100 && measureA.worst >= -100 && measureA.worst <= 100, 'saved-rule metrics are finite and bounded');
+console.log(`Dynamic model checks passed: ${holdA.length} holdout states, ${operationChecks} operation applications, five targeted families.`);
+console.log('All static and dynamic smoke checks passed.');
