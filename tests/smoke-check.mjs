@@ -27,6 +27,8 @@ const required = [
   ['Discovery Cycle panel', '00F / DISCOVERY CYCLE'],
   ['Paired baseline comparison button', 'id="compareBaseline"'],
   ['Cross-goal audit button', 'id="crossGoalAudit"'],
+  ['Rule stability audit button', 'id="ruleStabilityAudit"'],
+  ['Rule stability audit wiring', "getElementById('ruleStabilityAudit').addEventListener('click',runRuleStabilityAudit)"],
   ['Discovery Evidence Ledger button', 'id="compileEvidenceLedger"'],
   ['Next experiment selector button', 'id="selectNextExperiment"'],
   ['Run selected probes button', 'id="runSelectedProbes"'],
@@ -99,6 +101,8 @@ const modelSource = [
   functionBlock('buildPrometheusHoldout', 'measurePrometheusRule'),
   functionBlock('buildBaselineComparison', 'buildCrossGoalAudit'),
   functionBlock('buildCrossGoalAudit', 'compareAgainstBaseline'),
+  functionBlock('measurePrometheusRuleForGoal', 'buildDiscoveryEvidenceLedger'),
+  functionBlock('buildRuleStabilityAudit', 'runRuleStabilityAudit'),
   functionBlock('buildDiscoveryEvidenceLedger', 'compileDiscoveryEvidenceLedger'),
   functionBlock('buildNextExperimentPlan', 'selectNextExperiment'),
   functionBlock('evaluateRecommendedProbes', 'runSelectedProbes'),
@@ -110,7 +114,7 @@ const modelSource = [
   functionBlock('load', 'showToast'),
   functionBlock('validVector', 'load'),
   exportHelper,
-  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,evaluateRecommendedProbes,buildNextExperimentPlan,buildDiscoveryEvidenceLedger,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
+  'globalThis.testApi={state,goals,ops,clamp,score,apply,buildPrometheusHoldout,measurePrometheusRuleForGoal,buildRuleStabilityAudit,evaluateRecommendedProbes,buildNextExperimentPlan,buildDiscoveryEvidenceLedger,buildCrossGoalAudit,measurePrometheusRule,buildBaselineComparison,buildBlindSpotFamilies,buildDiscoveryCycleAudit,runDiscoveryCycle,persist,load,validVector,validSnapshot,validHistoryEntry,validTraceEntry,validRule,createExportPayload};'
 ].join('\n');
 const sandbox = {};
 vm.createContext(sandbox);
@@ -141,6 +145,14 @@ assertModel(ledger.type==='discovery-evidence-ledger'&&ledger.ruleCount===3, 'ev
 assertModel(ledger.rules.find(r=>r.name==='rule-a').measurementCount===4&&ledger.rules.find(r=>r.name==='rule-a').sources.length>=3, 'evidence ledger aggregates multiple test families for each rule');
 assertModel(ledger.rules.find(r=>r.name==='rule-b').status==='FRAGILE OR CONTRADICTED'&&ledger.rules.find(r=>r.name==='untested').status==='INSUFFICIENT EVIDENCE', 'evidence ledger flags counterevidence and avoids overstating untested rules');
 assertModel(api.buildDiscoveryEvidenceLedger([{type:'discovery-evidence-ledger',rules:[{name:'rule-a',mean:99}]}],[],[]).ruleCount===0, 'evidence ledger does not recursively count its own saved snapshots');
+const stabilityRules=[{name:'stable-candidate',delta:[2,2,2,2],ds:0},{name:'edge-sensitive',delta:[0,0,0,0],ds:0}];
+const stabilitySamples=api.buildPrometheusHoldout(),stabilityBefore=JSON.stringify(stabilitySamples);
+const stabilityAudit=api.buildRuleStabilityAudit(stabilityRules,stabilitySamples,'balanced');
+assertModel(stabilityAudit.type==='rule-stability-audit'&&stabilityAudit.summaries.length===2&&stabilityAudit.summaries.every(r=>r.variantCount===10), 'stability audit tests the baseline plus eight component and two stability perturbations per rule');
+assertModel(stabilityAudit.summaries.every(r=>r.variants.every(v=>Number.isFinite(v.mean)&&v.winRate>=0&&v.winRate<=100&&Number.isFinite(v.worst))), 'stability audit metrics are numeric and bounded');
+assertModel(JSON.stringify(stabilitySamples)===stabilityBefore&&JSON.stringify(api.buildRuleStabilityAudit(stabilityRules,stabilitySamples,'balanced'))===JSON.stringify(stabilityAudit), 'stability audit is deterministic and leaves sample states unchanged');
+const stabilityLedger=api.buildDiscoveryEvidenceLedger([{type:'rule-stability-audit',summaries:stabilityAudit.summaries}],[],stabilityRules);
+assertModel(stabilityLedger.rules.every(r=>r.sources.includes('Parameter stability audit')), 'stability audit results are included in evidence ledger');
 const crossGoalRules=[{name:'toward-salt',delta:[-2,-2,5,-4],ds:1},{name:'toward-void',delta:[1,1,-1,6],ds:-1}];
 const crossGoalSamples=api.buildPrometheusHoldout();
 const crossGoalSamplesBefore=JSON.stringify(crossGoalSamples);
