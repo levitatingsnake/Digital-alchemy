@@ -72,10 +72,11 @@ function applyCandidate(r,label,sampleCount){
  saveExperiment(label,before,[label],{values:state.values.slice(),stability:state.stability});
  renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Hypothesis tested and recorded');
 }
-let lastRulePlans=[];
+let lastRulePlans=[],lastPlanContext=null;
 function findRulePlans(){
  if(!state.learnedRules.length){showToast('Keep at least one rule first');return}
  const start={values:state.values.slice(),stability:state.stability},startScore=score(start);
+ lastPlanContext={stateKey:[...start.values,start.stability].join(','),goal:state.goal,target:goalConfig().target.slice(),targetStability:goalConfig().stab};
  let beam=[{s:start,path:[]}],all=[{s:start,path:[],score:startScore}];
  for(let depth=1;depth<=5;depth++){
   const generated=[];
@@ -97,6 +98,15 @@ function findRulePlans(){
 }
 function runRulePlan(index){
  const plan=lastRulePlans[index];if(!plan)return;
+ const currentKey=[...state.values,state.stability].join(','),g=goalConfig();
+ if(!lastPlanContext||currentKey!==lastPlanContext.stateKey||state.goal!==lastPlanContext.goal||g.target.join(',')!==lastPlanContext.target.join(',')||g.stab!==lastPlanContext.targetStability){
+  showToast('State or goal changed. Find a fresh plan before running it.');return;
+ }
+ const check={values:state.values.slice(),stability:state.stability};
+ for(const rule of plan.path){check.values=check.values.map((x,i)=>clamp(x+rule.delta[i]));check.stability=Math.max(0,Math.min(10,check.stability+rule.ds));}
+ if(check.values.join(',')!==plan.s.values.join(',')||check.stability!==plan.s.stability){
+  showToast('Plan validation mismatch. Search again before running.');return;
+ }
  const beforeAll={values:state.values.slice(),stability:state.stability},titles=[];
  for(const rule of plan.path){
   const before={values:state.values.slice(),stability:state.stability};
