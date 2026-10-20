@@ -280,7 +280,7 @@ const failedStageAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new
 assertModel(!failedStageAudit.passed && failedStageAudit.stageErrors.length===1 && failedStageAudit.stageErrors[0].stage==='anomaly-challenge-protocol', 'discovery cycle cannot pass when a stage reports an error');
 const staleCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(cycleBlindSpotReports),cycleBlindSpotReports,cycleGoal,2,'2026-10-20T00:00:00.000Z',[],new Set(cyclePrometheusReports),cyclePrometheusReports);
 assertModel(!staleCycleAudit.passed && staleCycleAudit.missingReports.length===10, 'discovery cycle audit rejects stale reports from both report stores');
-const incompleteCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports.slice(0,2),cycleGoal,2,'2026-10-20T00:00:00.000Z',[],new Set(),cyclePrometheusReports);
+const incompleteCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,cycleAfter,new Set(),cycleReports.slice(0,2),cycleGoal,2,'2026-10-20T00:00:00.000Z',[],new Set(),cyclePrometheusReports.slice(1));
 assertModel(!incompleteCycleAudit.passed && incompleteCycleAudit.missingReports.includes('anomaly-challenge-protocol') && incompleteCycleAudit.missingReports.includes('prometheus-trial'), 'discovery cycle audit identifies missing stage reports across both report stores');
 const mutatedCycleAudit = api.buildDiscoveryCycleAudit(cycleBefore,{...cycleAfter,stability:9},new Set(),cycleReports,cycleGoal,2,'2026-10-20T00:00:00.000Z');
 assertModel(!mutatedCycleAudit.passed && !mutatedCycleAudit.statePreserved, 'discovery cycle audit detects working-state mutation');
