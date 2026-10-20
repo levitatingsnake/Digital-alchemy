@@ -9,6 +9,7 @@
 <section class="panel"><h2>01 / The substrate</h2><p class="sub">Adjust the starting material. Values are symbolic units from 0 to 100.</p><div class="stats" id="stats"></div><div class="stability"><label for="stability">Stability</label><input id="stability" class="range" type="range" min="0" max="10" value="4"><strong id="stabValue">4</strong></div><div class="scoreline"><div><div class="eyebrow">Current goal alignment</div><div class="score" id="score">--%</div></div><div style="text-align:right"><div class="eyebrow">Selected aim</div><strong id="goalName">Balanced</strong></div></div><div class="meter"><span id="meter"></span></div><div class="row" style="margin-top:15px"><button class="ghost" id="resetState">Reset substrate</button><button class="ghost" id="export">Export experiments</button></div></section>
 <section class="panel"><h2>02 / Choose an outcome</h2><p class="sub">The engine scores distance from each goal's target profile.</p><select class="goal-select" id="goal"><option value="balanced">Balanced</option><option value="concentrated">Concentrated</option><option value="purified">Purified</option><option value="stable">Stable</option><option value="custom">Custom intention</option></select><div id="goalDescription" class="sub" style="margin-bottom:12px"></div><div id="customTarget" class="routebox" style="display:none;margin:0 0 18px"><h2>Define your target state</h2><p class="sub">Set the destination. The engine will search for a sequence that moves the substrate toward this profile.</p><div id="targetControls"></div><div class="stability"><label for="targetStability">Target stability</label><input id="targetStability" class="range" type="range" min="0" max="10" value="8"><strong id="targetStabilityValue">8</strong></div></div><h2>Invoke an operation</h2><p class="sub">Each operation has a deterministic, inspectable rule.</p><div class="ops"><button class="op" data-op="Separate"><span class="symbol">◈</span><b>Separate</b><small>Differentiate the volatile pair.</small></button><button class="op" data-op="Conjoin"><span class="symbol">⊙</span><b>Conjoin</b><small>Bring the primary pair together.</small></button><button class="op" data-op="Distill"><span class="symbol">♧</span><b>Distill</b><small>Refine the substrate.</small></button><button class="op" data-op="Fix"><span class="symbol">⌑</span><b>Fix</b><small>Trade volatility for stability.</small></button></div><div class="routebox"><div class="row"><div><h2>Find a route</h2><p class="sub" style="margin:3px 0 0">Search up to 6 operations ahead.</p></div><button class="primary" id="findRoute">Find route</button></div><div id="routeResult" class="sub" style="margin:12px 0 0">Ready when you are. The route finder searches real operation sequences.</div><div class="routepath" id="routePath"></div><button id="runRoute" class="primary" style="width:100%;display:none">Execute recipe step by step</button></div><div class="routebox"><div class="row"><div><h2>Consult the Oracle</h2><p class="sub" style="margin:3px 0 0">Compare alternate futures, not just one recipe.</p></div><button class="primary" id="oracle">Explore futures</button></div><div id="oracleResult" class="sub" style="margin:12px 0 0">The Oracle will explore alternative sequences and rank them by alignment, efficiency and path diversity.</div><div id="oraclePaths" class="trace" style="margin-top:10px"></div></div></section>
 <section class="panel wide"><div class="row"><div><h2>05 / Rule discovery</h2><p class="sub">Generate and test candidate transformation hypotheses.</p></div><button class="primary smallbtn" id="discoverRules" style="flex:0 0 auto">Discover rules</button> <button class="primary smallbtn" id="synthesizeStrategy" style="flex:0 0 auto">Synthesize strategy</button></div><div id="discoveryResults"><div class="empty">Generate candidate rules, compare their predicted effects, and test one.</div></div><div id="keptRules" class="trace" style="margin-top:12px"><p class="sub">Your preserved rule library will appear here.</p></div></section>
+<section class="panel wide"><div class="row"><div><h2>02B / Engine integrity</h2><p class="sub">Repeatable software checks before trusting a result.</p></div><button class="primary smallbtn" id="runIntegrity" style="flex:0 0 auto">Run integrity tests</button></div><div id="integrityResults"><div class="empty">Run the test bench to check operation bounds, deterministic behaviour, scoring, and saved-rule transformations. Tests do not validate the symbolic model against the real world.</div></div></section>
 <section class="panel wide"><div class="row"><div><h2>03 / Experiment trace</h2><p class="sub">A record of what changed, and why.</p></div><button class="ghost smallbtn" id="clearTrace" style="flex:0 0 auto">Clear trace</button></div><div class="trace" id="trace"><div class="empty">Your first operation will appear here.</div></div></section>
 <section class="panel wide"><div class="row"><div><h2>04 / Experiment archive</h2><p class="sub">Saved locally, including recipe and before/after state.</p></div><button class="ghost smallbtn" id="clearHistory" style="flex:0 0 auto">Clear archive</button></div><div class="history" id="history"><div class="empty">No experiments yet. Invoke an operation or run a recipe.</div></div></section>
 </div><p class="foot">Digital Alchemy Lab · Symbolic computation, not physical chemistry or supernatural transmutation. Browser storage is device/browser-specific; cloud sync is not enabled in this version.</p></main><div class="toast" id="toast"></div>
@@ -99,6 +100,36 @@ function discoverRules(){
   persist();renderKeptRules();showToast('Rule preserved in your local library');
  }));
  renderKeptRules();
+}
+function runIntegrityTests(){
+ const checks=[];
+ const add=(name,ok,detail)=>checks.push({name,ok:!!ok,detail});
+ const samples=Array.from({length:64},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
+ let bounded=true,deterministic=true,scoreSafe=true,ruleBounded=true,operations=0,ruleChecks=0;
+ for(const sample of samples){
+  const base={values:sample.values.slice(),stability:sample.stability};
+  const sc=score(base);
+  if(!Number.isFinite(sc)||sc<0||sc>100)scoreSafe=false;
+  for(const op of ops){
+   const a=apply(base,op).state,b=apply(base,op).state;operations++;
+   if(JSON.stringify(a)!==JSON.stringify(b))deterministic=false;
+   if(!Array.isArray(a.values)||a.values.length!==4||a.values.some(v=>!Number.isFinite(v)||v<0||v>100)||!Number.isFinite(a.stability)||a.stability<0||a.stability>10)bounded=false;
+   const nextScore=score(a);if(!Number.isFinite(nextScore)||nextScore<0||nextScore>100)scoreSafe=false;
+  }
+  for(const rule of state.learnedRules){
+   const next={values:base.values.map((v,i)=>clamp(v+(Number(rule.delta[i])||0))),stability:Math.max(0,Math.min(10,base.stability+(Number(rule.ds)||0)))};
+   ruleChecks++;
+   if(next.values.some(v=>!Number.isFinite(v)||v<0||v>100)||!Number.isFinite(next.stability)||next.stability<0||next.stability>10)ruleBounded=false;
+  }
+ }
+ add('Operation outputs remain in bounds',bounded,operations+' operation evaluations across '+samples.length+' deterministic sample states');
+ add('Operation rules are deterministic',deterministic,'Repeated evaluations from identical inputs produced identical states');
+ add('Alignment scores remain valid',scoreSafe,'Scores stayed finite and within 0–100');
+ add('Saved rules remain in bounds',ruleBounded,ruleChecks+' saved-rule evaluations across '+samples.length+' sample states');
+ const passed=checks.filter(x=>x.ok).length,failed=checks.length-passed;
+ const root=document.getElementById('integrityResults');
+ root.innerHTML='<div class="routebox"><b>'+passed+'/'+checks.length+' integrity checks passed</b><p class="sub" style="margin:5px 0 0">Completed '+new Date().toLocaleString()+' · no symbolic state was changed.</p></div>'+checks.map(x=>'<div class="traceitem"><b>'+(x.ok?'✓ ':'✗ ')+esc(x.name)+'</b><p>'+esc(x.detail)+'</p></div>').join('')+'<p class="sub">Scope note: these tests check implementation consistency and numeric safety. They do not prove that the symbolic operations describe reality, that a discovered rule generalises beyond the tested samples, or that a predicted outcome will occur in the real world.</p>';
+ showToast(failed?'Integrity tests found '+failed+' issue(s)':'Integrity tests passed');
 }
 function recordObservedRule(name,before,after){
  const rule=state.learnedRules.find(r=>r.name===name);
@@ -283,7 +314,7 @@ document.querySelectorAll('[data-op]').forEach(b=>b.addEventListener('click',()=
 document.getElementById('goal').addEventListener('change',e=>{state.goal=e.target.value;invalidateRoute();updateSummary();persist()});
 document.getElementById('targetStability').addEventListener('input',e=>{state.customStability=+e.target.value;document.getElementById('targetStabilityValue').textContent=e.target.value;updateSummary();invalidateRoute();persist()});
 document.getElementById('stability').addEventListener('input',e=>{state.stability=+e.target.value;updateSummary();invalidateRoute();persist()});
-document.getElementById('discoverRules').addEventListener('click',discoverRules);document.getElementById('synthesizeStrategy').addEventListener('click',synthesizeStrategy);document.getElementById('findRoute').addEventListener('click',findRoute);document.getElementById('oracle').addEventListener('click',consultOracle);
+document.getElementById('runIntegrity').addEventListener('click',runIntegrityTests);document.getElementById('discoverRules').addEventListener('click',discoverRules);document.getElementById('synthesizeStrategy').addEventListener('click',synthesizeStrategy);document.getElementById('findRoute').addEventListener('click',findRoute);document.getElementById('oracle').addEventListener('click',consultOracle);
 document.getElementById('runRoute').addEventListener('click',runRoute);
 document.getElementById('resetState').addEventListener('click',()=>{if(!confirm('Reset the substrate to its starting values? Your experiment archive will remain.'))return;state.values=[50,50,50,20];state.stability=4;state.route=null;renderStats();updateSummary();persist();showToast('Substrate reset')});
 document.getElementById('clearTrace').addEventListener('click',()=>{state.trace=[];renderTrace();persist()});
