@@ -229,6 +229,15 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Intention-to-test-brief workflow (2026-10-20)
+
+- Added a plain-language intention field and an explicit model-interpretation selector.
+- Building a brief selects the chosen goal, updates the current goal alignment, runs the bounded route finder, and presents the target profile and any candidate operation sequence.
+- The user's intention text is stored locally and included in the experiment export.
+- The interface explicitly states that the sentence is contextual text, not semantic input to an NLP/LLM system. Goal interpretation remains a deliberate human choice.
+- Added smoke-check coverage for the brief controls, event wiring, local persistence, and export.
+- The brief reports the model's predicted alignment only; it does not claim the route is effective in the real world.
+
 ### Guided session console (2026-10-20)
 
 - Added a responsive launch console near the top of the app to reduce the cognitive load of a lab that now contains many research tools.
