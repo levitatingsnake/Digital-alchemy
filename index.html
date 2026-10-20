@@ -41,20 +41,28 @@ function apply(s,op){
 function discoverRules(){
  const root=document.getElementById('discoveryResults');
  const start={values:state.values.slice(),stability:state.stability};
- const candidates=[];
- for(let s=-1;s<=1;s++)for(let m=-1;m<=1;m++)for(let a=-1;a<=1;a++)for(let v=-1;v<=1;v++){
-  if(s===0&&m===0&&a===0&&v===0)continue;
-  const delta=[s*4,m*4,a*4,v*4];
-  const next={values:start.values.map((x,i)=>clamp(x+delta[i])),stability:Math.min(10,start.stability+1)};
-  candidates.push({delta,next,score:score(next),gain:score(next)-score(start)});
+ const candidates=[],levels=[-8,-4,0,4,8],stabilityLevels=[-1,0,1];
+ // A fixed sample set makes repeated tests comparable rather than lucky.
+ const samples=Array.from({length:24},(_,i)=>({values:[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101],stability:(i*7+3)%11}));
+ for(let k=0;k<64;k++){
+  const delta=[levels[(k*7+1)%5],levels[(k*11+2)%5],levels[(k*13+3)%5],levels[(k*17+4)%5]];
+  if(delta.every(x=>x===0))delta[k%4]=levels[(k%2===0)?0:4];
+  const ds=stabilityLevels[k%3];
+  const evaluate=s=>({values:s.values.map((x,i)=>clamp(x+delta[i])),stability:Math.max(0,Math.min(10,s.stability+ds))});
+  let gains=samples.map(s=>score(evaluate(s))-score(s));
+  const mean=gains.reduce((a,b)=>a+b,0)/gains.length;
+  const wins=gains.filter(x=>x>0).length;
+  const losses=gains.filter(x=>x<0);
+  const next=evaluate(start);
+  candidates.push({delta,ds,next,mean,winRate:Math.round(wins/gains.length*100),worst:losses.length?Math.min(...losses):0,currentGain:score(next)-score(start)});
  }
- candidates.sort((a,b)=>b.score-a.score||b.gain-a.gain);
+ candidates.sort((a,b)=>(b.mean+b.winRate/100)-(a.mean+a.winRate/100)||b.worst-a.worst);
  const top=candidates.slice(0,8);
- root.innerHTML='<p class="sub">Generated and evaluated '+candidates.length+' bounded rule hypotheses. These are candidate rules, not discovered laws of nature.</p>'+top.map((r,i)=>'<div class="traceitem"><b>Hypothesis '+(i+1)+' · '+r.score+'% alignment ('+(r.gain>=0?'+':'')+r.gain+')</b><p>Changes: S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability +1</p><p>Predicted state: '+r.next.values.join(' / ')+' · stability '+r.next.stability+'</p><button class="smallbtn" data-hypothesis="'+i+'">Test this hypothesis</button></div>').join('');
+ root.innerHTML='<p class="sub">Validated '+candidates.length+' candidate rules against '+samples.length+' repeatable sample states each. Ranking combines average alignment gain and win rate. This is a bounded symbolic simulation, not a law of nature.</p>'+top.map((r,i)=>'<div class="traceitem"><b>Hypothesis '+(i+1)+' · '+(r.mean>=0?'+':'')+r.mean.toFixed(2)+' mean gain</b><p>Worked on '+r.winRate+'% of sample states · worst loss '+r.worst+' points</p><p>Rule: S '+signed(r.delta[0])+' · M '+signed(r.delta[1])+' · Salt '+signed(r.delta[2])+' · Void '+signed(r.delta[3])+' · stability '+signed(r.ds)+'</p><p>Current-state prediction: '+r.next.values.join(' / ')+' · stability '+r.next.stability+' · alignment '+score(r.next)+'% ('+(r.currentGain>=0?'+':'')+r.currentGain+')</p><button class="smallbtn" data-hypothesis="'+i+'">Test on my state</button></div>').join('');
  root.querySelectorAll('[data-hypothesis]').forEach(btn=>btn.addEventListener('click',()=>{
   const r=top[+btn.dataset.hypothesis],before=clone(state);
   state.values=r.next.values.slice();state.stability=r.next.stability;state.route=null;
-  addTrace('Hypothesis '+(+btn.dataset.hypothesis+1),before,state,'Tested a generated candidate rule with component shifts '+r.delta.join(', ')+'. Alignment changed from '+score(before)+'% to '+score(state)+'%. This is an experimental heuristic, not a physical law.');
+  addTrace('Validated hypothesis '+(+btn.dataset.hypothesis+1),before,state,'Applied a candidate rule tested across '+samples.length+' sample states. Sample win rate: '+r.winRate+'%; mean alignment gain: '+r.mean.toFixed(2)+'. This is an experimental heuristic, not a physical law.');
   saveExperiment('Hypothesis test '+(+btn.dataset.hypothesis+1),before,['Hypothesis '+(+btn.dataset.hypothesis+1)],{values:state.values.slice(),stability:state.stability});
   renderStats();updateSummary();renderTrace();invalidateRoute();persist();showToast('Hypothesis tested and recorded');
  }));
