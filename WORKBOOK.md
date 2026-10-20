@@ -240,6 +240,15 @@ Interpretation: this is a positive internal optimisation result for the current 
 - Prometheus trial reports carry an explicit `prometheus-trial` type, allowing the report generator and evidence ledger to recognise them reliably.
 - All generated evidence remains synthetic and scoring-model-dependent; this workflow is a repeatable internal research protocol, not external validation.
 
+### Independent validation for rule refinement (2026-10-21)
+
+- Corrected a potential evaluation leak: candidate variants were previously selected and judged on the same sample set.
+- Candidate variants are now ranked on 128 deterministic tuning states, then the chosen variant is evaluated against the original rule on a separate 128-state validation set generated from a distinct seed, with tuning states explicitly excluded.
+- Conservative acceptance criteria are applied to validation metrics, not tuning metrics. If a candidate does not clear the threshold on validation, it is not offered for preservation.
+- The original saved rule remains unchanged; only a candidate that clears independent validation can be added to the local library.
+- Tests assert determinism, separate sample counts, non-overlap between tuning and validation sets, non-mutation of source rule/samples, and the validation acceptance thresholds.
+- This reduces selection bias within the synthetic symbolic model. It is not independent real-world validation.
+
 ### Evidence-aware research report export (2026-10-20)
 
 - Added a **Research report** export alongside the existing full JSON experiment export.
