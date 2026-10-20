@@ -33,6 +33,8 @@ jobs:
           node-version: 24
       - name: Run existing smoke checks
         run: node tests/smoke-check.mjs
+      - name: Run real-stage Discovery Cycle integration test
+        run: node tests/real-stage-integration.mjs
       - name: Run adversarial boundary checks
         run: node tests/adversarial-boundaries.mjs
       - name: Run controlled mutation checks
