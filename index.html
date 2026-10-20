@@ -187,14 +187,15 @@ function runDiscoveryCycle(){
  if(state.learnedRules.length<2){root.innerHTML='<div class="routebox"><b>Cycle requires at least two saved rules.</b><p class="sub" style="margin:5px 0 0">Preserve two or more competing candidates, then run the cycle again. This gives the experiment designer something meaningful to compare.</p></div>';showToast('Discovery cycle needs two saved rules');return}
  const start=state.learnedRules.length,goal=state.goal;
  const before={values:JSON.stringify(state.values),stability:state.stability,goal:state.goal,rules:JSON.stringify(state.learnedRules)};
- const reportIds=new Set(state.blindSpotReports.map(r=>r.type));
+ const reportsBefore=new Set(state.blindSpotReports);
  root.innerHTML='<div class="routebox"><b>Discovery cycle running</b><p class="sub" style="margin:5px 0 0">Stage 1: conditional patterns · Stage 2: discriminating probes · Stage 3: adversarial challenge. A final integrity check will verify report creation and preservation of your working state.</p></div>';
  scanConditionalPatterns();
  designDiscriminatingExperiments();
  runAnomalyProtocol();
- const created=state.blindSpotReports.filter(r=>!reportIds.has(r.type));
+ const created=state.blindSpotReports.filter(r=>!reportsBefore.has(r));
  const required=['conditional-pattern-scan','discriminating-experiment-design','anomaly-challenge-protocol'];
- const missing=required.filter(type=>!state.blindSpotReports.some(r=>r.type===type&&r.goal===goal));
+ const createdTypes=new Set(created.filter(r=>r.goal===goal).map(r=>r.type));
+ const missing=required.filter(type=>!createdTypes.has(type));
  const statePreserved=before.values===JSON.stringify(state.values)&&before.stability===state.stability&&before.goal===state.goal&&before.rules===JSON.stringify(state.learnedRules);
  const passed=missing.length===0&&statePreserved;
  const audit={timestamp:new Date().toISOString(),type:'discovery-cycle-audit',goal,ruleCount:start,requiredReports:required,missingReports:missing,statePreserved,passed};
