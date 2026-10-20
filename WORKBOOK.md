@@ -229,6 +229,14 @@ These are results inside the current symbolic scoring model only. They demonstra
 
 Interpretation: this is a positive internal optimisation result for the current four-operation symbolic model. The transition-count reduction is a work proxy, not a measured wall-clock speedup, and it does not establish real-world usefulness. Keep the equivalence assertion in place whenever search logic changes.
 
+### Guided session console (2026-10-20)
+
+- Added a responsive launch console near the top of the app to reduce the cognitive load of a lab that now contains many research tools.
+- Five jump points guide users through substrate setup, goal selection, route exploration, model investigation, and evidence review.
+- Navigation uses real in-page anchors, includes keyboard-visible focus styling, and rearranges for mobile screens.
+- Added an explicit scope reminder: scores describe the symbolic model and are not probabilities of real-world success.
+- Existing engine functions and saved state format are unchanged by this UI-only addition.
+
 ### Search-route replay integrity (2026-10-20)
 
 - The benchmark now replays every selected naive and deduplicated route from its original starting state.
