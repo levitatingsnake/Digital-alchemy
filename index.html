@@ -140,7 +140,7 @@ function runPrometheusTrial(){
  // Independent deterministic PRNG. Samples matching the original training generator are excluded.
  let seed=0x5EEDC0DE;
  const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
- const training=new Set(Array.from({length:64},(_,i)=>[[ (i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101,(i*7+3)%11].join(',')]));
+ const training=new Set(Array.from({length:64},(_,i)=>[(i*37+13)%101,(i*53+29)%101,(i*29+47)%101,(i*71+7)%101,(i*7+3)%11].join(',')));
  const samples=[],seen=new Set();
  while(samples.length<128){
   const sample={values:[Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101),Math.floor(rand()*101)],stability:Math.floor(rand()*11)};
