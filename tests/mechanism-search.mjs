@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import {inspectConstraint} from "../src/constraint-reversal.mjs";
+import {proposeMechanisms} from "../src/mechanism-search.mjs";
+const problem={objective:"Reduce project delays",signals:["dependency","capacity"],constraints:[{id:"handoff",kind:"soft",statement:"Every handoff must happen in person",evidence:[]}]};
+const reversal=inspectConstraint(problem,"handoff","substitute");
+const result=proposeMechanisms(problem,reversal);
+assert.ok(result.candidates.some(x=>x.mechanismId==="decouple"));
+assert.ok(result.candidates.some(x=>x.mechanismId==="pool"));
+assert.ok(result.candidates.every(x=>x.evidenceStatus==="unverified"&&x.novelty==="unknown"));
+const noSignals=proposeMechanisms({...problem,signals:[]},reversal);
+assert.equal(noSignals.abstained,true);
+const hard={...problem,constraints:[{...problem.constraints[0],kind:"hard"}]};
+assert.equal(proposeMechanisms(hard,inspectConstraint(hard,"handoff","substitute")).abstained,true);
+assert.throws(()=>proposeMechanisms({...problem,signals:["magic"]},reversal),/Unknown signals/);
+console.log("PASS: mechanism matching, abstention and hard-constraint guard");
