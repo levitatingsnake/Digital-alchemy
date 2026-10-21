@@ -52,7 +52,7 @@ console.log('PASS model constraints, exact enumeration, stress sensitivity, and 
 
 const labSource=readFileSync('decision-lab.html','utf8');
 for(const fn of ['probeExperimentalSensitivity','renderExperimentalSensitivity','exportExperimentalReport','runExperimentalPortfolio','generateMechanismHypotheses']){
- assert.equal((labSource.match(new RegExp('function '+fn+'\\\\(','g'))||[]).length,1,fn+' declared once');
+ assert.equal(labSource.split('function '+fn+'(').length-1,1,fn+' declared once');
 }
 assert.match(labSource,/runExperimentalPortfolio\(\)/,'comparison button wired');
 assert.match(labSource,/exportExperimentalReport\(\)/,'export button wired');
