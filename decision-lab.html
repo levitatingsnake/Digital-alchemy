@@ -88,6 +88,10 @@ button{border-radius:4px 10px 4px 10px;background:#102738;border-color:#315367;t
 @media(max-width:800px){.headline{font-size:30px;padding-left:12px}.plain-summary .plain-lead{font-size:17px}.item-top strong{font-size:16px}.section-title{font-size:9px}}
 
 </style><link rel="stylesheet" href="prometheus-visual.css">
+
+<style>
+.prometheus-readout{margin:20px 0;padding:24px;background:radial-gradient(ellipse at 90% 0%,rgba(78,196,255,.13),transparent 55%),#071626;border:1px solid rgba(108,233,255,.48);border-radius:8px;box-shadow:inset 0 1px rgba(180,246,255,.13)}.prometheus-kicker{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:10px;font-weight:800;letter-spacing:.17em;color:#79e8ff}.prometheus-kicker span{color:#ffc978}.prometheus-readout h2{font-size:clamp(23px,3vw,31px);margin:20px 0 10px}.prometheus-lead{font-size:clamp(17px,2.2vw,22px);line-height:1.45;color:#f0faff}.prometheus-brief-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}.prometheus-brief-grid>div{padding:14px;background:rgba(5,15,30,.7);border-left:2px solid #6ce9ff}.prometheus-brief-grid strong{font-size:12px;color:#ffc978}.prometheus-brief-grid p{font-size:13px;line-height:1.6;color:#c7dce9}.prometheus-boundary{margin:18px 0 0;color:#a6bdce;font-size:12px}@media(max-width:740px){.prometheus-readout{padding:17px}.prometheus-brief-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="sigil">⌁</div><div><strong>LUMORA STRATEGY</strong><small>DECISION SUPPORT / WORKING PROTOTYPE</small></div></div><span class="pill">Decision Lab · v0.1</span></header>
@@ -314,6 +318,16 @@ function buildPlainSummary(question,domain,sorted,rejected,budgetMode,budget,str
  out+='<p class="plain-foot">Run settings: '+escHtml(modes[mode]||mode)+' · '+(budgetMode==="set"?'budget cap '+fmt(budget):'no fixed budget')+' · downside severity '+stressSeverity+'%. All initiative costs and scores are illustrative until checked against real evidence.</p></section>';
  return out;
 }
+function buildDecisionReadout(chosen,stability,domain,mode,budgetMode,stressSeverity){
+ const esc=escHtml;const first=chosen[0];const all=chosen.length;
+ const strong=stability.stableItems.filter(x=>x.stability===stability.levels.length).length;
+ const weak=stability.stableItems.filter(x=>x.stability<=2).length;
+ const opening=first?'Start by validating '+first.name.toLowerCase()+'.':'No candidate satisfies the current constraints.';
+ const rationale=all?'The model compared available '+domain+' initiatives under the selected '+mode+' objective. '+strong+' of '+all+' selected actions remain in the top portfolio at all five tested stress settings.':'Change the constraints and run the comparison again.';
+ const caution='These rankings use illustrative costs and internal scores. Stability across synthetic stress settings is not a real-world success probability.';
+ const next=first?'Before committing funds, measure a current baseline, verify the cost and expected effect of '+first.name.toLowerCase()+', and run a small reversible test.':'Try removing the budget cap or changing the number of actions.';
+ return '<section class="prometheus-readout" aria-label="Decision briefing"><div class="prometheus-kicker">PROMETHEUS // DECISION BRIEFING <span>MODEL-INTERNAL ANALYSIS</span></div><h2>What should you do next?</h2><p class="prometheus-lead">'+esc(opening)+'</p><div class="prometheus-brief-grid"><div><strong>Why this route</strong><p>'+esc(rationale)+'</p></div><div><strong>What could change the answer</strong><p>'+esc(weak?'Some choices change under stress. Verify the fragile assumptions first.':'Different actual costs, outcomes, constraints or market conditions may reverse this ranking.')+'</p></div><div><strong>First real-world experiment</strong><p>'+esc(next)+'</p></div></div><p class="prometheus-boundary">'+esc(caution)+' Downside setting: '+Number(stressSeverity)+'%. '+(budgetMode==='set'?'A budget cap was applied.':'No budget cap was applied.')+'</p></section>';
+}
 function render(){
 const q=$("question").value.toLowerCase(),domain=$("domain").value,budgetMode=$("budgetMode").value,budget=budgetMode==="set"?Math.max(0,Math.min(1000000,Number($("budget").value)||0)):Infinity,maxItems=Number($("maxItems").value),priority=$("priority").value,mode=$("mode").value,stressSeverity=Number($("stressSeverity")?.value||28);
 if(budgetMode==="set"&&budget===0){$("status").textContent="CHECK BUDGET";$("results").innerHTML='<p class="summary">Enter a budget greater than zero, or choose “No fixed budget”.</p>';return}
@@ -328,6 +342,7 @@ const domainName={"construction":"construction operations","business":"small-bus
 const contextual=q.includes("delay")||q.includes("late")||q.includes("schedule")?"The prompt signals delivery reliability, so review the chosen planning, coordination and supply actions against the real causes of delay.":q.includes("cash")||q.includes("profit")||q.includes("margin")?"The prompt signals financial control, so validate the cost assumptions and check that expected gains connect to cash or margin.":q.includes("invest")||domain==="investing"?"This is a process checklist, not an asset recommendation. No live prices, returns or personal circumstances are modelled; independently verify risks, fees and suitability.":domain==="property"?"Treat this as a due-diligence framework. Verify local market data, legal requirements, financing terms, property condition and tax implications before making a property decision.":domain==="finance"?"Validate every financial assumption against current accounts and forecasts; this model does not access accounts or provide accounting, lending or tax advice.":q.includes("risk")||q.includes("safety")?"The prompt signals risk reduction, so treat the risk-weighted ranking as a starting point for a formal risk review.":"The model selected a portfolio using the chosen objective and initiative limit, with a budget cap only if one was supplied.";
 let html='<div class="headline">'+(chosen.length?'Here is the plan the model ranked highest.':'No options fit the current limits.')+'</div>';
 html+=buildPlainSummary($("question").value,domain,sorted,rejected,budgetMode,budget,stressSeverity,priority,mode);
+html+=buildDecisionReadout(sorted,stability,domain,mode,budgetMode,stressSeverity);
 html+='<p class="summary">Why this area was selected: '+contextual+'</p>';
 html+=buildStrategyBrief(domain,sorted,rejected,budgetMode,budget,stressSeverity);
 html+='<div class="metrics"><div class="metric"><span>'+(budgetMode==="set"?'Budget allocated':'Illustrative cost')+'</span><strong>'+(budgetMode==="set"?Math.round(spent/budget*100)+'%':fmt(spent))+'</strong></div><div class="metric"><span>Selected actions</span><strong>'+chosen.length+'/'+maxItems+'</strong></div><div class="metric"><span>'+(budgetMode==="set"?'Budget remaining':'Budget cap')+'</span><strong style="font-size:18px">'+(budgetMode==="set"?fmt(remain):'Open')+'</strong></div></div>';
