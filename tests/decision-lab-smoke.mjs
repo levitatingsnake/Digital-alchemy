@@ -48,7 +48,7 @@ assert.match(html, /field textarea#question\\{min-height:230px;height:230px/, 'Q
 assert.match(html, /Area to assess/, 'Visible labels should use clear language');
 
 assert.match(elements.results.innerHTML, /Challenge the recommendation/, 'Output must include a plain-language decision challenge');
-assert.match(elements.results.innerHTML, /Falsification \/ reversal rule/, 'Output must state what evidence could overturn the recommendation');
+assert.match(elements.results.innerHTML, /When to reconsider this choice/, 'Output must state what evidence could overturn the recommendation');
 assert.match(elements.results.innerHTML, /A practical way to test it/, 'Output must recommend a practical validation experiment');
 assert.match(elements.results.innerHTML, /Evidence to check first/, 'Output must identify real-world evidence to collect');
 assert.match(html, /function buildChallengeBrief\(/, 'Decision Challenger logic must be isolated and maintainable');
