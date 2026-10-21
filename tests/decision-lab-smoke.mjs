@@ -45,6 +45,9 @@ assert.match(elements.results.innerHTML, /THE ANSWER \/ PLAIN ENGLISH/, 'Output 
 assert.match(elements.results.innerHTML, /What this result means/, 'Summary must explain the recommendation in ordinary language');
 assert.match(elements.results.innerHTML, /Your question/, 'Summary must echo the question being assessed');
 assert.match(elements.results.innerHTML, /does not fully interpret every detail/, 'Summary must clearly explain the model boundary');
+assert.match(elements.results.innerHTML, /Evidence check: what supports this answer\?/, 'Summary must show an evidence status map');
+assert.match(elements.results.innerHTML, /MODEL OUTPUT, NOT VERIFIED FACTS/, 'Summary must distinguish model output from verified evidence');
+assert.match(elements.results.innerHTML, /Decision rule:/, 'Summary must state how evidence can change the decision');
 assert.match(elements.results.innerHTML, /What to do next/, 'Summary must give practical next steps');
 assert.match(html, /field textarea#question\{display:block;width:100%;min-height:320px;height:320px/, 'Desktop question field must fit a detailed prompt');
 assert.match(html, /field textarea#question\{min-height:260px;height:260px/, 'Mobile question field must fit a detailed prompt');
