@@ -148,7 +148,7 @@ for(const label of ['Tailored intervention design','Adaptation to your question:
 console.log('PASS tailored intervention and trade-off composition');
 
 assert.ok(cockpitSource.includes('function extractQuestionContext(question)'),'multi-clause context extraction');
-assert.ok(cockpitSource.includes('contextMarkup(context)+questionSpecificIntervention'),'constraints included in all plans');
+assert.ok(cockpitSource.includes('contextMarkup(context)+constraintGateMarkup(index,context)+questionSpecificIntervention'),'constraints included in all plans');
 for(const id of ['no_hiring','low_budget','no_code','time','remote'])assert.ok(cockpitSource.includes("id:'"+id+"'"),'explicit constraint '+id);
 const ctxStart=cockpitSource.indexOf('const constraintPatterns=');
 const ctxEnd=cockpitSource.indexOf('function renderQuestionDiagnosis(',ctxStart);
