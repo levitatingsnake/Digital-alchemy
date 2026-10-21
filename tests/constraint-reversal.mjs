@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import {inspectConstraint,enumerateReversals,REVERSAL_OPERATIONS} from "../src/constraint-reversal.mjs";
+const p={objective:"Deliver more homes with fixed staffing",constraints:[{id:"staff",kind:"soft",statement:"Each project requires a dedicated onsite coordinator",evidence:["Current scheduling practice"]},{id:"code",kind:"hard",statement:"All buildings must satisfy building-code requirements",evidence:[]}]};
+assert.equal(enumerateReversals(p).length,2*REVERSAL_OPERATIONS.length);
+const a=inspectConstraint(p,"staff","substitute");
+assert.equal(a.experiment.status,"not-designed");
+assert.equal(a.evidenceStatus,"unverified");
+assert.ok(a.counterfactual.includes("dedicated onsite coordinator"));
+const b=inspectConstraint(p,"code","remove");
+assert.ok(b.warnings.some(x=>x.includes("do not violate")));
+assert.throws(()=>inspectConstraint(p,"staff","teleport"),/Unknown/);
+assert.throws(()=>inspectConstraint({objective:"x",constraints:[]},"missing","relax"),/not found/);
+console.log("PASS: constraint reversal structure and safety guards");
