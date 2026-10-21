@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { challengeDecision } from "../src/decision-challenger.mjs";
+const empty = challengeDecision({decision:"Expand into Auckland"});
+assert.ok(empty.findings.some(x=>x.code==="NO_EVIDENCE"));
+assert.ok(empty.findings.some(x=>x.code==="NO_ALTERNATIVES"));
+const supplied = challengeDecision({decision:"Expand into Auckland",objective:"Test demand",evidence:[{claim:"Demand is rising",source:"Internal forecast",status:"unverified"}],alternatives:["Pilot first"],constraints:["$5000 cap"],assumptions:["Sales convert"]});
+assert.ok(supplied.findings.some(x=>x.code==="UNVERIFIED_EVIDENCE"));
+assert.ok(supplied.findings.some(x=>x.code==="ASSUMPTIONS_TO_TEST"));
+assert.equal(supplied.findings.some(x=>x.code==="NO_EVIDENCE"),false);
+assert.throws(()=>challengeDecision({}),/required/);
+console.log("Decision Challenger v0.1 checks passed");
