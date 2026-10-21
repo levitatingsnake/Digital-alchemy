@@ -247,10 +247,24 @@ function composeAlchemyMechanisms(index,context){
  const parts=options.slice(0,3);
  return {concept:parts.map(x=>x.name).join(' + '),hypothesis:parts.map(x=>x.mechanism).join(' '),test:parts.map(x=>x.test).join(' ')};
 }
+function evaluateAlchemyConcept(index,context){
+ const concept=composeAlchemyMechanisms(index,context);
+ if(!concept)return null;
+ const ids=new Set(context.constraints.map(x=>x.id));
+ const checks=[
+ {name:'Cash exposure',state:ids.has('low_budget')?'Requires verified cost ceiling':'Unverified',action:'Estimate upfront spend and monthly obligations.'},
+ {name:'Delivery capacity',state:ids.has('no_hiring')?'Must work without payroll growth':'Unverified',action:'Measure actual labour hours and dependencies.'},
+ {name:'Implementation speed',state:ids.has('time')?'Deadline-sensitive':'Unverified',action:'Map the critical path and pilot duration.'},
+ {name:'Technical complexity',state:ids.has('no_code')?'Avoid custom development':'Unverified',action:'Prove the workflow with existing tools.'},
+ {name:'Operating model',state:ids.has('remote')?'Remote fulfilment must be tested':'Unverified',action:'Test accountability and service quality.'}
+ ];
+ return {checks,verdict:'UNVERIFIED: pilot required',next:checks.filter(x=>x.state!=='Unverified').map(x=>x.action).slice(0,3)};
+}
 function alchemyCompositionMarkup(index,context){
  const result=composeAlchemyMechanisms(index,context);
  if(!result)return '';
- return '<section><h4>Combined alchemy concept</h4><p><b>Candidate:</b> '+escHtml(result.concept)+'</p><p><b>Mechanism:</b> '+escHtml(result.hypothesis)+'</p><p><b>Validation:</b> '+escHtml(result.test)+'</p><p><b>Interaction risk:</b> Combined mechanisms can introduce hidden cost and operational dependencies. Validate before implementation.</p><p>This is a rule-generated hypothesis, not a proven invention.</p></section>';
+ const assessment=evaluateAlchemyConcept(index,context);
+ return '<section><h4>Combined alchemy concept</h4><p><b>Candidate:</b> '+escHtml(result.concept)+'</p><p><b>Mechanism:</b> '+escHtml(result.hypothesis)+'</p><p><b>Validation:</b> '+escHtml(result.test)+'</p><p><b>Interaction risk:</b> Combined mechanisms can introduce hidden cost and operational dependencies. Validate before implementation.</p><p><b>Feasibility:</b> '+escHtml(assessment.verdict)+'</p><ul>'+assessment.checks.map(x=>'<li><b>'+escHtml(x.name)+':</b> '+escHtml(x.state)+'; '+escHtml(x.action)+'</li>').join('')+'</ul><p>This is a rule-generated hypothesis, not a proven invention.</p></section>';
 }
 function transformConstraint(index,context,domain){
  const ids=new Set(context.constraints.map(x=>x.id));
