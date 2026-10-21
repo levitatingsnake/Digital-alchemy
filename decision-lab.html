@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1217"><title>Lumora Strategy | Decision Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1217;--panel:#111d24;--panel2:#172730;--line:#2c4149;--gold:#f2c879;--mint:#8ee0c0;--text:#edf5f2;--muted:#9cb0b6;--red:#f3a49a;--blue:#9ac6ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#203942 0,#0b1217 55%);color:var(--text);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:11px;padding:10px 14px;background:#22363e;color:var(--text);font-weight:650}button:hover{border-color:var(--mint)}button.primary{background:var(--gold);border-color:var(--gold);color:#172127}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.wrap{max-width:1160px;margin:auto;padding:26px 18px 54px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:28px}.brand{display:flex;gap:12px;align-items:center}.sigil{width:42px;height:42px;border:1px solid #66847b;border-radius:13px;display:grid;place-items:center;color:var(--gold);font-size:24px;background:#14231f}.brand strong{letter-spacing:.12em;font-size:13px}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em}.pill{border:1px solid var(--line);border-radius:99px;padding:6px 10px;color:var(--mint);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:end;margin-bottom:25px}.eyebrow{color:var(--mint);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:750}.hero h1{font-size:clamp(34px,5vw,56px);line-height:1.04;letter-spacing:-.045em;margin:10px 0 14px;max-width:720px}.hero p{color:var(--muted);max-width:670px;margin:0}.hero-note{border-left:2px solid var(--gold);padding:12px 0 12px 17px;color:#d7e1dc;font-size:13px}.hero-note strong{color:var(--gold);display:block;margin-bottom:4px}
+.layout{display:grid;grid-template-columns:minmax(280px,.82fr) minmax(0,1.18fr);gap:16px;align-items:start}.panel{border:1px solid var(--line);border-radius:17px;background:linear-gradient(155deg,rgba(24,40,47,.96),rgba(15,25,31,.97));padding:20px;box-shadow:0 16px 40px #0002}.panel h2{font-size:17px;margin:0 0 5px;letter-spacing:-.02em}.sub{font-size:12px;color:var(--muted);margin:0 0 18px}.field{margin:15px 0}.field label{display:block;color:#cbd9d5;font-size:12px;font-weight:700;margin-bottom:7px}.field textarea,.field input,.field select{width:100%;background:#0d171c;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px 12px}.field textarea{min-height:110px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.samples{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 15px}.samples button{font-size:11px;padding:7px 9px;background:#16262d;color:#cbd9d5}.run{width:100%;padding:13px}.tiny{font-size:11px;color:var(--muted);margin-top:11px}
+.result-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.status{font-size:11px;color:var(--mint);border:1px solid #355a50;border-radius:99px;padding:5px 8px;white-space:nowrap}.headline{font-size:27px;line-height:1.15;letter-spacing:-.03em;margin:16px 0 8px}.summary{color:#c3d2ce;font-size:13px;margin:0 0 18px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:16px 0}.metric{background:#0d171c;border:1px solid var(--line);border-radius:12px;padding:12px}.metric span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.1em}.metric strong{display:block;font-size:22px;margin-top:4px}.section-title{display:flex;justify-content:space-between;align-items:center;margin:21px 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.11em;color:#d8e4df}.items{display:grid;gap:8px}.item{border:1px solid var(--line);border-radius:12px;padding:12px;background:#101b20}.item-top{display:flex;justify-content:space-between;gap:12px}.item strong{font-size:13px}.price{color:var(--gold);font-weight:750;white-space:nowrap}.item p{margin:4px 0 8px;color:var(--muted);font-size:12px}.tags{display:flex;flex-wrap:wrap;gap:5px}.tag{font-size:10px;color:#b8d3c8;border:1px solid #2b4b43;border-radius:99px;padding:3px 7px}.tag.warn{color:#f2c1a0;border-color:#694b3c}.bar{height:5px;background:#26373d;border-radius:99px;overflow:hidden;margin-top:10px}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--gold));border-radius:99px}.reason{border-left:2px solid var(--mint);padding:10px 0 10px 13px;margin:8px 0;color:#d4e0db;font-size:12px}.log{background:#0b1418;border:1px solid var(--line);border-radius:11px;padding:12px;font:11px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#9fbbb0;white-space:pre-wrap;overflow-wrap:anywhere}.footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.disclaimer{margin-top:16px;padding:12px;border:1px solid #5b4c32;border-radius:11px;background:#241f15;color:#d8c9a8;font-size:11px}.empty{padding:40px 12px;text-align:center;color:var(--muted)}.empty .glyph{font-size:30px;color:var(--gold);margin-bottom:10px}
+@media(max-width:800px){.hero,.layout{grid-template-columns:1fr}.hero{gap:16px}.hero-note{max-width:650px}.top{align-items:flex-start}.pill{display:none}.wrap{padding:18px 12px 36px}.panel{padding:16px}.metrics{gap:6px}.metric{padding:9px}.metric strong{font-size:19px}}
+</style></head>
+<body><main class="wrap">
+<header class="top"><div class="brand"><div class="sigil">⌁</div><div><strong>LUMORA STRATEGY</strong><small>APPLIED INTELLIGENCE / PROTOTYPE</small></div></div><span class="pill">Decision Lab · v0.1</span></header>
+<section class="hero"><div><div class="eyebrow">Digital Alchemy / Field Interface</div><h1>Turn a messy problem into a testable decision.</h1><p>Describe a business or construction challenge. The lab converts it into a bounded choice problem, compares feasible combinations, and shows why the leading plan wins.</p></div><div class="hero-note"><strong>Explainable by design</strong>No black-box verdicts. Inspect the budget, candidate actions, scoring objective, alternatives and trade-offs. Change an assumption and run it again.</div></section>
+<div class="layout">
+<section class="panel"><h2>01 / Define the challenge</h2><p class="sub">Start with a prompt or load a scenario. This prototype uses a transparent local model, not a live consultant or an external AI service.</p>
+<div class="field"><label for="question">What are you trying to improve?</label><textarea id="question">We have NZ$30,000 to improve a small construction business. What should we prioritise to reduce delays and improve delivery?</textarea></div>
+<div class="samples"><button type="button" data-sample="business">Small business</button><button type="button" data-sample="construction">Construction project</button><button type="button" data-sample="resilience">Reduce operational risk</button></div>
+<div class="row"><div class="field"><label for="domain">Scenario model</label><select id="domain"><option value="construction">Construction</option><option value="business">Small business</option></select></div><div class="field"><label for="budget">Available budget (NZD)</label><input id="budget" type="number" min="1000" max="1000000" step="1000" value="30000"></div></div>
+<div class="row"><div class="field"><label for="priority">Main objective</label><select id="priority"><option value="balanced">Balanced improvement</option><option value="impact">Maximum impact</option><option value="risk">Reduce risk</option><option value="speed">Fast implementation</option></select></div><div class="field"><label for="maxItems">Maximum initiatives</label><select id="maxItems"><option value="3">3 initiatives</option><option value="4" selected>4 initiatives</option><option value="5">5 initiatives</option><option value="6">6 initiatives</option></select></div></div>
+<button class="primary run" id="run">▶ Run decision engine</button><p class="tiny">All amounts are illustrative NZD planning estimates. No external services or data are called.</p>
+</section>
+<section class="panel" aria-live="polite" aria-atomic="false"><div class="result-head"><div><div class="eyebrow">02 / Decision output</div><h2 style="margin-top:6px">Recommended portfolio</h2></div><span class="status" id="status">READY TO RUN</span></div>
+<div id="results"><div class="empty"><div class="glyph">⌘</div><strong>Your first run is waiting.</strong><p>Choose a scenario and run the engine to see ranked initiatives, budget use and the search evidence.</p></div></div></section>
+</div>
+<footer class="footer"><span>Digital Alchemy · Lumora Strategy working brand</span><span>Local deterministic prototype · no legal or professional advice</span></footer>
+</main>
+<script>
+(function(){
+const datasets={
+construction:[
+{id:"planning",name:"Short-interval planning huddles",cost:2500,impact:68,risk:12,speed:92,cat:"coordination",desc:"15-minute look-ahead planning to expose blockers before they stall the site."},
+{id:"procurement",name:"Critical-material procurement buffer",cost:7000,impact:76,risk:18,speed:64,cat:"supply",desc:"Identify long-lead items and create a small, targeted buffer for critical materials."},
+{id:"training",name:"Crew cross-skilling",cost:4800,impact:62,risk:14,speed:57,cat:"people",desc:"Train key crew members to cover predictable bottlenecks and absences."},
+{id:"qa",name:"Digital quality checklists",cost:3800,impact:64,risk:9,speed:81,cat:"quality",desc:"Standardise inspection points and capture defects before work is covered."},
+{id:"plant",name:"Preventive plant maintenance",cost:6200,impact:71,risk:8,speed:69,cat:"equipment",desc:"Schedule maintenance around production windows to reduce avoidable downtime."},
+{id:"safety",name:"Pre-task safety refresh",cost:1800,impact:42,risk:31,speed:95,cat:"safety",desc:"Focused toolbox refresh on the highest-risk recurring tasks."},
+{id:"forecast",name:"Two-week labour and cost forecast",cost:3200,impact:59,risk:11,speed:83,cat:"planning",desc:"A rolling forecast makes labour clashes and cost drift visible earlier."},
+{id:"supplier",name:"Supplier performance review",cost:2200,impact:48,risk:10,speed:79,cat:"supply",desc:"Review delivery reliability and agree escalation points with key suppliers."},
+{id:"survey",name:"Site layout and logistics review",cost:5400,impact:66,risk:15,speed:48,cat:"coordination",desc:"Reduce double-handling and travel through a targeted site logistics redesign."},
+{id:"handover",name:"Handover and close-out pack",cost:2800,impact:45,risk:7,speed:88,cat:"quality",desc:"Standardise records, sign-offs and owner handover to reduce end-stage rework."},
+{id:"contingency",name:"Ring-fenced contingency",cost:5000,impact:40,risk:35,speed:99,cat:"resilience",desc:"Retain a controlled reserve for unexpected cost or delivery shocks."},
+{id:"sensor",name:"Targeted equipment telemetry pilot",cost:9500,impact:78,risk:16,speed:38,cat:"equipment",desc:"Pilot basic usage and fault monitoring on one critical asset."},
+{id:"mentor",name:"Working supervisor coaching",cost:4200,impact:57,risk:10,speed:52,cat:"people",desc:"Coach supervisors on escalation, sequencing and clear daily handovers."},
+{id:"change",name:"Variation and change-control routine",cost:2600,impact:55,risk:13,speed:76,cat:"planning",desc:"Make scope changes visible, priced and approved before they disrupt delivery."}
+],
+business:[
+{id:"cash",name:"13-week cash-flow forecast",cost:900,impact:65,risk:8,speed:95,cat:"finance",desc:"Track expected receipts and payments to surface cash pressure before it arrives."},
+{id:"crm",name:"Lightweight customer follow-up system",cost:3200,impact:68,risk:13,speed:76,cat:"customers",desc:"Create a consistent process for enquiries, quotes and follow-up."},
+{id:"automation",name:"Automate repetitive admin",cost:4800,impact:77,risk:15,speed:65,cat:"operations",desc:"Automate one high-volume workflow after mapping its current steps."},
+{id:"pricing",name:"Quote and margin review",cost:1800,impact:71,risk:7,speed:91,cat:"finance",desc:"Review pricing, delivery assumptions and margin leakage on common work."},
+{id:"training",name:"Team cross-training",cost:2600,impact:54,risk:12,speed:58,cat:"people",desc:"Reduce dependence on one person for important repeatable tasks."},
+{id:"web",name:"Website conversion improvements",cost:3900,impact:59,risk:18,speed:67,cat:"customers",desc:"Improve service clarity, enquiry paths and proof points on key pages."},
+{id:"qa",name:"Document core operating procedures",cost:2100,impact:58,risk:8,speed:83,cat:"operations",desc:"Write short checklists for the tasks where mistakes or rework are common."},
+{id:"supplier",name:"Supplier and expense review",cost:1300,impact:49,risk:9,speed:86,cat:"finance",desc:"Check recurring costs, supplier terms and low-value spend."},
+{id:"retention",name:"Customer retention check-in",cost:1700,impact:61,risk:10,speed:82,cat:"customers",desc:"Contact existing customers with a structured service and repeat-work review."},
+{id:"security",name:"Account access and backup audit",cost:2400,impact:47,risk:29,speed:73,cat:"resilience",desc:"Review account access, recovery methods and backup restoration."},
+{id:"dashboard",name:"Weekly performance dashboard",cost:3500,impact:63,risk:11,speed:62,cat:"operations",desc:"Track a small set of measures that connect activity to delivery and cash."},
+{id:"capacity",name:"Capacity and workload planning",cost:2800,impact:60,risk:10,speed:64,cat:"people",desc:"Make demand, workload and bottlenecks visible before overcommitment."},
+{id:"offer",name:"Clarify highest-value service offer",cost:1500,impact:66,risk:13,speed:87,cat:"customers",desc:"Focus the offer around the work customers value and the business delivers well."},
+{id:"continuity",name:"Basic continuity plan",cost:2200,impact:45,risk:27,speed:55,cat:"resilience",desc:"Define how essential work continues if a key person or system is unavailable."}
+]};
+const $=id=>document.getElementById(id);
+const fmt=n=>new Intl.NumberFormat("en-NZ",{style:"currency",currency:"NZD",maximumFractionDigits:0}).format(n);
+function objective(item,priority){if(priority==="impact")return item.impact;if(priority==="risk")return item.risk*1.35+item.impact*.35;if(priority==="speed")return item.speed*.68+item.impact*.32;return item.impact*.7+item.speed*.15+item.risk*.15}
+function solve(items,budget,maxItems,priority){
+let best=null,checks=0,feasible=0;const n=items.length,limit=1<<n;
+for(let mask=0;mask<limit;mask++){checks++;let cost=0,count=0,base=0,selected=[],cats=new Set();
+for(let i=0;i<n;i++)if(mask&(1<<i)){const it=items[i];cost+=it.cost;count++;base+=objective(it,priority);selected.push(it);cats.add(it.cat)}
+if(cost>budget||count>maxItems)continue;feasible++;
+const diversity=Math.max(0,cats.size-1)*3.2;
+const score=base+diversity;
+if(!best||score>best.score||(score===best.score&&cost<best.cost))best={selected,cost,score,base,diversity,categories:cats.size};
+}
+return {...best,checks,feasible};
+}
+function render(){
+const q=$("question").value.toLowerCase(),domain=$("domain").value,budget=Math.max(0,Math.min(1000000,Number($("budget").value)||0)),maxItems=Number($("maxItems").value),priority=$("priority").value;
+if(!budget){$("status").textContent="CHECK BUDGET";$("results").innerHTML='<p class="summary">Enter a budget greater than zero to run the model.</p>';return}
+$("status").textContent="SEARCHING";$("run").disabled=true;
+try{
+const items=datasets[domain].map(x=>({...x}));const res=solve(items,budget,maxItems,priority);const chosen=res.selected||[];const spent=res.cost||0;const remain=budget-spent;
+const names=chosen.map(x=>x.name).join(", ");
+const sorted=[...chosen].sort((a,b)=>objective(b,priority)-objective(a,priority));
+const rejected=items.filter(x=>!chosen.some(y=>y.id===x.id)).sort((a,b)=>{const fa=a.cost<=remain?0:1,fb=b.cost<=remain?0:1;return fa-fb||objective(b,priority)/b.cost-objective(a,priority)/a.cost}).slice(0,3);
+const objectiveName={balanced:"balanced improvement",impact:"maximum impact",risk:"risk reduction",speed:"implementation speed"}[priority];
+const domainName=domain==="construction"?"construction operations":"small-business operations";
+const contextual=q.includes("delay")||q.includes("late")||q.includes("schedule")?"The prompt signals delivery reliability, so review the chosen planning, coordination and supply actions against the real causes of delay.":q.includes("cash")||q.includes("profit")||q.includes("margin")?"The prompt signals financial control, so validate the cost assumptions and check that expected gains connect to cash or margin.":q.includes("risk")||q.includes("safety")?"The prompt signals risk reduction, so treat the risk-weighted ranking as a starting point for a formal risk review.":"The model selected a feasible portfolio using the chosen objective, the stated budget and the initiative limit.";
+let html='<div class="headline">'+(chosen.length?'A feasible plan, ranked by trade-offs.':'No initiatives fit the current constraints.')+'</div>';
+html+='<p class="summary">For '+domainName+', the model searched combinations under a '+fmt(budget)+' cap, optimising for '+objectiveName+'. '+contextual+'</p>';
+html+='<div class="metrics"><div class="metric"><span>Budget allocated</span><strong>'+Math.round(spent/budget*100)+'%</strong></div><div class="metric"><span>Selected actions</span><strong>'+chosen.length+'/'+maxItems+'</strong></div><div class="metric"><span>Budget remaining</span><strong style="font-size:18px">'+fmt(remain)+'</strong></div></div>';
+html+='<div class="section-title"><span>Recommended initiatives</span><span>'+fmt(spent)+' total</span></div><div class="items">';
+if(!chosen.length)html+='<p class="summary">Try increasing the budget or reducing the initiative limit.</p>';
+sorted.forEach((it,i)=>{const value=Math.round(objective(it,priority));html+='<article class="item"><div class="item-top"><strong><span style="color:var(--mint);margin-right:8px">0'+(i+1)+'</span>'+it.name+'</strong><span class="price">'+fmt(it.cost)+'</span></div><p>'+it.desc+'</p><div class="tags"><span class="tag">Impact '+it.impact+'/100</span><span class="tag">Risk factor '+it.risk+'/35</span><span class="tag">Speed '+it.speed+'/100</span><span class="tag">'+it.cat+'</span></div><div class="bar"><span style="width:'+Math.min(100,value)+'%"></span></div></article>'});
+html+='</div><div class="section-title"><span>Why this combination?</span><span>Search trace</span></div>';
+html+='<div class="reason">1. Hard constraint: total selected cost stays within '+fmt(budget)+'.</div><div class="reason">2. Portfolio constraint: no more than '+maxItems+' initiatives are selected.</div><div class="reason">3. Objective: each item is scored for '+objectiveName+'; the portfolio receives a small diversity bonus for covering different operational categories.</div><div class="reason">4. Selection: all '+items.length+' candidates were considered in every possible subset ('+res.checks.toLocaleString()+' combinations). The highest-scoring feasible combination was kept.</div>';
+html+='<div class="section-title"><span>Alternatives to inspect</span><span>Not selected</span></div><div class="items">';
+rejected.forEach(it=>{html+='<article class="item"><div class="item-top"><strong>'+it.name+'</strong><span class="price">'+fmt(it.cost)+'</span></div><p>'+it.desc+'</p><div class="tags"><span class="tag warn">'+(it.cost>remain?'Would require budget reallocation':'Lower portfolio score')+'</span><span class="tag">Impact '+it.impact+'/100</span></div></article>'});
+html+='</div><div class="section-title"><span>Run record</span><span>Reproducible</span></div><div class="log">MODEL: constrained portfolio selection\nDOMAIN: '+domain+'\nOBJECTIVE: '+priority+'\nBUDGET: '+budget+' NZD\nMAX_ITEMS: '+maxItems+'\nCANDIDATES: '+items.length+'\nSUBSETS_EVALUATED: '+res.checks+'\nFEASIBLE_SUBSETS: '+res.feasible+'\nSELECTED: '+(names||'none')+'\nCOST: '+spent+' NZD\nREMAINING: '+remain+' NZD\nDIVERSITY_BONUS: '+(res.diversity||0).toFixed(2)+'</div>';
+html+='<div class="disclaimer"><strong>Important boundary:</strong> this is a deterministic demonstration using illustrative costs and modelled scores, not a general-purpose AI that understands arbitrary questions. It does not use live market prices, site data or verified forecasts. Validate assumptions with qualified people before acting.</div>';
+$("results").innerHTML=html;$("status").textContent="RUN COMPLETE";}catch(e){$("status").textContent="ENGINE ERROR";$("results").innerHTML='<p class="summary">The model could not complete this run. Try a different budget or scenario.</p>';}finally{$("run").disabled=false}
+}
+document.querySelectorAll("[data-sample]").forEach(btn=>btn.addEventListener("click",()=>{
+const type=btn.dataset.sample;
+if(type==="business"){$("domain").value="business";$("budget").value=12000;$("priority").value="balanced";$("question").value="Our small business has NZ$12,000. Which improvements should we prioritise to improve delivery, customer retention and cash control?"}
+if(type==="construction"){$("domain").value="construction";$("budget").value=30000;$("priority").value="balanced";$("question").value="We have NZ$30,000 to improve a small construction business. What should we prioritise to reduce delays and improve delivery?"}
+if(type==="resilience"){$("domain").value="business";$("budget").value=8000;$("priority").value="risk";$("question").value="We have NZ$8,000 and want to reduce operational risk and reliance on one person. What should we prioritise?"}
+}));
+$("question").addEventListener("input",()=>{const q=$("question").value.toLowerCase();if(q.includes("construction")||q.includes("site")||q.includes("crew")||q.includes("plant"))$("domain").value="construction";else if(q.includes("small business")||q.includes("cash flow")||q.includes("customer"))$("domain").value="business";const match=q.match(/(?:nz\$|\$)\s?([\d,]+)/i);if(match&&Number(match[1].replace(/,/g,""))>0)$("budget").value=Number(match[1].replace(/,/g,""))});
+$("run").addEventListener("click",render);
+})();
+</script></body></html>
