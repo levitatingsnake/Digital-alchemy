@@ -43,6 +43,24 @@ button{border-radius:4px 10px 4px 10px;background:#102738;border-color:#315367;t
 /* Replace internal jargon with ordinary labels */
 .hero .eyebrow{letter-spacing:.12em}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.field textarea#question{min-height:260px;height:260px;padding:15px}.plain-summary{padding:15px}.plain-columns{grid-template-columns:1fr}}
+
+/* Typography system: editorial serif for decisions, instrument mono for controls */
+:root{--type-editorial:"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;--type-instrument:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+.hero h1,.result h2,.strategy-brief h2{font-family:var(--type-editorial);font-weight:500;letter-spacing:-.045em;font-kerning:normal;text-wrap:balance}
+.hero h1{font-size:clamp(38px,5.6vw,66px);line-height:.99}
+.panel h2,.panel h3,.strategy-brief h3{font-family:var(--type-editorial);font-weight:500;letter-spacing:-.025em}
+.panel h2{font-size:22px;line-height:1.15}
+.strategy-brief h3{font-size:19px;line-height:1.2}
+.eyebrow,.pill,.field label,.metric span,.strategy-step b,.strategy-kpi strong{font-family:var(--type-instrument);font-variant-numeric:tabular-nums;letter-spacing:.12em}
+.eyebrow{font-size:9px;letter-spacing:.2em}
+.pill{font-size:9px}
+.result,.recommendation,.strategy-brief{font-kerning:normal}
+.result h2,.strategy-brief h2{font-size:clamp(25px,3vw,34px);line-height:1.1}
+.field textarea{font-family:var(--type-editorial);font-size:17px;line-height:1.75}
+.field label{font-size:10px;letter-spacing:.09em}
+.samples button{font-family:var(--type-instrument);font-size:10px;letter-spacing:.01em}
+@media(max-width:800px){.hero h1{font-size:clamp(38px,10vw,54px)}.panel h2{font-size:21px}}
+
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="sigil">⌁</div><div><strong>LUMORA STRATEGY</strong><small>DECISION SUPPORT / WORKING PROTOTYPE</small></div></div><span class="pill">Decision Lab · v0.1</span></header>
