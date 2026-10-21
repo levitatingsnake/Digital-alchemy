@@ -41,6 +41,8 @@ assert.equal(typeof handlers.run, 'function', 'Run button must be wired');
 handlers.run();
 assert.equal(elements.status.textContent, 'RUN COMPLETE', 'Default scenario must run');
 assert.match(elements.results.innerHTML, /Suggested actions/, 'Output must show a plan');
+assert.match(elements.results.innerHTML, /Test this recommendation/, 'Each recommendation should link to a real-world experiment');
+assert.match(elements.results.innerHTML, /console\.html\?experiment=/, 'Recommendation links should carry the action into the console');
 assert.match(elements.results.innerHTML, /THE ANSWER \/ PLAIN ENGLISH/, 'Output must include a clear executive summary');
 assert.match(elements.results.innerHTML, /What this result means/, 'Summary must explain the recommendation in ordinary language');
 assert.match(elements.results.innerHTML, /Your question/, 'Summary must echo the question being assessed');
