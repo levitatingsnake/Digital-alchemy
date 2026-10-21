@@ -18,6 +18,9 @@ assert.match(html, /<textarea id="chamberQuestion" rows="5" maxlength="2000"/, "
 assert.match(html, /id="chamberQuestionCount"/, "Long-form question field should show its character count");
 assert.match(match[1], /e\.key==="Enter"&&\(e\.metaKey\|\|e\.ctrlKey\)/, "Question should preserve newlines and submit only on Cmd/Ctrl+Enter");
 assert.match(html, /FIELD NOTE/, "The entry surface should use Digital Alchemy’s original field-note identity");
+assert.match(html, /--type-editorial/, "Console should define a distinctive editorial display type system");
+assert.match(html, /--type-instrument/, "Console should define a separate instrument-label type system");
+assert.match(html, /\.panel h2,\.panel-head h2\{font-family:var\(--type-editorial\)/, "Panel headings should use the editorial typeface");
 assert.match(html, /Make the unknown measurable\./, "The Chamber should have a distinctive product headline");
 assert.match(html, /id="conditionReview"/, 'Ledger should compare the same outcome under different conditions');
 assert.match(html, /id="nextExperimentReview"/, "Ledger should display a next-experiment recommendation");
