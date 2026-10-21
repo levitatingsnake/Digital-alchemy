@@ -65,6 +65,7 @@ The overnight workflow also checks route replay integrity, repeatability, bounda
 - **Research export:** builds a Markdown snapshot from evidence saved in the current browser without inventing missing results.
 - **Outcome threshold review:** the browser-local experiment ledger can store an explicit numeric success threshold and whether higher or lower is better, flag misses for human review, and preserve the rule beside the observed result. A flag triggers reconsideration; it does not prove causation or automatically change the engine's recommendation.
 - **Human decision review:** after recording an outcome, the ledger can preserve an explicit next step (continue cautiously, adjust and retest, stop, or gather more evidence) and the reason for it. The readout counts unresolved reviews and shows the chosen next step beside the observation.
+- **Rule-based follow-up prompts:** the ledger suggests a cautious next step from the recorded verdict and threshold: investigate unexpected harm, adjust after a miss, repeat a met target under comparable conditions, gather evidence for inconclusive results, or set a target if none was recorded. These prompts are transparent rules, not machine learning or autonomous decisions.
 - **Automated tests and benchmark:** static/dynamic smoke checks, real-stage integration, adversarial boundaries, targeted mutation checks, deterministic benchmark, and route replay assertions.
 
 ## Run the checks locally
