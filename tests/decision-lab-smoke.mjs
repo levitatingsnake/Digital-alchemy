@@ -21,7 +21,7 @@ const elements = {
   status: { textContent: '' },
   results: { innerHTML: '' }
 };
-const samples = ['improve', 'construction', 'resilience', 'budget'].map(sample => ({
+const samples = ['improve', 'finance', 'investing', 'property', 'construction', 'resilience', 'budget'].map(sample => ({
   dataset: { sample },
   addEventListener(type, fn) { handlers[sample] = fn; }
 }));
@@ -67,4 +67,19 @@ handlers.construction();
 assert.equal(elements.domain.value, 'construction', 'Construction sample must load');
 handlers.resilience();
 assert.equal(elements.domain.value, 'business', 'Resilience sample must load');
-console.log('PASS: Decision Lab syntax, controls, reproducible output, objective selection, and budget constraints.');
+for (const domain of ['finance', 'investing', 'property']) {
+  elements.domain.value = domain;
+  elements.budgetMode.value = 'none';
+  elements.maxItems.value = '4';
+  handlers.run();
+  assert.equal(elements.status.textContent, 'RUN COMPLETE', `${domain} scenario must run`);
+  assert.match(elements.results.innerHTML, new RegExp(`DOMAIN: ${domain}`), `${domain} output must identify its domain`);
+  assert.match(elements.results.innerHTML, /Important boundary/, `${domain} output must state limitations`);
+}
+handlers.finance();
+assert.equal(elements.domain.value, 'finance', 'Finance sample must load');
+handlers.investing();
+assert.equal(elements.domain.value, 'investing', 'Investment sample must load');
+handlers.property();
+assert.equal(elements.domain.value, 'property', 'Real-estate sample must load');
+console.log('PASS: Decision Lab syntax, controls, all five domains, reproducible output, objective selection, and budget constraints.');
