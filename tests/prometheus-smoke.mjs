@@ -148,7 +148,7 @@ for(const label of ['Tailored intervention design','Adaptation to your question:
 console.log('PASS tailored intervention and trade-off composition');
 
 assert.ok(cockpitSource.includes('function extractQuestionContext(question)'),'multi-clause context extraction');
-assert.ok(cockpitSource.includes('contextMarkup(context)+constraintGateMarkup(index,context)+transformConstraint(index,context,domain)+questionSpecificIntervention'),'constraints included in all plans');
+assert.ok(cockpitSource.includes('contextMarkup(context)+constraintGateMarkup(index,context)+transformConstraint(index,context,domain)+alchemyCompositionMarkup(index,context)+questionSpecificIntervention'),'constraints included in all plans');
 for(const id of ['no_hiring','low_budget','no_code','time','remote'])assert.ok(cockpitSource.includes("id:'"+id+"'"),'explicit constraint '+id);
 const ctxStart=cockpitSource.indexOf('const constraintPatterns=');
 const ctxEnd=cockpitSource.indexOf('function renderQuestionDiagnosis(',ctxStart);
@@ -172,3 +172,8 @@ console.log('PASS constraints alter candidate selection before optimisation');
 assert.ok(cockpitSource.includes('function transformConstraint(index,context,domain)'),'alchemy transformation logic');
 for(const label of ['Outcome-based specialist partnerships','Pre-commitment before investment','Manual concierge prototype','Remote coordination and local fulfilment'])assert.ok(cockpitSource.includes(label),'transformation mechanism: '+label);
 console.log('PASS alchemy substitution hypotheses');
+
+assert.ok(cockpitSource.includes('function composeAlchemyMechanisms(index,context)'),'alchemy composition function');
+assert.ok(cockpitSource.includes('function alchemyCompositionMarkup(index,context)'),'alchemy composition rendering');
+assert.ok(cockpitSource.includes('transformConstraint(index,context,domain)+alchemyCompositionMarkup(index,context)'),'composed alternatives appear in plans');
+console.log('PASS combined alchemy concepts');
