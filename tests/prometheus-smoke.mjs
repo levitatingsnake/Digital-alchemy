@@ -177,3 +177,8 @@ assert.ok(cockpitSource.includes('function composeAlchemyMechanisms(index,contex
 assert.ok(cockpitSource.includes('function alchemyCompositionMarkup(index,context)'),'alchemy composition rendering');
 assert.ok(cockpitSource.includes('transformConstraint(index,context,domain)+alchemyCompositionMarkup(index,context)'),'composed alternatives appear in plans');
 console.log('PASS combined alchemy concepts');
+
+assert.ok(cockpitSource.includes('function evaluateAlchemyConcept(index,context)'),'feasibility assessment');
+for(const name of ['Cash exposure','Delivery capacity','Implementation speed','Technical complexity','Operating model'])assert.ok(cockpitSource.includes(name),'feasibility dimension '+name);
+assert.ok(cockpitSource.includes('assessment.checks.map'),'feasibility checks rendered');
+console.log('PASS composed concept feasibility checks');
