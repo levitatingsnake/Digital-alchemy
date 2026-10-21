@@ -1,10 +1,10 @@
 # Portfolio pitch: Digital Alchemy
 
-A practical talk track for showing Digital Alchemy to an AI, product, or engineering person. Keep the live app open and let the evidence do the work.
+A practical talk track for showing Digital Alchemy to an AI, product, or engineering person. Keep the live app open and let the evidence do the work. The wider portfolio is being developed under the working brand **Lumora Strategy**; this is a proposed brand name, not a statement of legal incorporation.
 
 ## The 20-second introduction
 
-“I’m building Digital Alchemy, a browser-based experiment engine. You give it an explicit goal, it searches candidate routes, compares alternatives, and runs repeatable checks so you can inspect how it reached a result. I’m exploring how to make AI-style systems more testable and transparent, rather than just producing a convincing answer.”
+“I’m developing an applied-AI portfolio under the working name Lumora Strategy. Digital Alchemy is one of my flagship experiments: a browser-based engine where you choose an explicit goal, it searches candidate routes, compares alternatives, and runs repeatable checks. I’m exploring how to make these systems more testable and transparent, rather than just producing a convincing answer.”
 
 ## The two-minute walkthrough
 
