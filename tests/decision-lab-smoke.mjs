@@ -69,7 +69,7 @@ assert.match(elements.results.innerHTML, /External evidence to verify/, 'Output 
 assert.match(elements.results.innerHTML, /Evidence plan for your shortlist/, 'Output must provide an evidence plan for the selected actions');
 assert.match(elements.results.innerHTML, /Assumption to test:/, 'Each selected action must state a testable assumption');
 assert.match(elements.results.innerHTML, /Collect:/, 'Each selected action must list data to collect');
-assert.match(html, /function evidenceChecks\\(domain,items\\)/, 'Evidence plan generation must be isolated and maintainable');
+assert.ok(html.includes('function evidenceChecks(domain,items)'), 'Evidence plan generation must be isolated and maintainable');
 assert.match(elements.results.innerHTML, /Important boundary/, 'Output must state limitations');
 assert.match(elements.results.innerHTML, /risk-adjusted constrained portfolio selection/, 'Run record must identify the robust engine');
 assert.match(elements.results.innerHTML, /COST: (\d+) NZD/, 'Output must log the total cost');
