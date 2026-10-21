@@ -7,7 +7,7 @@ assert.match(html, /Signal Observatory/, 'page has the expected product identity
 assert.match(html, /https:\/\/catalogue\.data\.govt\.nz\/api\/3\/action\/package_search/, 'search points to the public CKAN API');
 assert.match(html, /fetch\(url/, 'search makes a real network request');
 assert.match(html, /No stale sample data is substituted/, 'network failure is not masked with fake data');
-assert.match(html, /does not yet pipe observations directly into Decision Lab/, 'integration boundary is disclosed');
+assert.match(html, /pass the bounded sample into Decision Lab/, 'sample handoff and its boundary are disclosed');
 assert.match(html, /data-q=/, 'curated search shortcuts exist');
 assert.match(html, /data-copy=/, 'source-link copy action exists');
 assert.match(html, /datastore_search/, 'DataStore resource preview is supported');
