@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 function makeRandom(seed) {
   let value = seed >>> 0;
@@ -150,5 +151,38 @@ function stableResult(result) {
 const first = runBenchmark();
 const second = runBenchmark();
 assert(stableResult(first) === stableResult(second), 'independent benchmark must be deterministic');
+fs.mkdirSync('reports', { recursive: true });
+fs.writeFileSync('reports/transfer-task-latest.json', JSON.stringify(first, null, 2) + '\\n');
+const markdown = [
+  '# Independent Constrained-Selection Benchmark',
+  '',
+  '> Scope: separate synthetic optimisation task; this does not establish generalisation to real-world tasks.',
+  '',
+  '## Method',
+  '',
+  '- 100 deterministic cases across four fixed seeds.',
+  '- 14 candidate items per case and a fixed budget of 30.',
+  '- Objective: total item value plus a bonus for each represented category.',
+  '- Greedy comparator: value-to-cost ratio.',
+  '- Reference: exact enumeration of all 16,384 possible subsets per case.',
+  '',
+  '## Results',
+  '',
+  '| Metric | Result |',
+  '|---|---:|',
+  '| Cases | ' + first.overall.cases + ' |',
+  '| Mean greedy score | ' + first.overall.averageGreedyScore + ' |',
+  '| Mean exact optimum score | ' + first.overall.averageExactScore + ' |',
+  '| Mean absolute score gap | ' + first.overall.averageAbsoluteGap + ' |',
+  '| Mean relative gap | ' + first.overall.averageRelativeGapPct + '% |',
+  '| Greedy matched optimum | ' + first.overall.greedyMatchedOptimumCases + ' / ' + first.overall.cases + ' (' + first.overall.greedyMatchedOptimumPct + '%) |',
+  '| Budget violations | ' + first.overall.budgetViolations + ' |',
+  '',
+  '## Interpretation',
+  '',
+  'The exact solver is a reference for this small, fully enumerable problem. The gap measures how the simple greedy heuristic compares on these generated cases. This is a separate toy task, not evidence that Digital Alchemy generalises to unrelated domains or makes good real-world decisions.',
+  ''
+].join('\n');
+fs.writeFileSync('reports/transfer-task-latest.md', markdown + '\\n');
 console.log('PASS: independent constrained-selection benchmark');
-console.log(JSON.stringify({ method: first.method, overall: first.overall, examples: first.examples }, null, 2));
+console.log(markdown);
