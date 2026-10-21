@@ -1,69 +1,78 @@
-# Digital Alchemy: 2-minute demo script
+# Digital Alchemy: 2-minute portfolio demo
 
-**Purpose:** a concise portfolio walkthrough for an AI engineering reviewer. Show the system working, show its evidence, and state the boundary honestly.
+**Purpose:** show an AI-engineering reviewer a working search-and-evidence prototype, its tests, and the limits of its claims.
 
-**Format:** screen recording, 16:9, 1080p if available. Keep the cursor deliberate. No background music is required. Do not edit in results that were not produced by the live app.
+**Live demo:** https://levitatingsnake.github.io/Digital-alchemy/  
+**Repository:** https://github.com/levitatingsnake/Digital-alchemy
+
+## Before you show it
+
+- Open the live site and make sure the latest dashboard has deployed.
+- In **Mission**, choose a goal, build a test brief, then use **Find route** and **Explore futures**. Use a simple goal such as Balanced or Stable.
+- In **Evidence**, tap **Run proof demo**. Wait for the real result.
+- If you plan to show rule research, go to **Engine**, preserve at least two candidate rules, then run the Discovery Cycle and inspect its actual report.
+- In **Memory**, confirm the Obsidian vault name and export or send a test log.
+- Do not clear browser data just before the demo. The app's saved state is local to that browser.
 
 ## Run of show
 
-### 0:00–0:12 | The question
+### 0:00–0:15 | The question
 
-**On screen:** Open the live app and show the title and guided session console.
+**On screen:** Show the XenoLab landing screen and the four workspace tabs.
 
-**Narration:**
-“Digital Alchemy is an experimental search-and-evidence engine. The idea is simple: don't just show an answer. Show the goal, candidate routes, the tests, and what the evidence actually supports.”
+**Say:**
+“Digital Alchemy explores a simple engineering question: can a system make its decisions easier to inspect by exposing its objective, comparing possible routes, testing hypotheses, and keeping evidence?”
 
-### 0:12–0:30 | Set a goal
+### 0:15–0:40 | Mission: make a goal explicit
 
-**On screen:** Move through the guided console. Enter a short intention, explicitly choose a goal profile, and build a test brief.
+**On screen:** Open **Mission**. Enter a short intention, explicitly choose the model goal, build the test brief, then find a route.
 
-**Narration:**
-“The intention is context, not magic. I choose the model interpretation explicitly, so the system doesn't pretend a language model understood something it never parsed.”
+**Say:**
+“The text is context, not a claim of natural-language understanding. I choose the actual model objective explicitly. The engine then searches sequences of defined symbolic operations and shows its route and score.”
 
-### 0:30–0:52 | Compare routes
+### 0:40–0:58 | Compare alternatives
 
-**On screen:** Show the primary route, then the alternative endpoint comparison. Point out route operations, score delta, and final state.
+**On screen:** Tap **Explore futures** and inspect the alternatives and their endpoints.
 
-**Narration:**
-“The engine searches bounded sequences of symbolic operations. It can compare distinct endpoints and show how each scores against the chosen objective. These percentages are internal model scores, not real-world success probabilities.”
+**Say:**
+“Rather than presenting one answer as magic, it lets me compare alternatives against the same declared objective. These are internal alignment scores, not probabilities of success in the real world.”
 
-### 0:52–1:15 | Inspect the research loop
+### 0:58–1:20 | Evidence: challenge the implementation
 
-**On screen:** Navigate to the Discovery Cycle and Rule Adjudicator. Run the workflow only if the current browser state and saved candidate rules make the run meaningful. If it needs saved candidate rules, prepare them before recording.
+**On screen:** Open **Evidence**, run the proof demo, and show the actual pass/fail summary. If time allows, inspect Prometheus or reproducibility results.
 
-**Narration:**
-“The research layer compares candidate rules, checks holdout behaviour, records disagreements, and audits whether evidence is fresh. A rule that wins on discovery can still lose on holdout, and the system is allowed to say so.”
+**Say:**
+“The evidence layer checks implementation properties such as bounded outputs and repeatability. Adversarial tests and holdout experiments can reveal weaknesses in the model. Passing these checks is not proof that the model describes external reality.”
 
-**Recording note:** don't manufacture a preferred verdict. Show the actual result from the current run. If the panel reports insufficient candidates or inconclusive evidence, explain that honestly.
+**Important:** show the verdict the app actually produces. Do not manufacture a preferred result. If a test fails or a report is inconclusive, explain it plainly.
 
-### 1:15–1:38 | Show reproducible evidence
+### 1:20–1:40 | Engine: show the research loop
 
-**On screen:** Show the Research report export control, then open the repository's README benchmark table or the latest successful GitHub Actions run.
+**On screen:** Open **Engine**. Show rule discovery or refinement, and the Discovery Cycle only if enough saved candidates are available.
 
-**Narration:**
-“The benchmark uses 400 deterministic cases. Depth-three search reached a mean score of 78.933 versus 68.778 for doing nothing, and beat greedy search in 379 cases. That's a measured improvement inside this symbolic model, not proof of external effectiveness.”
+**Say:**
+“The research tools make it possible to generate candidate rules, test them on separate synthetic samples, compare competing explanations, and record counterexamples. The next step is to challenge the same architecture on a genuinely different task.”
 
-### 1:38–1:52 | Show engineering discipline
+### 1:40–1:52 | Reproducible engineering
 
-**On screen:** Open the Actions run and show the passing smoke, integration, boundary, mutation, and benchmark steps. Briefly show the architecture diagram.
+**On screen:** Open the repository's [README](README.md), [Architecture](ARCHITECTURE.md), and the latest successful [overnight lab workflow](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml).
 
-**Narration:**
-“The project also checks route replay, repeatability, boundary conditions, and whether selected invariants catch deliberately injected faults. That makes the claims easier to audit.”
+**Say:**
+“The benchmark compares bounded search against simpler baselines over 400 deterministic cases. The measured improvement is specific to this model and test suite. The repository includes the implementation, tests, and reports so a reviewer can challenge the result.”
 
-### 1:52–2:00 | Close with the limitation
+### 1:52–2:00 | Close honestly
 
-**On screen:** Return to the app or README.
+**On screen:** Return to the live app.
 
-**Narration:**
-“The next challenge is to test this architecture on a genuinely different task with an external baseline. Until then, the honest result is a reproducible, inspectable prototype, not a scientific discovery engine.”
+**Say:**
+“This is a reproducible, inspectable symbolic prototype, not a validated scientific discovery engine. I'm interested in feedback on the evaluation design and what task would be the strongest next test.”
 
 ## Capture checklist
 
 - [ ] Close unrelated tabs, notifications, and personal information.
-- [ ] Test the route and buttons once before recording.
-- [ ] Ensure the app has enough saved candidate rules for any research panel you plan to demonstrate.
-- [ ] Use a fresh, understandable example and keep the goal choice visible.
-- [ ] Show actual outputs and actual Actions results.
+- [ ] Verify the live site reflects the current dashboard before recording.
+- [ ] Test the key buttons once on the device you will use.
+- [ ] Show actual outputs, test results, and workflow status.
 - [ ] Do not describe the intention field as semantic AI understanding.
-- [ ] Do not call symbolic scores probabilities or claims of real-world success.
-- [ ] Include captions or a transcript when publishing.
+- [ ] Do not describe symbolic scores as real-world probabilities or scientific proof.
+- [ ] If recording a screen demo, keep the cursor deliberate and avoid editing in results that the app did not produce.
