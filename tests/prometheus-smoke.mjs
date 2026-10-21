@@ -132,5 +132,6 @@ console.log('PASS transparent question-specific unit economics');
 
 assert.ok(cockpitSource.includes('function compareStrategies(plans,diagnosis)'),'cross-strategy decision arena');
 for(const label of ['Evidence strength','Economic viability','Downside exposure','do not invest yet','synthetic optimisation scores are deliberately excluded'])assert.ok(cockpitSource.includes(label),'comparison gate '+label);
-assert.ok(cockpitSource.includes('compareStrategies(plans,diagnosis)+plans.map'),'comparison rendered before plans');
+assert.ok(cockpitSource.includes('<details class=\\"advanced-analysis\\">') || cockpitSource.includes('<details class="advanced-analysis">'),'advanced comparison is opt-in');
+assert.ok(cockpitSource.includes("plans.map(p=>planMarkup") ,'three strategies remain primary output');
 console.log('PASS evidence-gated three-strategy decision arena');
