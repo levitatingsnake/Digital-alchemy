@@ -13,6 +13,9 @@ assert.match(html, /id="expTarget"/, 'Ledger should allow an explicit success th
 assert.match(html, /id="expReview"/, 'Ledger should capture the human decision after reviewing an outcome');
 assert.match(html, /id="expReviewReason"/, 'Ledger should record why a follow-up decision was chosen');
 assert.match(match[1], /Review open/, 'Readout should expose unresolved review decisions');
+assert.match(match[1], /The target was missed\. Inspect context and assumptions/, "A missed target should suggest reviewing assumptions and retesting");
+assert.match(match[1], /The target was met\. Check side effects and repeat/, "A met target should suggest a controlled repeat before scaling");
+assert.match(match[1], /No explicit success target was recorded/, "Missing targets should not be silently interpreted as success");
 assert.match(html, /id="expPrefillNotice"/, 'Console should explain when an experiment is carried over from Decision Lab');
 assert.match(match[1], /params\.get\("experiment"\)/, 'Console should accept a decision action from the recommendation link');
 assert.match(match[1], /TARGET MISSED/, 'Ledger should flag outcomes that miss their target');
