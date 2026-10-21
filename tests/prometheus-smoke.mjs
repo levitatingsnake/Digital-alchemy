@@ -99,7 +99,7 @@ for(const heading of ['Opportunity and strategic logic','Business case and finan
 for(const domain of ['business','construction','finance','investing','property']){
  assert.ok(cockpitSource.includes(domain+':{market:'),'domain-specific strategy guidance for '+domain);
 }
-assert.ok(cockpitSource.includes('planMarkup(p.v,p.run,p.i,question,domain)'),'domain context passed to all three briefings');
+assert.ok(cockpitSource.includes('planMarkup(p.v,p.run,p.i,question,domain,diagnosis)'),'domain context passed to all three briefings');
 console.log('PASS comprehensive three-plan strategy structure');
 
 assert.ok(cockpitSource.includes('const modelPlaybooks='),'model-specific strategy library exists');
@@ -120,3 +120,7 @@ assert.equal(interpret('We need to grow without hiring more staff').primary.id,'
 assert.equal(interpret('Improve the customer sales funnel').primary.id,'demand','demand identified from user problem');
 assert.equal(interpret('A timely business decision').matched,0,'substring matches excluded');
 console.log('PASS question-specific interpretation and safeguards');
+
+assert.ok(cockpitSource.includes('function causalMarkup(index,diagnosis)'),'falsifiable causal analysis renderer');
+for(const label of ['Critical assumption:','What would disprove it:','Smallest useful test:','Untested hypothesis'])assert.ok(cockpitSource.includes(label),'causal evidence: '+label);
+console.log('PASS causal hypotheses and disconfirmation tests');
