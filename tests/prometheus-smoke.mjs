@@ -186,3 +186,6 @@ console.log('PASS composed concept feasibility checks');
 assert.ok(cockpitSource.includes('<details class="plan-deep-dive">'),'detailed plan collapses by default');
 assert.ok(cockpitSource.includes('</div></details><div class="plan-conclusion">'),'summary and conclusion remain visible');
 console.log('PASS progressive disclosure for strategy reports');
+
+assert.ok(cockpitSource.includes('const parts=options;'),'composition retains all applicable constraints');
+console.log('PASS no constraint silently dropped from composition');
