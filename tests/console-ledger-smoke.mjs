@@ -13,6 +13,7 @@ assert.match(html, /id="expTarget"/, 'Ledger should allow an explicit success th
 assert.match(match[1], /TARGET MISSED/, 'Ledger should flag outcomes that miss their target');
 assert.match(match[1], /review the assumptions, context and next step/i, 'A missed target should prompt a review, not claim causation');
 assert.match(match[1], /digital-alchemy-experiment-ledger\.csv/, 'Experiment records must be exportable as CSV');
+assert.match(match[1], /"target","direction"/, 'CSV export must preserve the success rule used for review flags');
 assert.match(match[1], /digital-alchemy-experiment-ledger\.json/, 'Experiment records must be exportable as JSON');
 
 const handlers = {};
