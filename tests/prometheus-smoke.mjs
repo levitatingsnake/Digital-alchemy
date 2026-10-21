@@ -92,3 +92,12 @@ const cockpitScript=cockpitSource.split('<script>')[1]?.split('</script>')[0];
 assert.ok(cockpitScript,'cockpit has embedded script');
 new Script(cockpitScript,{filename:'cockpit.html'});
 console.log('PASS simplified customer cockpit structure and JavaScript syntax');
+
+for(const heading of ['Opportunity and strategic logic','Business case and financial model','90-day implementation plan','Evidence required before investment','Risks, compliance and stop conditions']){
+ assert.ok(cockpitSource.includes(heading),'strategy briefing includes '+heading);
+}
+for(const domain of ['business','construction','finance','investing','property']){
+ assert.ok(cockpitSource.includes(domain+':{market:'),'domain-specific strategy guidance for '+domain);
+}
+assert.ok(cockpitSource.includes('planMarkup(p.v,p.run,p.i,question,domain)'),'domain context passed to all three briefings');
+console.log('PASS comprehensive three-plan strategy structure');
