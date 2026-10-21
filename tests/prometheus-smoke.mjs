@@ -146,3 +146,15 @@ assert.ok(cockpitSource.includes('function questionSpecificIntervention(index,di
 assert.ok(cockpitSource.includes('questionSpecificIntervention(index,diagnosis,domain)+causalMarkup'),'intervention included in each briefing');
 for(const label of ['Tailored intervention design','Adaptation to your question:','Low-cost proof:','Trade-off:'])assert.ok(cockpitSource.includes(label),'tailored plan detail '+label);
 console.log('PASS tailored intervention and trade-off composition');
+
+assert.ok(cockpitSource.includes('function extractQuestionContext(question)'),'multi-clause context extraction');
+assert.ok(cockpitSource.includes('contextMarkup(context)+questionSpecificIntervention'),'constraints included in all plans');
+for(const id of ['no_hiring','low_budget','no_code','time','remote'])assert.ok(cockpitSource.includes("id:'"+id+"'"),'explicit constraint '+id);
+const ctxStart=cockpitSource.indexOf('const constraintPatterns=');
+const ctxEnd=cockpitSource.indexOf('function renderQuestionDiagnosis(',ctxStart);
+const getContext=runInNewContext(cockpitSource.slice(ctxStart,ctxEnd)+'\nextractQuestionContext',{String});
+const constrained=getContext('I want to grow without hiring more staff. We have a minimal budget and need results within 3 months.');
+assert.ok(constrained.constraints.some(x=>x.id==='no_hiring'),'staffing constraint detected');
+assert.ok(constrained.constraints.some(x=>x.id==='low_budget'),'budget constraint detected');
+assert.ok(constrained.constraints.some(x=>x.id==='time'),'delivery window detected');
+console.log('PASS multi-clause goals and explicit constraint extraction');
