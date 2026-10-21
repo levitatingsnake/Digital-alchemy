@@ -10,6 +10,7 @@ on:
     paths:
       - 'index.html'
       - 'decision-lab.html'
+      - 'observatory.html'
       - 'tests/**'
       - '.github/workflows/overnight-lab.yml'
 
@@ -36,6 +37,8 @@ jobs:
         run: node tests/smoke-check.mjs
       - name: Run Decision Lab smoke and constraint checks
         run: node tests/decision-lab-smoke.mjs
+      - name: Run Signal Observatory smoke checks
+        run: node tests/observatory-smoke.mjs
       - name: Run real-stage Discovery Cycle integration test
         run: node tests/real-stage-integration.mjs
       - name: Run adversarial boundary checks
