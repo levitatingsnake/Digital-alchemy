@@ -16,7 +16,7 @@ assert.match(match[1], /Review open/, 'Readout should expose unresolved review d
 assert.match(html, /id="expPrefillNotice"/, 'Console should explain when an experiment is carried over from Decision Lab');
 assert.match(match[1], /params\.get\("experiment"\)/, 'Console should accept a decision action from the recommendation link');
 assert.match(match[1], /TARGET MISSED/, 'Ledger should flag outcomes that miss their target');
-assert.match(match[1], /review the assumptions, context and next step/i, 'A missed target should prompt a review, not claim causation');
+assert.match(match[1], /Review missed targets before repeating or scaling/i, 'A missed target should prompt a review, not claim causation');
 assert.match(match[1], /digital-alchemy-experiment-ledger\.csv/, 'Experiment records must be exportable as CSV');
 assert.match(match[1], /"target","direction"/, 'CSV export must preserve the success rule used for review flags');
 assert.match(match[1], /digital-alchemy-experiment-ledger\.json/, 'Experiment records must be exportable as JSON');
