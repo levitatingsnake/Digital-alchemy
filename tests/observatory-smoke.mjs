@@ -11,6 +11,12 @@ assert.match(html, /does not yet pipe observations directly into Decision Lab/, 
 assert.match(html, /data-q=/, 'curated search shortcuts exist');
 assert.match(html, /data-copy=/, 'source-link copy action exists');
 assert.match(html, /datastore_search/, 'DataStore resource preview is supported');
+assert.match(html, /data-preview=/, 'machine-readable resources have a live fetch control');
+assert.match(html, /function handoffToForge/, 'live samples can be handed to the Decision Lab');
+assert.match(html, /digitalAlchemyImportedCsv/, 'handoff uses a defined same-origin transfer key');
+assert.match(html, /data-export=/, 'fetched rows can be exported as CSV');
+assert.match(html, /function toCSV/, 'API rows are serialised as CSV with escaping');
+assert.match(html, /function profileRecords/, 'sample numeric fields are profiled');
 assert.match(html, /metadata_modified/, 'catalogue metadata timestamps are surfaced');
 assert.match(html, /<meta name="viewport"/, 'page is responsive');
 assert.match(html, /prefers-reduced-motion/, 'reduced-motion preference is respected');
