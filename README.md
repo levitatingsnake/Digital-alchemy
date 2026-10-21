@@ -4,7 +4,7 @@
 
 [**Launch the live demo**](https://levitatingsnake.github.io/Digital-alchemy/) · [Portfolio pitch](PORTFOLIO_PITCH.md) · [Architecture](ARCHITECTURE.md) · [Technical case study](CASE_STUDY.md) · [2-minute demo script](DEMO_SCRIPT.md) · [Event rehearsal card](EVENT_REHEARSAL_CARD.md) · [Development workbook](WORKBOOK.md) · [Latest overnight lab](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml) · [Latest benchmark report](reports/overnight-2026-10-21.md)
 
-Digital Alchemy is an experimental portfolio project about building systems that do more than produce an answer: they expose their objective, compare alternatives, test candidate rules, preserve reproducible evidence, and report limitations.
+Digital Alchemy is an experimental portfolio project about building systems that do more than produce an answer: they expose their objective, compare alternatives, test candidate rules, preserve reproducible evidence, and report limitations. It is part of an emerging applied-AI portfolio being developed under the working brand **Lumora Strategy**. Lumora Strategy is a proposed name, not a claim that a company has been legally registered.
 
 > **Evidence boundary:** this is a symbolic toy model. Its scores are internal objective scores, not probabilities of success, physical chemistry, causal evidence, or proof of real-world usefulness.
 
