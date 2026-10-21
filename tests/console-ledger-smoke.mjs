@@ -83,5 +83,5 @@ assert.equal(records[0].review, 'adjust');
 assert.equal(records[0].reviewReason, 'Target missed; reduce scope and retest');
 assert.match(getElement('experimentList').innerHTML, /Adjust and retest/);
 assert.match(getElement('experimentList').innerHTML, /reduce scope and retest/);
-assert.match(getElement('expAlerts').textContent, /1 review decision\(s\) still open/, 'Pending review summary should be visible for unreviewed records');
+assert.match(getElement('expAlerts').textContent, /0 review decision\(s\) still open/, 'A completed human review should clear the open-review count');
 console.log('PASS: Console syntax, experiment ledger, local persistence, signed error, MAE and percentage error.');
