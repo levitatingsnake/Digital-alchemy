@@ -41,6 +41,8 @@ jobs:
         run: node tests/mutation-check.mjs
       - name: Run overnight benchmark
         run: node tests/overnight-benchmark.mjs
+      - name: Run independent constrained-selection benchmark
+        run: node tests/transfer-task-benchmark.mjs
       - name: Publish concise report to job summary
         if: always()
         run: |
@@ -50,12 +52,17 @@ jobs:
             echo "## Digital Alchemy Overnight Lab" >> "$GITHUB_STEP_SUMMARY"
             echo "Benchmark did not produce a report. Inspect the failed step logs." >> "$GITHUB_STEP_SUMMARY"
           fi
+          if [ -f reports/transfer-task-latest.md ]; then
+            cat reports/transfer-task-latest.md >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Store machine-readable and human-readable reports
-        if: always() && hashFiles('reports/overnight-latest.json', 'reports/overnight-latest.md') != ''
+        if: always() && hashFiles('reports/overnight-latest.json', 'reports/overnight-latest.md', 'reports/transfer-task-latest.json', 'reports/transfer-task-latest.md') != ''
         uses: actions/upload-artifact@v4
         with:
           name: digital-alchemy-overnight-lab-${{ github.run_number }}
           path: |
             reports/overnight-latest.json
             reports/overnight-latest.md
+            reports/transfer-task-latest.json
+            reports/transfer-task-latest.md
           retention-days: 30
