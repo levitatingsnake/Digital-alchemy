@@ -1,0 +1,28 @@
+name: FORGE diagnostic laboratory
+on:
+  pull_request:
+    paths:
+      - 'cockpit.html'
+      - 'tests/forge-diagnostic.mjs'
+      - '.github/workflows/forge-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run bounded offline diagnostic
+        run: node tests/forge-diagnostic.mjs
+      - name: Upload diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-diagnostic
+          path: reports/forge-diagnostic.*
+          retention-days: 3
