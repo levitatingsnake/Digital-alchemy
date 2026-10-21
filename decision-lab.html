@@ -115,17 +115,28 @@ property:[
 ]};
 const $=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat("en-NZ",{style:"currency",currency:"NZD",maximumFractionDigits:0}).format(n);
-function objective(item,priority){if(priority==="impact")return item.impact;if(priority==="risk")return (35-item.risk)*1.35+item.impact*.35;if(priority==="speed")return item.speed*.68+item.impact*.32;return item.impact*.7+item.speed*.15+item.risk*.15}
+function objective(item,priority){if(priority==="impact")return item.impact;if(priority==="risk")return (35-item.risk)*1.35+item.impact*.35;if(priority==="speed")return item.speed*.62+item.impact*.30+(35-item.risk)*.08;return item.impact*.7+item.speed*.15+(35-item.risk)*.15}
 function solve(items,budget,maxItems,priority){
 let best=null,checks=0,feasible=0;const n=items.length,limit=1<<n;
-for(let mask=0;mask<limit;mask++){checks++;let cost=0,count=0,base=0,selected=[],cats=new Set();
-for(let i=0;i<n;i++)if(mask&(1<<i)){const it=items[i];cost+=it.cost;count++;base+=objective(it,priority);selected.push(it);cats.add(it.cat)}
+for(let mask=0;mask<limit;mask++){checks++;let cost=0,count=0,base=0,stressBase=0,selected=[],cats=new Set();
+for(let i=0;i<n;i++)if(mask&(1<<i)){const it=items[i];cost+=it.cost;count++;base+=objective(it,priority);const stressed={...it,impact:it.impact*.72,risk:Math.min(35,it.risk+6),speed:it.speed*.85};stressBase+=objective(stressed,priority);selected.push(it);cats.add(it.cat)}
 if(cost>budget||count>maxItems)continue;feasible++;
 const diversity=Math.max(0,cats.size-1)*3.2;
-const score=base+diversity;
-if(!best||score>best.score||(score===best.score&&cost<best.cost))best={selected,cost,score,base,diversity,categories:cats.size};
+const baselineScore=base+diversity,stressScore=stressBase+diversity;
+const score=baselineScore*.65+stressScore*.35;
+if(!best||score>best.score||(score===best.score&&cost<best.cost))best={selected,cost,score,base,diversity,categories:cats.size,baselineScore,stressScore,stressDelta:stressScore-baselineScore};
 }
 return {...best,checks,feasible};
+}
+function evidenceSources(domain){
+const map={
+finance:[{name:"Reserve Bank · lending and deposit rates",url:"https://www.rbnz.govt.nz/statistics/series/exchange-and-interest-rates/retail-interest-rates-on-lending-and-deposits",why:"Verify current published business and household lending-rate series."},{name:"Stats NZ · official statistics",url:"https://www.stats.govt.nz/",why:"Check inflation, labour and business indicators."}],
+investing:[{name:"Financial Markets Authority · consumers",url:"https://www.fma.govt.nz/consumer/",why:"Check investor education, provider information and warnings."},{name:"Reserve Bank · lending and deposit rates",url:"https://www.rbnz.govt.nz/statistics/series/exchange-and-interest-rates/retail-interest-rates-on-lending-and-deposits",why:"Check published rate context, not an asset-return forecast."}],
+property:[{name:"REINZ · property research and reports",url:"https://www.reinz.co.nz/Research-and-reports",why:"Review published housing-market reports and regional context."},{name:"Reserve Bank · lending and deposit rates",url:"https://www.rbnz.govt.nz/statistics/series/exchange-and-interest-rates/retail-interest-rates-on-lending-and-deposits",why:"Verify published mortgage-rate context before stress-testing finance."},{name:"IRD · residential rental income",url:"https://www.ird.govt.nz/topics/rental-income-and-paying-tax",why:"Check current tax guidance for rental income and records."},{name:"Tenancy Services · Healthy Homes",url:"https://www.tenancy.govt.nz/healthy-homes/",why:"Verify relevant rental-property compliance requirements."}],
+construction:[{name:"Stats NZ · official statistics",url:"https://www.stats.govt.nz/",why:"Find published construction, labour and price indicators."}],
+business:[{name:"Stats NZ · official statistics",url:"https://www.stats.govt.nz/",why:"Find current business, inflation and labour indicators."}]
+};
+return (map[domain]||map.business).map(x=>'<article class="item"><div class="item-top"><strong>'+x.name+'</strong><a href="'+x.url+'" target="_blank" rel="noopener noreferrer">Open source ↗</a></div><p>'+x.why+'</p></article>').join("");
 }
 function render(){
 const q=$("question").value.toLowerCase(),domain=$("domain").value,budgetMode=$("budgetMode").value,budget=budgetMode==="set"?Math.max(0,Math.min(1000000,Number($("budget").value)||0)):Infinity,maxItems=Number($("maxItems").value),priority=$("priority").value,mode=$("mode").value;
