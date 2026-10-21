@@ -12,6 +12,8 @@ assert.match(html, /data-q=/, 'curated search shortcuts exist');
 assert.match(html, /data-copy=/, 'source-link copy action exists');
 assert.match(html, /datastore_search/, 'DataStore resource preview is supported');
 assert.match(html, /data-preview=/, 'machine-readable resources have a live fetch control');
+assert.match(html, /data-analyse-source=/, 'each compatible resource has a visible direct Decision Lab action');
+assert.match(html, /Preview rows/, 'preview and analysis actions are clearly separated');
 assert.match(html, /function handoffToForge/, 'live samples can be handed to the Decision Lab');
 assert.match(html, /digitalAlchemyImportedCsv/, 'handoff uses a defined same-origin transfer key');
 assert.match(html, /data-export=/, 'fetched rows can be exported as CSV');
