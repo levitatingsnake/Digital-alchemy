@@ -127,12 +127,35 @@ function detectInventionLab(q){
  if(/system|logistics|supply chain|bottleneck|workflow|infrastructure|queue|transport|coordination|process|distribution|operations/.test(s))return 'systems';
  return null;
 }
+const mechanismLibrary=[
+ {id:'modular',name:'Modular substitution',origin:'Manufacturing',labs:['engineering','systems'],tags:['building','construction','material','housing','assembly','repeat','waste','process'],idea:'Replace one-off work with independently testable interchangeable modules.',measure:'Time and defects per completed module',risk:'Interfaces may transfer failure between modules'},
+ {id:'feedback',name:'Local feedback loops',origin:'Control theory',labs:['engineering','systems'],tags:['system','logistics','queue','delay','coordination','transport','quality','flow'],idea:'Move measurement and adjustment closer to the point where failures emerge.',measure:'Detection delay and correction cycle time',risk:'Local optimisation may harm the whole system'},
+ {id:'reuse',name:'Circular resource flow',origin:'Industrial ecology',labs:['engineering','systems'],tags:['waste','material','cost','resource','building','freight','empty','reuse'],idea:'Treat unused output or idle capacity as an input to another step.',measure:'Recovered resource value net of handling costs',risk:'Recovery can cost more than it saves'},
+ {id:'parallel',name:'Parallelise independent steps',origin:'Scheduling theory',labs:['engineering','systems'],tags:['time','speed','delay','construction','workflow','build','bottleneck','queue'],idea:'Identify dependent and independent tasks; overlap only those with safe interfaces.',measure:'Critical-path duration and rework',risk:'Premature parallelism creates costly rework'},
+ {id:'buffer',name:'Adaptive buffering',origin:'Queueing theory',labs:['systems','engineering'],tags:['logistics','queue','demand','bottleneck','capacity','supply','transport'],idea:'Place small adjustable buffers only where variability causes system-wide disruption.',measure:'Throughput, waiting time and buffer cost',risk:'Buffers can hide persistent faults'},
+ {id:'distributed',name:'Distributed execution',origin:'Network architecture',labs:['systems','engineering'],tags:['remote','distribution','transport','logistics','construction','site','infrastructure'],idea:'Separate central coordination from independent local execution.',measure:'Delivery time, handoff errors and resilience',risk:'Accountability and interface failures'}
+];
+function deriveMechanismCandidates(question,lab){
+ const tokens=new Set(question.toLowerCase().match(/[a-z]{3,}/g)||[]);
+ const ranked=mechanismLibrary.filter(m=>m.labs.includes(lab)).map(m=>({...m,score:m.tags.filter(t=>tokens.has(t)).length}));
+ ranked.sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+ const pairs=[];
+ for(let i=0;i<ranked.length;i++)for(let j=i+1;j<ranked.length;j++){
+  const a=ranked[i],b=ranked[j];
+  pairs.push({a,b,score:a.score+b.score+(a.origin!==b.origin?1:0),key:[a.id,b.id].sort().join('+')});
+ }
+ pairs.sort((a,b)=>b.score-a.score||a.key.localeCompare(b.key));
+ return pairs.slice(0,3);
+}
 function labHypothesisMarkup(question,index){
  const lab=detectInventionLab(question);
  if(!lab)return '';
- const d=inventionLabs[lab],mechanism=d.mechanisms[index],check=d.checks[index];
- return '<div class="lab-hypothesis"><b>'+escHtml(d.name)+' / EXPERIMENT '+(index+1)+'</b><h4>'+escHtml(mechanism)+'</h4><p><b>Design hypothesis:</b> Investigate whether this mechanism could achieve the desired outcome with fewer dependencies or resources.</p><p><b>Primary validation:</b> '+escHtml(check)+'. Define a measurable baseline and independent review before implementation.</p><p>Concept exploration only. Not a certified design, safety assessment or verified performance claim.</p></div>';
+ const d=inventionLabs[lab],candidate=deriveMechanismCandidates(question,lab)[index];
+ if(!candidate)return '';
+ const a=candidate.a,b=candidate.b;
+ return '<div class="lab-hypothesis"><b>'+escHtml(d.name)+' / CROSS-DISCIPLINE EXPERIMENT '+(index+1)+'</b><h4>'+escHtml(a.name)+' × '+escHtml(b.name)+'</h4><p><b>Borrowed from:</b> '+escHtml(a.origin)+' + '+escHtml(b.origin)+'</p><p><b>Combined mechanism:</b> '+escHtml(a.idea)+' '+escHtml(b.idea)+'</p><p><b>What to measure:</b> '+escHtml(a.measure)+'; '+escHtml(b.measure)+'</p><p><b>Potential failure modes:</b> '+escHtml(a.risk)+'; '+escHtml(b.risk)+'</p><p><b>Relevance signal:</b> '+candidate.score+' heuristic points from keyword matches and cross-discipline diversity. Not a feasibility or novelty score.</p><p>Concept exploration only. Validate safety, legal requirements, engineering performance and real costs before implementation.</p></div>';
 }
+
 function detectDomain(q){
  const s=q.toLowerCase();
  const rules=[['property',/real estate|property|rental|tenant|landlord|housing/],['investing',/invest|portfolio|shares|funds|asset allocation/],['finance',/finance|cash flow|debt|receivable|working capital|margin/],['construction',/construction|building|site|crew|contractor|project delivery/]];
