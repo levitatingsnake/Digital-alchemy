@@ -158,3 +158,8 @@ assert.ok(constrained.constraints.some(x=>x.id==='no_hiring'),'staffing constrai
 assert.ok(constrained.constraints.some(x=>x.id==='low_budget'),'budget constraint detected');
 assert.ok(constrained.constraints.some(x=>x.id==='time'),'delivery window detected');
 console.log('PASS multi-clause goals and explicit constraint extraction');
+
+assert.ok(cockpitSource.includes('function assessConstraints(index,context)'),'constraint-aware strategy screening');
+assert.ok(cockpitSource.includes('constraintGateMarkup(index,context)+questionSpecificIntervention'),'constraint checks appear in each plan');
+for(const term of ['no_hiring','low_budget','no_code','time','remote'])assert.ok(cockpitSource.includes("ids.includes('"+term+"')"),'constraint affects recommendations: '+term);
+console.log('PASS constraint-aware strategy screening');
