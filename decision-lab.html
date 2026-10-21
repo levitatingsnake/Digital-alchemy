@@ -477,8 +477,8 @@ function exportExperimentalReport(){
  const question=$('question').value;
  const source=document.getElementById('experimentalSource').value.trim();
  const fields=['experimentalCost','experimentalImpact','experimentalRisk','experimentalSpeed'];
- const assumptions=fields.map(id=>id.replace('experimental','')+': '+document.getElementById(id).value).join('\\n');
- const content=['DIGITAL ALCHEMY / EXPERIMENTAL COMPARISON','Generated: '+new Date().toISOString(),'Question: '+question,'Assumption basis: '+source,assumptions,'',result.innerText||result.textContent,'','CAUTION: Hypothetical, user-estimated values. No external verification or causal proof.'].join('\\n');
+ const assumptions=fields.map(id=>id.replace('experimental','')+': '+document.getElementById(id).value).join('\n');
+ const content=['DIGITAL ALCHEMY / EXPERIMENTAL COMPARISON','Generated: '+new Date().toISOString(),'Question: '+question,'Assumption basis: '+source,assumptions,'',result.innerText||result.textContent,'','CAUTION: Hypothetical, user-estimated values. No external verification or causal proof.'].join('\n');
  const blob=new Blob([content],{type:'text/plain;charset=utf-8'});
  const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='prometheus-experimental-comparison.txt';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
 }
