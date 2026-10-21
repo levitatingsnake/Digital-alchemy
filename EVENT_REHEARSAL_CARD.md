@@ -5,10 +5,11 @@ A phone-friendly guide for showing the project to an AI, product, or engineering
 ## Open these first
 
 1. [Live app](https://levitatingsnake.github.io/Digital-alchemy/)
-2. [GitHub repository](https://github.com/levitatingsnake/Digital-alchemy)
-3. [Technical case study](CASE_STUDY.md)
-4. [Latest successful automated test run](https://github.com/levitatingsnake/Digital-alchemy/actions/runs/39545380031)
-5. [Versioned benchmark report](reports/overnight-2026-10-21.md)
+2. [Decision Lab: business and construction choices](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html)
+3. [GitHub repository](https://github.com/levitatingsnake/Digital-alchemy)
+4. [Technical case study](CASE_STUDY.md)
+5. [Latest automated test run](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml)
+6. [Versioned benchmark report](reports/overnight-2026-10-21.md)
 
 ## The 20-second opener
 
@@ -53,6 +54,10 @@ Say: “Those results are internal to this symbolic model, so I’m not claiming
 - **A separate benchmark shows:** how a greedy heuristic compares with an exact optimum on 100 small constrained-selection cases. Mean relative gap: 1.396%, with zero budget violations. [Read the report](reports/transfer-task-2026-10-21.md).
 - **Neither benchmark shows:** real-world accuracy or generalisation to unrelated real-world tasks. Transition counts are not wall-clock speed measurements.
 - **Your role:** you conceived and directed the project, made product decisions, tested the live app and used AI assistance in building it. Be transparent about the collaboration.
+
+## Optional applied-decision demo
+
+Open the [Decision Lab](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html), run the construction scenario, then change the budget or objective. Explain that it is a separate bounded-choice model using illustrative inputs, not an LLM understanding arbitrary questions or a validated construction adviser. Its purpose is to demonstrate constraints, transparent scoring and explainable trade-offs.
 
 ## Three good questions for a technical person
 
