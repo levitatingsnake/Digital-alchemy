@@ -50,7 +50,7 @@ The depth-three search evaluated 33,600 candidate transitions in the benchmark. 
 
 These results support a narrow claim: **deeper search improves the current model's own objective on this fixed benchmark, and state deduplication preserved the measured result**. They do not establish that the objective is a good proxy for real-world outcomes or that the approach generalises to other domains.
 
-The overnight workflow also checks route replay integrity, repeatability, boundary behaviour, workspace preservation, and three deliberately introduced model faults. See the [latest successful run](https://github.com/levitatingsnake/Digital-alchemy/actions/runs/39537751705) for the run's logs and generated report artifacts.
+The overnight workflow also checks route replay integrity, repeatability, boundary behaviour, workspace preservation, and three deliberately introduced model faults. See the [latest successful run](https://github.com/levitatingsnake/Digital-alchemy/actions/runs/39545380031) for the run's logs and generated report artifacts.
 
 ## Research and engineering features
 
