@@ -134,7 +134,7 @@ const coreStart = applicationScript.indexOf('const names=');
 const coreEnd = applicationScript.indexOf('function synthesizeStrategy()', coreStart);
 if (coreStart < 0 || coreEnd < 0) throw new Error('Cannot isolate core symbolic model.');
 const exportHelperStart = applicationScript.indexOf('function createExportPayload(');
-const exportHelperEnd = applicationScript.indexOf("document.getElementById('exportReport').addEventListener", exportHelperStart);
+const exportHelperEnd = applicationScript.indexOf('function buildResearchReport(', exportHelperStart);
 if (exportHelperStart < 0 || exportHelperEnd < 0) throw new Error('Cannot isolate export payload builder.');
 const exportHelper = applicationScript.slice(exportHelperStart, exportHelperEnd);
 const modelSource = [
