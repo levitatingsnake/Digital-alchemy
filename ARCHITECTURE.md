@@ -70,7 +70,8 @@ The Node-based checks isolate the application script or execute it inside a ligh
 - real execution of the ten-stage Discovery Cycle;
 - adversarial boundary and mixed states;
 - three targeted injected faults;
-- deterministic search comparisons and route replay integrity.
+- deterministic search comparisons and route replay integrity;
+- an independent constrained-selection benchmark checked against exact enumeration.
 
 GitHub Actions runs the checks and benchmark on relevant pushes and on a schedule. The workflow publishes a job summary and uploads JSON/Markdown reports. It has read-only repository permissions and does not modify the application or auto-merge changes.
 
@@ -84,7 +85,7 @@ GitHub Actions runs the checks and benchmark on relevant pushes and on a schedul
 6. Repeat the benchmark and assert deterministic results.
 7. Write JSON and Markdown reports as workflow artifacts.
 
-The benchmark's current headline result is an average depth-three score of 78.933 versus 68.778 for the no-op baseline, with search beating the greedy baseline in 379 of 400 cases. This is a result inside the model, not a claim about external effectiveness.
+The symbolic benchmark's headline result is an average depth-three score of 78.933 versus 68.778 for the no-op baseline, with search beating the greedy baseline in 379 of 400 cases. A second benchmark uses a separate constrained-selection problem with 14 items, a fixed budget, and an objective that rewards item value and category coverage. It compares a value-to-cost greedy heuristic with exact enumeration of all subsets. This is a separate synthetic optimisation exercise, not evidence of generalisation to real-world tasks.
 
 ## Current non-goals
 
