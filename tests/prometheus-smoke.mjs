@@ -141,3 +141,8 @@ assert.ok(cockpitSource.includes('function calculateEvidence()'),'client-side fi
 for(const field of ['upfront','benefit','monthly'])assert.ok(cockpitSource.includes('data-field="'+field+'"'),'financial input '+field);
 assert.ok(cockpitSource.includes('valid.length===3'),'comparison requires all three complete models');
 console.log('PASS optional user-entered economics workbench');
+
+assert.ok(cockpitSource.includes('function questionSpecificIntervention(index,diagnosis,domain)'),'intervention composition');
+assert.ok(cockpitSource.includes('questionSpecificIntervention(index,diagnosis,domain)+causalMarkup'),'intervention included in each briefing');
+for(const label of ['Tailored intervention design','Adaptation to your question:','Low-cost proof:','Trade-off:'])assert.ok(cockpitSource.includes(label),'tailored plan detail '+label);
+console.log('PASS tailored intervention and trade-off composition');
