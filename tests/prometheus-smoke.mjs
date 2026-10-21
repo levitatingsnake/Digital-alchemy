@@ -135,3 +135,9 @@ for(const label of ['Evidence strength','Economic viability','Downside exposure'
 assert.ok(cockpitSource.includes('<details class=\\"advanced-analysis\\">') || cockpitSource.includes('<details class="advanced-analysis">'),'advanced comparison is opt-in');
 assert.ok(cockpitSource.includes("plans.map(p=>planMarkup") ,'three strategies remain primary output');
 console.log('PASS evidence-gated three-strategy decision arena');
+
+assert.ok(cockpitSource.includes('function evidenceWorkbench()'),'optional evidence input UI');
+assert.ok(cockpitSource.includes('function calculateEvidence()'),'client-side financial comparison');
+for(const field of ['upfront','benefit','monthly'])assert.ok(cockpitSource.includes('data-field="'+field+'"'),'financial input '+field);
+assert.ok(cockpitSource.includes('valid.length===3'),'comparison requires all three complete models');
+console.log('PASS optional user-entered economics workbench');
