@@ -344,3 +344,10 @@ The result supports a limited conclusion: deeper search improves the current mod
 - Linked the case study from the README.
 - The case study uses the latest verified benchmark and identifies the next meaningful research step as evaluation on a genuinely different task or objective, rather than adding more features without external evidence.
 - The short screen-recorded demonstration remains outstanding.
+
+
+### Two-minute portfolio demo script (2026-10-21)
+
+- Added `DEMO_SCRIPT.md` with a timed two-minute walkthrough, narration, recording notes, and a capture checklist.
+- The script is designed to demonstrate the live UI, explicit goal selection, route alternatives, research workflow, benchmark evidence, automated checks, and limitations without inventing results.
+- The video itself has not been recorded yet.
