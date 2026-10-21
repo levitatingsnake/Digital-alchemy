@@ -10,6 +10,9 @@ assert.match(html, /id="experimentLedger"/, 'Console must expose the experiment 
 assert.match(match[1], /lumora-experiment-ledger-v1/, 'Experiment data must have a versioned local schema');
 assert.match(match[1], /absolutePercentageError/, 'Stored records must include prediction error');
 assert.match(html, /id="expTarget"/, 'Ledger should allow an explicit success threshold');
+assert.match(html, /id="expReview"/, 'Ledger should capture the human decision after reviewing an outcome');
+assert.match(html, /id="expReviewReason"/, 'Ledger should record why a follow-up decision was chosen');
+assert.match(match[1], /Review open/, 'Readout should expose unresolved review decisions');
 assert.match(html, /id="expPrefillNotice"/, 'Console should explain when an experiment is carried over from Decision Lab');
 assert.match(match[1], /params\.get\("experiment"\)/, 'Console should accept a decision action from the recommendation link');
 assert.match(match[1], /TARGET MISSED/, 'Ledger should flag outcomes that miss their target');
@@ -59,7 +62,9 @@ for (const [id, value] of Object.entries({
   expDirection: 'higher',
   expDate: '2026-10-21',
   expVerdict: 'Partially met',
-  expNotes: 'Sample outcome'
+  expNotes: 'Sample outcome',
+  expReview: 'adjust',
+  expReviewReason: 'Target missed; reduce scope and retest'
 })) getElement(id).value = value;
 handlers['experimentForm:submit']({ preventDefault() {} });
 assert.equal(getElement('expCount').textContent, '1', 'Submitting a measured outcome should add one record');
@@ -74,4 +79,9 @@ assert.equal(records[0].error, -0.5);
 assert.equal(records[0].absolutePercentageError, 25);
 assert.equal(records[0].target, 1.8);
 assert.equal(records[0].direction, 'higher');
+assert.equal(records[0].review, 'adjust');
+assert.equal(records[0].reviewReason, 'Target missed; reduce scope and retest');
+assert.match(getElement('experimentList').innerHTML, /Adjust and retest/);
+assert.match(getElement('experimentList').innerHTML, /reduce scope and retest/);
+assert.match(getElement('expAlerts').textContent, /1 review decision\(s\) still open/, 'Pending review summary should be visible for unreviewed records');
 console.log('PASS: Console syntax, experiment ledger, local persistence, signed error, MAE and percentage error.');
