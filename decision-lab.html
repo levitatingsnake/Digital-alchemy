@@ -61,6 +61,32 @@ button{border-radius:4px 10px 4px 10px;background:#102738;border-color:#315367;t
 .samples button{font-family:var(--type-instrument);font-size:10px;letter-spacing:.01em}
 @media(max-width:800px){.hero h1{font-size:clamp(38px,10vw,54px)}.panel h2{font-size:21px}}
 
+ 
+/* Decision readout: make the recommendation, reasoning and evidence visually distinct */
+.headline{font-family:var(--type-editorial);font-size:clamp(29px,3.5vw,40px);font-weight:500;line-height:1.08;letter-spacing:-.04em;text-wrap:balance;border-left:3px solid var(--gold);padding:3px 0 4px 16px;margin:22px 0 12px;max-width:780px}
+.plain-summary{position:relative;overflow:hidden;border-radius:3px 18px 3px 3px;padding:clamp(17px,2.5vw,25px);background:linear-gradient(145deg,#102a32,#0a1521 75%);border-color:#41636a}
+.plain-summary:before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--gold),var(--mint),transparent 78%)}
+.plain-summary>.eyebrow{font-size:9px;letter-spacing:.19em}
+.plain-summary h3{font-family:var(--type-editorial);font-weight:500;font-size:clamp(26px,3.4vw,36px);letter-spacing:-.04em;line-height:1.08;margin:11px 0 15px;text-wrap:balance}
+.plain-summary .plain-lead{font-family:var(--type-editorial);font-size:clamp(16px,1.6vw,19px);line-height:1.65;color:#e5f4f5;max-width:850px}
+.plain-summary .plain-lead strong{color:var(--gold);font-weight:600}
+.plain-question>strong,.plain-list>strong,.plain-next>strong,.plain-columns article>strong{font-family:var(--type-instrument);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.evidence-map{border-radius:3px 12px 12px 3px;border-left:2px solid var(--gold);background:linear-gradient(100deg,#17252a,#101d24)}
+.evidence-map h4{font-family:var(--type-editorial);font-size:19px;font-weight:500;letter-spacing:-.02em}
+.section-title{font-family:var(--type-instrument);font-size:10px;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid #2c4149;padding-bottom:9px}
+.section-title span:last-child{font-variant-numeric:tabular-nums;color:var(--gold)}
+.item{border-radius:3px 12px 12px 3px;transition:border-color .18s,background .18s}
+.item:first-child{border-left:3px solid var(--gold);background:linear-gradient(100deg,#182a2a,#101b20 68%)}
+.item-top strong{font-family:var(--type-editorial);font-size:17px;font-weight:500;line-height:1.3}
+.item-top strong span{font-family:var(--type-instrument);font-size:10px;letter-spacing:.06em}
+.item p{font-size:13px;line-height:1.7;max-width:780px}
+.item .price{font-family:var(--type-instrument);font-size:11px;font-variant-numeric:tabular-nums}
+.strategy-brief{position:relative}
+.strategy-brief h3{font-size:clamp(21px,2.5vw,27px);line-height:1.12}
+.strategy-step b{font-size:9px;letter-spacing:.13em}
+.metric strong{font-family:var(--type-editorial);font-size:27px;font-weight:500;font-variant-numeric:tabular-nums}
+@media(max-width:800px){.headline{font-size:30px;padding-left:12px}.plain-summary .plain-lead{font-size:17px}.item-top strong{font-size:16px}.section-title{font-size:9px}}
+
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="sigil">⌁</div><div><strong>LUMORA STRATEGY</strong><small>DECISION SUPPORT / WORKING PROTOTYPE</small></div></div><span class="pill">Decision Lab · v0.1</span></header>
