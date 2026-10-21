@@ -51,6 +51,10 @@ assert.match(elements.results.innerHTML, /Evidence check: what supports this ans
 assert.match(elements.results.innerHTML, /MODEL OUTPUT, NOT VERIFIED FACTS/, 'Summary must distinguish model output from verified evidence');
 assert.match(elements.results.innerHTML, /Decision rule:/, 'Summary must state how evidence can change the decision');
 assert.match(elements.results.innerHTML, /What to do next/, 'Summary must give practical next steps');
+assert.match(html, /Decision readout: make the recommendation, reasoning and evidence visually distinct/, 'Decision results should use a deliberate visual hierarchy');
+assert.match(html, /\.plain-summary \.plain-lead strong\{color:var\(--gold\)/, 'The lead recommendation should stand out clearly from supporting explanation');
+assert.match(html, /\.item:first-child\{border-left:3px solid var\(--gold\)/, 'The leading action should be visually distinguished without hiding alternatives');
+assert.match(html, /\.section-title\{font-family:var\(--type-instrument\)/, 'Result section labels should use the instrument typeface');
 assert.match(html, /field textarea#question\{display:block;width:100%;min-height:320px;height:320px/, 'Desktop question field must fit a detailed prompt');
 assert.match(html, /field textarea#question\{min-height:260px;height:260px/, 'Mobile question field must fit a detailed prompt');
 assert.match(html, /Area to assess/, 'Visible labels should use clear language');
