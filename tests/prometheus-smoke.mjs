@@ -160,7 +160,7 @@ assert.ok(constrained.constraints.some(x=>x.id==='time'),'delivery window detect
 console.log('PASS multi-clause goals and explicit constraint extraction');
 
 assert.ok(cockpitSource.includes('function assessConstraints(index,context)'),'constraint-aware strategy screening');
-assert.ok(cockpitSource.includes('constraintGateMarkup(index,context)+transformConstraint(index,context,domain)+questionSpecificIntervention'),'constraint checks appear in each plan');
+assert.ok(cockpitSource.includes('constraintGateMarkup(index,context)+transformConstraint(index,context,domain)+alchemyCompositionMarkup(index,context)+questionSpecificIntervention'),'constraint checks appear in each plan');
 for(const term of ['no_hiring','low_budget','no_code','time','remote'])assert.ok(cockpitSource.includes("ids.includes('"+term+"')"),'constraint affects recommendations: '+term);
 console.log('PASS constraint-aware strategy screening');
 
