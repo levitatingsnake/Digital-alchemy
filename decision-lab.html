@@ -411,7 +411,8 @@ function generateMechanismHypotheses(items,question,priority){
   {words:['error','quality','defect','mistake','rework'],need:'detect failures earlier',mechanism:'reversible micro-checkpoint',principle:'Move one low-cost verification step upstream, before an error becomes expensive to reverse.',test:'Measure escaped defects, rework and the extra inspection time.'},
   {words:['risk','uncertain','forecast','investment','property'],need:'preserve options under uncertainty',mechanism:'staged reversible commitment',principle:'Replace a large one-time commitment with small gates that unlock the next step only when evidence improves.',test:'Compare downside exposure and decision speed with the existing all-at-once approach.'}
  ];
- const ranked=signals.map((s,i)=>({...s,score:s.words.reduce((n,w)=>n+(intent.includes(w)?1:0),0),order:i})).sort((a,b)=>b.score-a.score||a.order-b.order);
+ const tokens=new Set((intent.match(/[a-z]+/g)||[]));
+ const ranked=signals.map((s,i)=>({...s,score:s.words.reduce((n,w)=>n+(tokens.has(w)?1:0),0),order:i})).sort((a,b)=>b.score-a.score||a.order-b.order);
  const chosen=ranked.slice(0,2);
  const categories=[...new Set(items.map(x=>x.cat))].slice(0,4);
  return chosen.map((s,i)=>({
@@ -457,19 +458,19 @@ function probeExperimentalSensitivity(items,candidate,budget,maxItems,priority,s
   {field:'speed',label:'Delivery speed',step:5,min:0,max:100}
  ];
  const findings=specs.map(spec=>{
-  const candidates=[-2,-1,1,2].map(k=>Math.max(spec.min,Math.min(spec.max,candidate[spec.field]+k*spec.step))).filter(v=>v!==candidate[spec.field]);
+  const candidates=[...new Set([-2,-1,1,2].map(k=>Math.max(spec.min,Math.min(spec.max,candidate[spec.field]+k*spec.step))))].filter(v=>v!==candidate[spec.field]);
   const tests=candidates.map(v=>{const alt={...candidate,[spec.field]:v};const result=solve([...items,alt],budget,maxItems,priority,stress);return {value:v,selected:selected(result),score:result.score}});
   const flip=tests.find(t=>t.selected!==selected(reference));
-  return {label:spec.label,field:spec.field,flip,tests,changed:!!flip};
+  return {label:spec.label,field:spec.field,flip,tests,changed:!!flip,relativeShift:flip?Math.abs(flip.value-candidate[spec.field])/Math.max(1,spec.max-spec.min):Infinity};
  });
  return {baseline,reference,selected:selected(reference),findings};
 }
 function renderExperimentalSensitivity(probe){
  const changed=probe.findings.filter(f=>f.changed);
- const ordered=[...changed,...probe.findings.filter(f=>!f.changed)];
+ const ordered=[...changed.sort((a,b)=>a.relativeShift-b.relativeShift),...probe.findings.filter(f=>!f.changed)];
  const rows=ordered.map(f=>'<li><b>'+escHtml(f.label)+'</b>: '+(f.flip?'A tested value of '+Number(f.flip.value).toLocaleString('en-NZ')+' changes whether the invention is selected.':'No selection change in the four nearby values tested.')+'</li>').join('');
- const first=changed[0];
- return '<div class="sensitivity-probe"><h3>Which assumption could change the decision?</h3><p>'+(first?'Investigate <b>'+escHtml(first.label.toLowerCase())+'</b> first: it changes selection within the sampled range.':'None of the nearby single-variable probes changed selection. Test wider ranges or interacting assumptions next.')+'</p><ul>'+rows+'</ul><p class="prometheus-boundary">Local, discrete sensitivity scan only. It is not a global threshold search, a statistical confidence interval or an estimate of real-world likelihood.</p></div>';
+ const first=ordered.find(f=>f.changed);
+ return '<div class="sensitivity-probe"><h3>Which assumption could change the decision?</h3><p>'+(first?'Investigate <b>'+escHtml(first.label.toLowerCase())+'</b> first: it changes selection within the sampled range. Prioritisation uses the smallest tested change relative to each input range, not evidence confidence.':'None of the nearby single-variable probes changed selection. Test wider ranges or interacting assumptions next.')+'</p><ul>'+rows+'</ul><p class="prometheus-boundary">Local, discrete sensitivity scan only. It is not a global threshold search, a statistical confidence interval or an estimate of real-world likelihood.</p></div>';
 }
 function exportExperimentalReport(){
  const result=document.getElementById('experimentalResult');
