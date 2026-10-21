@@ -189,3 +189,8 @@ console.log('PASS progressive disclosure for strategy reports');
 
 assert.ok(cockpitSource.includes('const parts=options;'),'composition retains all applicable constraints');
 console.log('PASS no constraint silently dropped from composition');
+
+assert.ok(cockpitSource.includes('function inventionLead(index,context,domain)'),'invention-first rendering');
+assert.ok(cockpitSource.includes('inventionLead(index,context,domain)'), 'invention visible in strategies');
+assert.ok(!cockpitSource.includes('planning huddles'),'planning jargon removed');
+console.log('PASS invention-first presentation and plain language');
