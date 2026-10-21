@@ -2,7 +2,7 @@
 
 **A small, inspectable search-and-experiment engine for turning an explicit goal into candidate routes, tests, and evidence.**
 
-[**Launch the live demo**](https://levitatingsnake.github.io/Digital-alchemy/) · [Architecture](ARCHITECTURE.md) · [Development workbook](WORKBOOK.md) · [Latest overnight lab](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml)
+[**Launch the live demo**](https://levitatingsnake.github.io/Digital-alchemy/) · [Architecture](ARCHITECTURE.md) · [Technical case study](CASE_STUDY.md) · [Development workbook](WORKBOOK.md) · [Latest overnight lab](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml)
 
 Digital Alchemy is an experimental portfolio project about building systems that do more than produce an answer: they expose their objective, compare alternatives, test candidate rules, preserve reproducible evidence, and report limitations.
 
