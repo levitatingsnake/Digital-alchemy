@@ -1,6 +1,6 @@
 # Digital Alchemy: event rehearsal card
 
-A phone-friendly guide for showing the project to an AI, product, or engineering person.
+A phone-friendly guide for showing the project to an AI, product, or engineering person. Digital Alchemy is a flagship portfolio experiment being developed under the working brand **Lumora Strategy**, which is a proposed name and not yet a legally registered company.
 
 ## Open these first
 
@@ -12,7 +12,7 @@ A phone-friendly guide for showing the project to an AI, product, or engineering
 
 ## The 20-second opener
 
-> “I built Digital Alchemy as an experiment in making goal-directed systems inspectable. You choose an explicit goal, it searches possible operation sequences, compares alternatives, and records evidence. I’ve built a working interface around it and a test pipeline that challenges the implementation. I’m interested in how to take that approach into more useful applied-AI tasks.”
+> “I’m building an applied-AI portfolio under the working name Lumora Strategy. Digital Alchemy is one experiment in making goal-directed systems inspectable: you choose an explicit goal, it searches possible operation sequences, compares alternatives, and records evidence. I’ve built a working interface and a test pipeline that challenges the implementation. I’m interested in taking this approach into more useful applied-AI tasks.”
 
 ## The two-minute live demo
 
