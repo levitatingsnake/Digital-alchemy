@@ -63,6 +63,7 @@ The overnight workflow also checks route replay integrity, repeatability, bounda
 - **Competing-rule adjudication:** ranks candidate rules on discovery and holdout states, reporting disagreement rather than hiding it.
 - **Ten-stage Discovery Cycle:** runs a chain of analysis and evidence-building stages, records stage failures, and audits freshness and workspace preservation.
 - **Research export:** builds a Markdown snapshot from evidence saved in the current browser without inventing missing results.
+- **Outcome threshold review:** the browser-local experiment ledger can store an explicit numeric success threshold and whether higher or lower is better, flag misses for human review, and preserve the rule beside the observed result. A flag triggers reconsideration; it does not prove causation or automatically change the engine's recommendation.
 - **Automated tests and benchmark:** static/dynamic smoke checks, real-stage integration, adversarial boundaries, targeted mutation checks, deterministic benchmark, and route replay assertions.
 
 ## Run the checks locally
@@ -103,7 +104,7 @@ The current system has important limits:
 - Plain-language intention is contextual text, not semantic understanding.
 - Holdout tests are independent samples within the same model, not independent real-world validation.
 - The benchmark uses a fixed synthetic suite; performance on other tasks is unknown.
-- Browser-local saved evidence can be missing or cleared, and is not cloud-synchronised.
+- Browser-local saved evidence can be missing or cleared, and is not cloud-synchronised. Target-based review flags depend on the threshold and direction entered by the user; they are prompts for review, not autonomous retraining or verified causal conclusions.
 - Mutation checks cover three targeted faults, not the entire application.
 - The application is a static prototype, not a production service with accounts, server storage, or multi-user collaboration.
 
