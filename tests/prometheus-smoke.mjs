@@ -129,3 +129,8 @@ assert.ok(cockpitSource.includes('function economicsMarkup(index,run,diagnosis,d
 for(const signal of ['capacity','demand','delay','cost','risk','automation'])assert.ok(cockpitSource.includes(' '+signal+':{unit:'),'economic driver '+signal);
 for(const label of ['Break-even months:','12-month net value:','No fabricated ROI','conservative, central and optimistic'])assert.ok(cockpitSource.includes(label),'economic model includes '+label);
 console.log('PASS transparent question-specific unit economics');
+
+assert.ok(cockpitSource.includes('function compareStrategies(plans,diagnosis)'),'cross-strategy decision arena');
+for(const label of ['Evidence strength','Economic viability','Downside exposure','do not invest yet','synthetic optimisation scores are deliberately excluded'])assert.ok(cockpitSource.includes(label),'comparison gate '+label);
+assert.ok(cockpitSource.includes('compareStrategies(plans,diagnosis)+plans.map'),'comparison rendered before plans');
+console.log('PASS evidence-gated three-strategy decision arena');
