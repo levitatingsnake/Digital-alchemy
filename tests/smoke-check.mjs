@@ -52,7 +52,7 @@ const required = [
   ['Anomaly Lab panel', '00C / ANOMALY LAB'],
   ['Evidence-guided refinement panel', 'id="refinementPanel"'],
   ['Evidence-guided refinement button wiring', "getElementById('runRuleRefinement').addEventListener('click',runRuleRefinement)"],
-  ['Paired rule refinement function', 'function buildRuleRefinement(rule,samples)'],
+  ['Paired rule refinement function', 'function buildRuleRefinement(rule,samples,validationSamples=samples)'],
   ['Refinement preserves original candidate', 'Original rule remains unchanged.'],
   ['Refinement uses explicit conservative criterion', 'mean gain improves by at least 0.5 points'],
   ['Portfolio discovery chain button', 'id="runEvidenceChain"'],
@@ -179,8 +179,8 @@ assertModel(JSON.stringify(activeA)===JSON.stringify(activeB)&&JSON.stringify(ac
 const refineSamples=api.buildPrometheusHoldout(0x5EEDC0DE),refineValidation=api.buildPrometheusHoldout(0xA11D0A7A,refineSamples),refineSamplesBefore=JSON.stringify(refineSamples);
 const refineRule={name:'refine-me',delta:[-8,2,0,0],ds:-2};
 const refineRuleBefore=JSON.stringify(refineRule);
-const refinementA=api.buildRuleRefinement(refineRule,refineSamples);
-const refinementB=api.buildRuleRefinement(refineRule,refineSamples);
+const refinementA=api.buildRuleRefinement(refineRule,refineSamples,refineValidation);
+const refinementB=api.buildRuleRefinement(refineRule,refineSamples,refineValidation);
 assertModel(refinementA.type==='paired-rule-refinement'&&refinementA.sampleCount===128&&refinementA.validationSampleCount===128&&refinementA.variantsTested>0, 'rule refinement evaluates bounded candidate variants on a deterministic holdout');
 assertModel(JSON.stringify(refinementA)===JSON.stringify(refinementB), 'paired rule refinement is repeatable on identical rules and holdout states');
 assertModel(refineValidation.every(s=>!new Set(refineSamples.map(x=>[...x.values,x.stability].join(',')).concat()).has([...s.values,s.stability].join(','))), 'refinement tuning and validation states do not overlap');
