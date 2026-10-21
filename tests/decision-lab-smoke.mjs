@@ -42,7 +42,7 @@ handlers.run();
 assert.equal(elements.status.textContent, 'RUN COMPLETE', 'Default scenario must run');
 assert.match(elements.results.innerHTML, /Recommended initiatives/, 'Output must show a plan');
 assert.match(html, /id="exportDecisionReport"/, 'Decision Lab must expose a decision brief export control');
-assert.match(match[1], /getElementById\("exportDecisionReport"\)\.addEventListener\("click"/, 'Decision brief export control must be wired');
+assert.match(match[1], /\$\("exportDecisionReport"\)\.addEventListener\("click"/, 'Decision brief export control must be wired');
 assert.match(match[1], /digital-alchemy-decision-brief\.txt/, 'Decision brief must have a clear export filename');
 assert.match(elements.results.innerHTML, /SUBSETS_EVALUATED/, 'Output must expose search evidence');
 assert.match(elements.results.innerHTML, /Downside scenario check/, 'Output must show the stress-test scenario');
