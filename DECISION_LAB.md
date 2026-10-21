@@ -6,7 +6,7 @@
 
 ## What it demonstrates
 
-The Decision Lab is a small, inspectable interface for turning a business or construction prompt into a bounded portfolio-selection task. A visitor can choose a scenario family, budget, objective and initiative limit, then inspect a feasible set of candidate actions and the evidence behind the selection.
+The Decision Lab is a small, inspectable interface for turning a business or construction prompt into a bounded portfolio-selection task. A visitor can choose improvement discovery, problem-solving exploration or constrained optimisation, then select a scenario family, objective and initiative limit. Budget is optional: when enabled, it becomes a hard constraint; otherwise the model compares initiatives without a spending cap. The visitor can inspect the selected actions and evidence behind the choice.
 
 It is deliberately built alongside, rather than presented as the same thing as, Digital Alchemy's original symbolic state-transition engine. It is a practical demonstration of explainable constrained optimisation, not an LLM that understands arbitrary natural-language requests.
 
@@ -15,15 +15,15 @@ It is deliberately built alongside, rather than presented as the same thing as, 
 1. The visitor enters a prompt and selects a scenario family. Simple keyword hints can suggest the domain and read a budget written in NZD; they are not full natural-language understanding.
 2. The interface loads one of two fixed illustrative candidate libraries: small-business operations or construction operations.
 3. Each candidate has an illustrative cost, impact score, risk factor, implementation-speed score and category.
-4. The visitor chooses a scoring objective: balanced improvement, maximum impact, risk reduction or implementation speed.
-5. The solver enumerates every subset of the 14 candidates (2^14 = 16,384 combinations), rejecting combinations that exceed the budget or maximum initiative count.
+4. The visitor chooses a mode and scoring objective: improvement discovery, problem-solving exploration or constrained optimisation, with balanced improvement, maximum impact, risk reduction or implementation speed.
+5. The solver enumerates every subset of the 14 candidates (2^14 = 16,384 combinations), rejecting combinations that exceed the optional budget cap or maximum initiative count.
 6. The highest-scoring feasible portfolio is returned, with selected actions, cost, remaining budget, rejected alternatives and a run trace.
 
 The risk objective rewards lower risk-factor values; it does not reward taking more risk. A small category-diversity bonus encourages the selected portfolio to cover more than one operational area.
 
 ## Evidence and checks
 
-The dedicated smoke test checks that the inline JavaScript parses, the Run button is wired, the default scenario completes, the run trace and limitation notice appear, both tested portfolios remain inside their budgets, and the sample scenario buttons work.
+The dedicated smoke test checks that the inline JavaScript parses, the Run button is wired, a budget-free default scenario completes, the run trace and limitation notice appear, a budget-constrained portfolio stays inside its budget, and the improvement, construction, resilience and budget sample buttons work.
 
 Reproduce locally with:
 
