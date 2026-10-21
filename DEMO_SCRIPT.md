@@ -3,7 +3,8 @@
 **Purpose:** show an AI-engineering reviewer a working search-and-evidence prototype, its tests, and the limits of its claims.
 
 **Live demo:** https://levitatingsnake.github.io/Digital-alchemy/  
-**Repository:** https://github.com/levitatingsnake/Digital-alchemy
+**Repository:** https://github.com/levitatingsnake/Digital-alchemy  
+**Optional applied-decision demo:** https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html
 
 ## Before you show it
 
@@ -66,6 +67,15 @@
 
 **Say:**
 “This is a reproducible, inspectable symbolic prototype, not a validated scientific discovery engine. I'm interested in feedback on the evaluation design and what task would be the strongest next test.”
+
+## Optional extension: Decision Lab (30–45 seconds)
+
+If the audience wants a more familiar business example, open the [Decision Lab](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html). Load the construction scenario, run it with the NZ$30,000 budget, then change the objective to risk reduction or lower the budget and rerun.
+
+**Say:**
+“This is a separate constrained-choice prototype built alongside the symbolic engine. It exhaustively compares combinations of illustrative initiatives against budget and item-count constraints, then shows the scoring and trade-offs. The costs and scores are demonstration inputs, not a real contractor estimate or a validated recommendation.”
+
+**Show:** selected initiatives, remaining budget, rejected alternatives and the run trace. Invite the reviewer to change a constraint and observe how the result changes.
 
 ## Capture checklist
 
