@@ -15,7 +15,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="sigil">⌁</div><div><strong>LUMORA STRATEGY</strong><small>APPLIED INTELLIGENCE / PROTOTYPE</small></div></div><span class="pill">Decision Lab · v0.1</span></header>
-<section class="hero"><div><div class="eyebrow">Digital Alchemy / Field Interface</div><h1>Turn a messy problem into a testable decision.</h1><p>Describe a business or construction challenge. The lab converts it into a bounded choice problem, compares feasible combinations, and shows why the leading plan wins.</p></div><div class="hero-note"><strong>Explainable by design</strong>No black-box verdicts. Inspect the budget, candidate actions, scoring objective, alternatives and trade-offs. Change an assumption and run it again.</div></section>
+<section class="hero"><div><div class="eyebrow">Digital Alchemy / Field Interface</div><h1>Turn a messy problem into a testable decision.</h1><p>Describe a business or construction challenge. This separate, transparent decision demo turns it into a bounded choice problem, compares feasible combinations, and shows why the leading plan wins. It sits alongside the original symbolic engine; it does not pretend arbitrary questions are being answered by an LLM.</p></div><div class="hero-note"><strong>Explainable by design</strong>No black-box verdicts. Inspect the budget, candidate actions, scoring objective, alternatives and trade-offs. Change an assumption and run it again.</div></section>
 <div class="layout">
 <section class="panel"><h2>01 / Define the challenge</h2><p class="sub">Start with a prompt or load a scenario. This prototype uses a transparent local model, not a live consultant or an external AI service.</p>
 <div class="field"><label for="question">What are you trying to improve?</label><textarea id="question">We have NZ$30,000 to improve a small construction business. What should we prioritise to reduce delays and improve delivery?</textarea></div>
@@ -66,7 +66,7 @@ business:[
 ]};
 const $=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat("en-NZ",{style:"currency",currency:"NZD",maximumFractionDigits:0}).format(n);
-function objective(item,priority){if(priority==="impact")return item.impact;if(priority==="risk")return item.risk*1.35+item.impact*.35;if(priority==="speed")return item.speed*.68+item.impact*.32;return item.impact*.7+item.speed*.15+item.risk*.15}
+function objective(item,priority){if(priority==="impact")return item.impact;if(priority==="risk")return (35-item.risk)*1.35+item.impact*.35;if(priority==="speed")return item.speed*.68+item.impact*.32;return item.impact*.7+item.speed*.15+item.risk*.15}
 function solve(items,budget,maxItems,priority){
 let best=null,checks=0,feasible=0;const n=items.length,limit=1<<n;
 for(let mask=0;mask<limit;mask++){checks++;let cost=0,count=0,base=0,selected=[],cats=new Set();
@@ -101,7 +101,7 @@ html+='<div class="reason">1. Hard constraint: total selected cost stays within 
 html+='<div class="section-title"><span>Alternatives to inspect</span><span>Not selected</span></div><div class="items">';
 rejected.forEach(it=>{html+='<article class="item"><div class="item-top"><strong>'+it.name+'</strong><span class="price">'+fmt(it.cost)+'</span></div><p>'+it.desc+'</p><div class="tags"><span class="tag warn">'+(it.cost>remain?'Would require budget reallocation':'Lower portfolio score')+'</span><span class="tag">Impact '+it.impact+'/100</span></div></article>'});
 html+='</div><div class="section-title"><span>Run record</span><span>Reproducible</span></div><div class="log">MODEL: constrained portfolio selection\nDOMAIN: '+domain+'\nOBJECTIVE: '+priority+'\nBUDGET: '+budget+' NZD\nMAX_ITEMS: '+maxItems+'\nCANDIDATES: '+items.length+'\nSUBSETS_EVALUATED: '+res.checks+'\nFEASIBLE_SUBSETS: '+res.feasible+'\nSELECTED: '+(names||'none')+'\nCOST: '+spent+' NZD\nREMAINING: '+remain+' NZD\nDIVERSITY_BONUS: '+(res.diversity||0).toFixed(2)+'</div>';
-html+='<div class="disclaimer"><strong>Important boundary:</strong> this is a deterministic demonstration using illustrative costs and modelled scores, not a general-purpose AI that understands arbitrary questions. It does not use live market prices, site data or verified forecasts. Validate assumptions with qualified people before acting.</div>';
+html+='<div class="disclaimer"><strong>Important boundary:</strong> this is a deterministic demonstration using illustrative costs and modelled scores, not a general-purpose AI that understands arbitrary questions, and it is separate from the original symbolic state engine. It does not use live market prices, site data or verified forecasts. Validate assumptions with qualified people before acting.</div>';
 $("results").innerHTML=html;$("status").textContent="RUN COMPLETE";}catch(e){$("status").textContent="ENGINE ERROR";$("results").innerHTML='<p class="summary">The model could not complete this run. Try a different budget or scenario.</p>';}finally{$("run").disabled=false}
 }
 document.querySelectorAll("[data-sample]").forEach(btn=>btn.addEventListener("click",()=>{
