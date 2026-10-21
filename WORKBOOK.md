@@ -328,3 +328,11 @@ The result supports a limited conclusion: deeper search improves the current mod
 - The report is deterministic for the same saved rules and goal, records the two seeds, and checks that the user's working substrate, goal, and saved rules remain unchanged.
 - Important limit: both samples are scored by the same symbolic objective used to define candidate gains. The holdout can expose ranking instability within this model, but it is not independent real-world validation and cannot establish practical usefulness.
 - Smoke checks cover deterministic output, separate sample counts, complete candidate rankings, non-zero disagreement probes, explicit verdicts, insufficient-candidate handling, and the stated evidence boundary.
+
+
+### Portfolio packaging checkpoint (2026-10-21)
+
+- Added a repository README with the live demo, guided first-run path, benchmark summary, test commands, repository map, current limits, and clear distinction between model-internal evidence and real-world claims.
+- Added `ARCHITECTURE.md` with a Mermaid system map, current component boundaries, evidence flow, benchmark method, and explicit non-goals.
+- These documents describe the current implementation and do not present planned work as already implemented.
+- Portfolio work remaining: record a short screen demonstration, write a concise technical case study, and test whether the approach generalises beyond its current hand-defined objective.
