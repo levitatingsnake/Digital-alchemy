@@ -30,6 +30,7 @@ function makeElement() {
 const elements = new Map();
 const document = {
   getElementById(id) { if (!elements.has(id)) elements.set(id, makeElement()); return elements.get(id); },
+  querySelector() { return makeElement(); },
   querySelectorAll() { return []; },
   createElement() { return makeElement(); }
 };
