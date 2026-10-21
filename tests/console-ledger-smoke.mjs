@@ -12,6 +12,10 @@ assert.match(match[1], /absolutePercentageError/, 'Stored records must include p
 assert.match(html, /id="expTarget"/, 'Ledger should allow an explicit success threshold');
 assert.match(html, /id="expReview"/, 'Ledger should capture the human decision after reviewing an outcome');
 assert.match(html, /id="expReviewReason"/, 'Ledger should record why a follow-up decision was chosen');
+assert.match(html, /id="repeatReview"/, 'Ledger should show consistency across comparable repeated tests');
+assert.match(match[1], /renderRepeatability/, 'Ledger should group repeated outcomes for consistency review');
+assert.match(match[1], /Success rules differ or are missing/, 'Ledger should warn when success thresholds are not comparable');
+assert.match(match[1], /Mixed results: the target was met in some tests and missed in others/, 'Ledger should flag conflicting repeated outcomes');
 assert.match(match[1], /Review open/, 'Readout should expose unresolved review decisions');
 assert.match(match[1], /The target was missed\. Inspect context and assumptions/, "A missed target should suggest reviewing assumptions and retesting");
 assert.match(match[1], /The target was met\. Check side effects and repeat/, "A met target should suggest a controlled repeat before scaling");
@@ -87,4 +91,39 @@ assert.equal(records[0].reviewReason, 'Target missed; reduce scope and retest');
 assert.match(getElement('experimentList').innerHTML, /Adjust and retest/);
 assert.match(getElement('experimentList').innerHTML, /reduce scope and retest/);
 assert.match(getElement('expAlerts').textContent, /0 review decision\(s\) still open/, 'A completed human review should clear the open-review count');
-console.log('PASS: Console syntax, experiment ledger, local persistence, signed error, MAE and percentage error.');
+for (const [id, value] of Object.entries({
+  expDecision: 'Pilot customer follow-up',
+  expHypothesis: 'A prompt follow-up saves time',
+  expMetric: 'Hours saved per week',
+  expPredicted: '2',
+  expActual: '2.2',
+  expUnit: 'hours/week',
+  expTarget: '1.8',
+  expDirection: 'higher',
+  expDate: '2026-10-22',
+  expVerdict: 'Success threshold met',
+  expNotes: 'Second comparable test',
+  expReview: 'continue',
+  expReviewReason: 'Repeat with same conditions'
+})) getElement(id).value = value;
+handlers['experimentForm:submit']({ preventDefault() {} });
+assert.match(getElement('repeatReview').innerHTML, /Mixed results: the target was met in some tests and missed in others/, 'Conflicting outcomes with the same success rule should be flagged');
+assert.match(getElement('repeatReview').innerHTML, /2 recorded tests/, 'Only comparable repeated tests should form a group');
+for (const [id, value] of Object.entries({
+  expDecision: 'Pilot customer follow-up',
+  expHypothesis: 'A prompt follow-up saves time',
+  expMetric: 'Hours saved per week',
+  expPredicted: '120',
+  expActual: '130',
+  expUnit: 'minutes',
+  expTarget: '100',
+  expDirection: 'higher',
+  expDate: '2026-10-23',
+  expVerdict: 'Success threshold met',
+  expNotes: 'Different unit, must remain separate',
+  expReview: 'continue',
+  expReviewReason: ''
+})) getElement(id).value = value;
+handlers['experimentForm:submit']({ preventDefault() {} });
+assert.match(getElement('repeatReview').innerHTML, /2 recorded tests/, 'Different units must not be merged into an existing repeatability group');
+console.log('PASS: Console syntax, experiment ledger, local persistence, error metrics, target review and repeated-test consistency.');
