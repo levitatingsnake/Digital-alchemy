@@ -182,3 +182,7 @@ assert.ok(cockpitSource.includes('function evaluateAlchemyConcept(index,context)
 for(const name of ['Cash exposure','Delivery capacity','Implementation speed','Technical complexity','Operating model'])assert.ok(cockpitSource.includes(name),'feasibility dimension '+name);
 assert.ok(cockpitSource.includes('assessment.checks.map'),'feasibility checks rendered');
 console.log('PASS composed concept feasibility checks');
+
+assert.ok(cockpitSource.includes('<details class="plan-deep-dive">'),'detailed plan collapses by default');
+assert.ok(cockpitSource.includes('</div></details><div class="plan-conclusion">'),'summary and conclusion remain visible');
+console.log('PASS progressive disclosure for strategy reports');
