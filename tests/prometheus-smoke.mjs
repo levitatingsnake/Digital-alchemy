@@ -101,3 +101,9 @@ for(const domain of ['business','construction','finance','investing','property']
 }
 assert.ok(cockpitSource.includes('planMarkup(p.v,p.run,p.i,question,domain)'),'domain context passed to all three briefings');
 console.log('PASS comprehensive three-plan strategy structure');
+
+assert.ok(cockpitSource.includes('const modelPlaybooks='),'model-specific strategy library exists');
+for(const name of ['The repeatable system','The partnership network','The specialist wedge'])assert.ok(cockpitSource.includes(name),'distinct strategy: '+name);
+assert.ok(cockpitSource.includes('const p=modelPlaybooks[domain][index]'),'model-specific domain playbook used');
+for(const label of ['Who benefits:','Value proposition:','Distribution or adoption:','Economic logic:','First proof:'])assert.ok(cockpitSource.includes(label),'model differentiation includes '+label);
+console.log('PASS three distinct business-model pathways');
