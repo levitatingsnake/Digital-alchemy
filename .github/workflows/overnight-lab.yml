@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'decision-lab.html'
       - 'tests/**'
       - '.github/workflows/overnight-lab.yml'
 
@@ -33,6 +34,8 @@ jobs:
           node-version: 24
       - name: Run existing smoke checks
         run: node tests/smoke-check.mjs
+      - name: Run Decision Lab smoke and constraint checks
+        run: node tests/decision-lab-smoke.mjs
       - name: Run real-stage Discovery Cycle integration test
         run: node tests/real-stage-integration.mjs
       - name: Run adversarial boundary checks
