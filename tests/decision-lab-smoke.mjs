@@ -17,6 +17,8 @@ const elements = {
   budget: { value: '30000', addEventListener() {} },
   priority: { value: 'balanced', addEventListener() {} },
   maxItems: { value: '4', addEventListener() {} },
+  stressSeverity: { value: '40', addEventListener() {} },
+  stressValue: { textContent: '28%' },
   run: { disabled: false, addEventListener(type, fn) { handlers.run = fn; } },
   status: { textContent: '' },
   results: { innerHTML: '' }
@@ -42,6 +44,7 @@ assert.match(elements.results.innerHTML, /Recommended initiatives/, 'Output must
 assert.match(elements.results.innerHTML, /SUBSETS_EVALUATED/, 'Output must expose search evidence');
 assert.match(elements.results.innerHTML, /Downside scenario check/, 'Output must show the stress-test scenario');
 assert.match(elements.results.innerHTML, /STRESS_SCORE/, 'Run record must include stress score');
+assert.match(elements.results.innerHTML, /STRESS_SEVERITY: 40% impact reduction/, 'Run record must preserve the selected stress severity');
 assert.match(elements.results.innerHTML, /External evidence to verify/, 'Output must offer external evidence sources');
 assert.match(elements.results.innerHTML, /Important boundary/, 'Output must state limitations');
 assert.match(elements.results.innerHTML, /risk-adjusted constrained portfolio selection/, 'Run record must identify the robust engine');
