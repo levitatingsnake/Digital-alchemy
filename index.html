@@ -191,6 +191,25 @@ input,select,textarea{accent-color:var(--gold)}
 .obsidian-bridge .bridge-note{font-size:12px;color:var(--muted);margin:10px 0 0}
 @media(max-width:520px){.obsidian-bridge .bridge-controls{grid-template-columns:1fr}.obsidian-bridge .bridge-actions button{min-width:100%}}
 
+
+/* COMMAND DECK / FOCUSED WORKSPACES */
+.workspace-shell{margin:0 0 18px;padding:16px;border:1px solid #255574;border-radius:18px;background:linear-gradient(125deg,rgba(10,25,43,.98),rgba(7,14,27,.98));box-shadow:0 18px 55px #0003}
+.workspace-topline{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:15px}
+.workspace-topline h2{margin:4px 0;font-size:20px;letter-spacing:-.025em}
+.workspace-topline p{margin:0;color:var(--muted);font-size:12px;max-width:480px}
+.workspace-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.workspace-actions button{font-size:12px;padding:10px 12px}
+.workspace-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.workspace-tab{background:#091321;border:1px solid #1c3d56;border-radius:11px;text-align:left;padding:11px 12px;min-width:0}
+.workspace-tab strong{display:block;font-size:12px}
+.workspace-tab small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:3px;line-height:1.35}
+.workspace-tab[aria-selected="true"]{border-color:#68f4ff;background:linear-gradient(135deg,#15354a,#102337);box-shadow:inset 0 0 0 1px #68f4ff33}
+.workspace-tab[aria-selected="true"] strong{color:#8ff7ff}
+.workspace-state{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;margin-top:12px}
+.workspace-state .dot{background:var(--green);box-shadow:0 0 10px #b7ff6a66}
+.workspace-hidden{display:none!important}
+@media(max-width:600px){.workspace-shell{padding:12px}.workspace-topline{display:block}.workspace-actions{justify-content:stretch;margin-top:12px}.workspace-actions button{flex:1}.workspace-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.workspace-tab{padding:10px}.workspace-topline h2{font-size:18px}}
+
 </style></head><body><main class="wrap">
 <header class="top"><div class="brand"><div class="sigil">⚗</div><div><div class="eyebrow">Computational transformation</div><h1>Digital Alchemy</h1></div></div><div class="status" id="saveStatus"><span class="dot"></span><span>Saved on this device</span></div></header>
 <section class="xeno-hero" aria-label="XenoLab research interface">
@@ -211,6 +230,18 @@ input,select,textarea{accent-color:var(--gold)}
  <div class="xeno-edge"><span>LAB NOTE 001</span><span>OBSERVE → TRANSFORM → CHALLENGE</span><span>LOCAL INSTANCE / NO CLOUD CLAIM</span></div>
 </section>
 <p class="intro"><strong>A laboratory for exploring change.</strong> Choose an outcome, test symbolic operations, and let the route finder look for a sequence that moves the current state toward your goal. Your state and experiments save automatically in this browser.</p>
+
+<section class="workspace-shell" aria-label="Digital Alchemy workspaces">
+ <div class="workspace-topline"><div><div class="eyebrow">XENOLAB / COMMAND DECK</div><h2 id="workspaceTitle">Mission control</h2><p id="workspaceDescription">Set an intention, choose a target, and search for a route through the symbolic model.</p></div><div class="workspace-actions"><button class="primary" id="launchProofDemo">Run proof demo ↗</button><button class="ghost" id="openResearchMemory">Research memory ◈</button></div></div>
+ <div class="workspace-tabs" role="tablist" aria-label="Research workspaces">
+  <button class="workspace-tab" type="button" role="tab" data-workspace-tab="mission" aria-selected="true"><strong>01 / Mission</strong><small>Set goals · run transformations</small></button>
+  <button class="workspace-tab" type="button" role="tab" data-workspace-tab="engine" aria-selected="false"><strong>02 / Engine</strong><small>Discover · refine · explore</small></button>
+  <button class="workspace-tab" type="button" role="tab" data-workspace-tab="evidence" aria-selected="false"><strong>03 / Evidence</strong><small>Test · challenge · verify</small></button>
+  <button class="workspace-tab" type="button" role="tab" data-workspace-tab="memory" aria-selected="false"><strong>04 / Memory</strong><small>Save research to Obsidian</small></button>
+ </div>
+ <div class="workspace-state"><span class="dot"></span><span id="workspaceStateText">Mission workspace active · local symbolic engine</span></div>
+</section>
+
 
 <section class="panel wide obsidian-bridge" id="obsidianBridge" aria-labelledby="obsidianBridgeTitle">
   <div class="bridge-head"><div><div class="eyebrow">Research memory / Obsidian bridge</div><h2 id="obsidianBridgeTitle">Keep the discoveries</h2><p class="sub">Send the latest saved experiment straight into an Obsidian note, or export your full experiment archive as Markdown.</p></div><span class="bridge-mark" aria-hidden="true">⌘</span></div>
@@ -1337,5 +1368,62 @@ document.getElementById('exportReport').addEventListener('click',()=>{
 });
 document.getElementById('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(createExportPayload(state,goalConfig(),new Date().toISOString()),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='digital-alchemy-experiments.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);showToast('Export prepared')});
 load();document.getElementById('intentionText').value=state.intentText||'';document.getElementById('intentionGoal').value=state.goal;renderStats();renderTargetControls();updateSummary();renderTrace();renderHistory();renderKeptRules();
+
+function setupWorkspaceDeck(){
+ const copy={
+  mission:{title:'Mission control',description:'Set an intention, choose a target, and search for a route through the symbolic model.',status:'Mission workspace active · local symbolic engine'},
+  engine:{title:'Engine room',description:'Generate candidate rules, evolve search strategies, and investigate how the symbolic system behaves.',status:'Engine workspace active · discovery tools'},
+  evidence:{title:'Evidence bay',description:'Run repeatability checks, challenge hypotheses, inspect counterexamples, and review saved experiments.',status:'Evidence workspace active · results stay within the model'},
+  memory:{title:'Research memory',description:'Send a saved experiment to Obsidian or export the full research log for your project vault.',status:'Memory workspace active · Obsidian opens by explicit action'}
+ };
+ const tag=(selector,workspace)=>{const el=document.querySelector(selector);if(el){el.dataset.workspace=workspace;return el}return null};
+ tag('#obsidianBridge','memory');
+ const demo=tag('#portfolioDemoTitle','evidence');if(demo)demo.closest('section').dataset.workspace='evidence';
+ tag('#refinementPanel','engine');tag('#discoveryPanel','engine');tag('#evidencePanel','evidence');
+ tag('#substratePanel','mission');tag('#intentionPanel','mission');
+ const intent=document.querySelector('#intentCompilerTitle');if(intent)intent.closest('section').dataset.workspace='mission';
+ const missionNav=document.querySelector('section[aria-labelledby="missionTitle"]');if(missionNav){missionNav.dataset.workspace='mission';missionNav.classList.add('workspace-hidden');missionNav.dataset.workspaceSkip='true'}
+ document.querySelectorAll('.grid > section').forEach(sec=>{
+  const heading=sec.querySelector('h2');const t=heading?heading.textContent:'';
+  if(/ANOMALY LAB|DISCOVERY CYCLE|EXPERIMENT DESIGNER|RULE ADJUDICATOR|PATTERN VAULT|THE LAW FORGE/i.test(t))sec.dataset.workspace='engine';
+  if(/Engine integrity|Experiment trace|Experiment archive/i.test(t))sec.dataset.workspace='evidence';
+ });
+ function switchTo(workspace,scroll){
+  if(!copy[workspace])workspace='mission';
+  document.querySelectorAll('[data-workspace-tab]').forEach(btn=>btn.setAttribute('aria-selected',String(btn.dataset.workspaceTab===workspace)));
+  document.querySelectorAll('[data-workspace]').forEach(el=>{
+   if(el.dataset.workspaceSkip==='true')return;
+   el.classList.toggle('workspace-hidden',el.dataset.workspace!==workspace);
+  });
+  document.querySelectorAll('.grid').forEach(grid=>{
+   const visible=[...grid.children].some(el=>!el.classList.contains('workspace-hidden'));
+   grid.classList.toggle('workspace-hidden',!visible);
+  });
+  document.getElementById('workspaceTitle').textContent=copy[workspace].title;
+  document.getElementById('workspaceDescription').textContent=copy[workspace].description;
+  document.getElementById('workspaceStateText').textContent=copy[workspace].status;
+  try{sessionStorage.setItem('da-workspace',workspace)}catch(e){}
+  if(scroll)document.querySelector('.workspace-shell').scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ document.querySelectorAll('[data-workspace-tab]').forEach(btn=>btn.addEventListener('click',()=>switchTo(btn.dataset.workspaceTab,false)));
+ document.getElementById('openResearchMemory').addEventListener('click',()=>switchTo('memory',true));
+ document.getElementById('launchProofDemo').addEventListener('click',()=>{
+  switchTo('evidence',false);
+  document.getElementById('portfolioDemoTitle').closest('section').scrollIntoView({behavior:'smooth',block:'start'});
+  runPortfolioDemo();
+ });
+ document.querySelectorAll('.xeno-actions a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+  const id=a.getAttribute('href').slice(1);
+  const workspace=id==='evidencePanel'?'evidence':'mission';
+  switchTo(workspace,false);
+  const target=document.getElementById(id);
+  if(target)setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),40);
+  e.preventDefault();
+ }));
+ let initial='mission';try{const saved=sessionStorage.getItem('da-workspace');if(copy[saved])initial=saved}catch(e){}
+ switchTo(initial,false);
+}
+
+setupWorkspaceDeck();
 })();
 </script></body></html>
