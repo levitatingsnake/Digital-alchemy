@@ -18,7 +18,7 @@ const css=readFileSync('prometheus-visual.css','utf8');
 assert.match(css,/#chamberQuestion,#question/);
 assert.match(css,/prefers-reduced-motion/);
 const lab=readFileSync('decision-lab.html','utf8');
-for(const name of ['buildDecisionReadout','buildCounterfactual','buildEvidenceIntelligence','buildStrategyConstellation','buildDecisionFingerprint']){
+for(const name of ['buildDecisionReadout','buildCounterfactual','buildEvidenceIntelligence','buildStrategyConstellation','buildDecisionFingerprint','buildInterventionForge']){
  assert.equal((lab.match(new RegExp('function '+name+'\\(','g'))||[]).length,1,name+' defined once');
  assert.match(lab,new RegExp('html\\+=' +name+'\\('),name+' included in results');
 }
