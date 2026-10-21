@@ -3,6 +3,9 @@
 ## Mission
 Invent and validate a **new machine for generating, testing and refining possibilities**. It must demonstrate a repeatable, measurable capability that is not merely a repackaged chatbot, static idea library, keyword matcher or decorative interface.
 
+## Scope: unrestricted invention space
+Alchemy is the historical seed and project name, **not** a scientific theory, metaphorical constraint, fixed set of operations, or design vocabulary. Explore any defensible computational paradigm: causal modelling, search, simulation, evolutionary methods, program synthesis, formal verification, agentic experiments, human-machine collaboration or techniques not yet selected. Do not privilege the existing four-value symbolic engine just because it came first. The architecture must earn its place through evaluation.
+
 ## Non-negotiable principles
 1. **Capability before spectacle.** No cosmetic work used to imply reasoning breakthroughs.
 2. **Differentiation must be earned.** Compare against strong baseline LLM prompting and conventional algorithms on held-out problems; report failures and cost.
