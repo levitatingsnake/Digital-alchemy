@@ -124,3 +124,8 @@ console.log('PASS question-specific interpretation and safeguards');
 assert.ok(cockpitSource.includes('function causalMarkup(index,diagnosis)'),'falsifiable causal analysis renderer');
 for(const label of ['Critical assumption:','What would disprove it:','Smallest useful test:','Untested hypothesis'])assert.ok(cockpitSource.includes(label),'causal evidence: '+label);
 console.log('PASS causal hypotheses and disconfirmation tests');
+
+assert.ok(cockpitSource.includes('function economicsMarkup(index,run,diagnosis,domain)'),'economic modelling helper');
+for(const signal of ['capacity','demand','delay','cost','risk','automation'])assert.ok(cockpitSource.includes(' '+signal+':{unit:'),'economic driver '+signal);
+for(const label of ['Break-even months:','12-month net value:','No fabricated ROI','conservative, central and optimistic'])assert.ok(cockpitSource.includes(label),'economic model includes '+label);
+console.log('PASS transparent question-specific unit economics');
