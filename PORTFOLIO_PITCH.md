@@ -29,6 +29,11 @@ These are model-internal results, not real-world success probabilities, physical
 
 I have also added a separate constrained-selection benchmark: a greedy value-to-cost heuristic is compared with an exact solver that enumerates every subset of a small item set under a budget. This tests evaluation discipline on a different toy problem, but it does not mean the Digital Alchemy engine has generalised or that either task is validated for real-world decisions. The first measured run scored 130.220 for greedy selection versus 132.010 for the exact optimum on 100 generated cases, with a mean relative gap of 1.396% and no budget violations. See the [versioned report](reports/transfer-task-2026-10-21.md) and [successful workflow](https://github.com/levitatingsnake/Digital-alchemy/actions/runs/39549026880).
 
+
+## Optional applied-decision demo
+
+The companion [Decision Lab](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html) now has five fixed scenario libraries: small-business operations, construction, business finance, investment-process review and real estate. It supports improvement discovery without a required budget, or constrained optimisation when one is supplied. Use the finance or property sample for a familiar business-facing walkthrough, while clearly stating that its assumptions are synthetic and it does not use live market data or provide professional advice.
+
 ## If someone asks “What is actually AI about it?”
 
 Be precise: the project is an AI-engineering portfolio experiment about search, evaluation, competing candidate rules, evidence capture, and reproducibility. The current browser engine is a deterministic symbolic model; the intention field is not interpreted by an LLM. The point is to demonstrate how to build and scrutinise an intelligent-system prototype, not to claim that this version is a trained model.
