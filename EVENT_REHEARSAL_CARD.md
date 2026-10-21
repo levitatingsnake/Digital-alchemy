@@ -5,7 +5,7 @@ A phone-friendly guide for showing the project to an AI, product, or engineering
 ## Open these first
 
 1. [Live app](https://levitatingsnake.github.io/Digital-alchemy/)
-2. [Decision Lab: business and construction choices](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html)
+2. [Decision Lab: five decision domains](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html)
 3. [GitHub repository](https://github.com/levitatingsnake/Digital-alchemy)
 4. [Technical case study](CASE_STUDY.md)
 5. [Latest automated test run](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml)
