@@ -1,0 +1,29 @@
+name: Prometheus smoke checks
+on:
+  pull_request:
+    paths:
+      - 'console.html'
+      - 'decision-lab.html'
+      - 'prometheus-visual.css'
+      - 'tests/prometheus-smoke.mjs'
+      - '.github/workflows/prometheus-smoke.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'console.html'
+      - 'decision-lab.html'
+      - 'prometheus-visual.css'
+      - 'tests/prometheus-smoke.mjs'
+      - '.github/workflows/prometheus-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  static-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/prometheus-smoke.mjs
