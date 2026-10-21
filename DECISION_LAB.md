@@ -33,6 +33,19 @@ node tests/decision-lab-smoke.mjs
 
 The repository's GitHub Actions workflow runs this check alongside the existing Digital Alchemy test suite.
 
+## New improvements: robust search and evidence pathways
+
+The portfolio search now evaluates every feasible subset against two deterministic scoring scenarios:
+
+- **Baseline:** the existing initiative scores under the selected objective.
+- **Illustrative downside:** impact is reduced to 72% of its baseline, risk factor increases by six points (capped at 35), and delivery speed is reduced to 85%.
+
+The ranking combines 65% baseline score with 35% downside score. Balanced and speed objectives now reward lower risk rather than accidentally rewarding higher risk. The run output records baseline, stress and combined robust scores so reviewers can inspect the effect. These scenario weights are design assumptions, not statistically estimated probabilities or forecasts.
+
+The output also presents a domain-specific evidence source list. For finance, investment and property this includes relevant New Zealand official or industry sources such as the Reserve Bank of New Zealand, Financial Markets Authority, REINZ, Inland Revenue and Tenancy Services. Links are **reference pathways only**: the prototype does not fetch, parse or verify their contents automatically. Users must check publication dates, geography, definitions and relevance, then replace synthetic inputs with verified evidence.
+
+The smoke test checks that downside scoring and external evidence pathways appear in the output across all five domains. Existing budget and deterministic-selection constraints remain in place.
+
 ## Limitations
 
 - Costs and scores are illustrative inputs, not estimates validated against a real business, contractor, job site, investment portfolio, property or dataset.
