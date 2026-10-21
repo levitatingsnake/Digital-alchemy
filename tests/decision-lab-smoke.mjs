@@ -44,7 +44,8 @@ assert.match(elements.results.innerHTML, /Suggested actions/, 'Output must show 
 assert.match(elements.results.innerHTML, /THE ANSWER \/ PLAIN ENGLISH/, 'Output must include a clear executive summary');
 assert.match(elements.results.innerHTML, /What this result means/, 'Summary must explain the recommendation in ordinary language');
 assert.match(elements.results.innerHTML, /What to do next/, 'Summary must give practical next steps');
-assert.match(html, /field textarea#question.{0,3}min-height:230px;height:230px/, 'Question field must be large enough for a detailed prompt');
+assert.match(html, /field textarea#question\{display:block;width:100%;min-height:320px;height:320px/, 'Desktop question field must fit a detailed prompt');
+assert.match(html, /field textarea#question\{min-height:260px;height:260px/, 'Mobile question field must fit a detailed prompt');
 assert.match(html, /Area to assess/, 'Visible labels should use clear language');
 
 assert.match(elements.results.innerHTML, /Challenge the recommendation/, 'Output must include a plain-language decision challenge');
