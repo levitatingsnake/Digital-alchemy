@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080f20"><title>Digital Alchemy | Discovery Cockpit</title>
+<style>
+:root{color-scheme:dark;--ink:#eff9ff;--muted:#a6bacb;--line:#32536b;--cyan:#8ceaff;--gold:#ffcf8a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1d3b52 0,#0a1428 48%,#070b18 100%);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1120px;margin:auto;padding:22px 18px 90px}header{display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding-bottom:16px}.brand{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--cyan)}.brand span{display:block;font-size:10px;letter-spacing:.14em;color:var(--muted);font-weight:500}.engineering{font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:4px}
+.hero{padding:65px 0 26px;max-width:880px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}.hero h1{font-size:clamp(36px,7vw,74px);line-height:1.07;letter-spacing:-.055em;margin:14px 0 19px;font-weight:650}.hero h1 em{font-style:normal;color:var(--cyan)}.hero p{color:var(--muted);max-width:630px}
+.input-shell{border:1px solid #49778e;background:linear-gradient(135deg,rgba(21,48,71,.85),rgba(9,21,39,.97));padding:20px;box-shadow:0 25px 75px #0006;position:relative}.input-shell:before{content:"";position:absolute;top:-1px;left:20px;width:110px;height:2px;background:var(--cyan)}
+label{font-size:12px;letter-spacing:.06em;color:#d7e8f3;font-weight:750}textarea{width:100%;min-height:225px;resize:vertical;margin:10px 0 16px;padding:18px;background:#071526;color:var(--ink);border:1px solid var(--line);border-radius:5px;font:inherit;font-size:17px;line-height:1.6}textarea:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}button{background:var(--cyan);border:0;border-radius:4px;color:#081526;padding:14px 24px;font:inherit;font-weight:800;cursor:pointer}button:disabled{opacity:.5;cursor:wait}.subtle{font-size:12px;color:var(--muted)}.results{margin-top:48px}.results[hidden]{display:none}.section-label{font-size:11px;letter-spacing:.18em;color:var(--cyan);font-weight:800}.results h2{font-size:clamp(26px,4vw,42px);letter-spacing:-.03em;margin:10px 0}.intro{color:var(--muted);max-width:760px}.plans{display:grid;gap:20px;margin-top:24px}.plan{border:1px solid var(--line);background:linear-gradient(130deg,#10273a,#0a1729);padding:26px;position:relative}.plan:nth-child(2){background:linear-gradient(130deg,#17253e,#0a1729)}.plan:nth-child(3){background:linear-gradient(130deg,#20243b,#0a1729)}.plan-index{font-size:11px;letter-spacing:.16em;color:var(--gold);font-weight:800}.plan h3{font-size:clamp(23px,4vw,32px);line-height:1.2;margin:10px 0}.plan>p{color:#d5e5ef}.plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:20px}.plan-grid section{border-top:1px solid #35546b;padding-top:12px}.plan h4{font-size:12px;text-transform:uppercase;letter-spacing:.13em;color:var(--cyan);margin:0 0 8px}.plan ul,.plan ol{margin:8px 0;padding-left:20px}.plan li{margin:6px 0;font-size:14px;color:#d3e1eb}.boundary{border-left:3px solid var(--gold);padding:13px 16px;background:#222536;font-size:12px;color:#d9d5ce;margin-top:26px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.secondary{background:transparent;color:var(--cyan);border:1px solid var(--line)}footer{color:var(--muted);font-size:12px;margin-top:50px}
+@media(max-width:650px){.hero{padding-top:42px}.plan{padding:18px}.plan-grid{grid-template-columns:1fr}textarea{min-height:240px}.engineering{font-size:10px}}
+ .step-note{display:block;color:#a7bdcd;font-size:12px;margin-top:4px}.plan-conclusion{border-top:1px solid #3a5b6e;margin-top:22px;padding:18px 0 0}.plan-conclusion b{color:var(--gold)}.plan-conclusion p{margin:5px 0 0;color:#dcecf4}.model-thesis{border:1px solid #416b79;background:rgba(26,58,76,.46);padding:18px;margin-top:20px}.model-thesis h4{margin:0 0 10px;font-size:12px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}.model-thesis p{margin:7px 0;color:#d7e9f1;font-size:14px}.model-thesis b{color:var(--cyan)}.question-diagnosis{border:1px solid #39647a;background:rgba(16,42,61,.8);padding:20px;margin-top:20px}.question-diagnosis h3{font-size:22px;margin:8px 0}.question-diagnosis p{margin:7px 0;color:#dcebf3}.question-diagnosis small{color:#a8b9c6}.advanced-analysis{margin-top:26px;border:1px solid var(--line);background:#0b1b2c;padding:16px 20px}.advanced-analysis summary{cursor:pointer;color:var(--cyan);font-weight:800;font-size:16px}.advanced-analysis summary span{display:block;font-size:12px;color:var(--muted);font-weight:400}.advanced-analysis[open] summary{margin-bottom:18px}.advanced-analysis table th,.advanced-analysis table td{border-bottom:1px solid var(--line);padding:10px;vertical-align:top;font-size:13px}.evidence-workbench{margin-top:24px;border-top:1px solid var(--line);padding-top:20px}.evidence-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.evidence-fields fieldset{border:1px solid var(--line);min-width:0}.evidence-fields legend{font-weight:700;color:var(--cyan)}.evidence-fields label{display:block;font-size:12px;margin:10px 0}.evidence-fields input{display:block;width:100%;background:#071526;color:var(--ink);border:1px solid var(--line);padding:10px;font:inherit}.evidence-workbench button{margin-top:14px}@media(max-width:700px){.evidence-fields{grid-template-columns:1fr}}.plan-deep-dive{margin-top:18px;border:1px solid #35546b;border-radius:14px;padding:14px 18px;background:rgba(10,25,41,.55)}.plan-deep-dive summary{cursor:pointer;font-weight:700;color:#d4f8ff}.plan-deep-dive summary span{display:block;font-weight:400;font-size:.84em;color:#9db8c7;margin-top:5px}.plan-deep-dive[open] summary{margin-bottom:12px}.plan-deep-dive summary:focus-visible{outline:2px solid #8de7ff;outline-offset:5px}.invention-lead{margin:18px 0 22px;padding:20px;border:1px solid #4e96a5;border-radius:16px;background:linear-gradient(125deg,rgba(18,65,77,.85),rgba(11,21,43,.9))}.invention-lead h4{font-size:1.24rem;margin:9px 0 13px;color:#d9fbff}.invention-tag{font-size:.76rem;letter-spacing:.19em;color:#8cebf0;font-weight:800}.invention-lead p{line-height:1.55}.invention-caveat{font-size:.8rem;opacity:.72}.deconstruction{border-left:3px solid #7bd6f0;padding:12px 16px;margin:15px 0;background:rgba(19,46,62,.52)}.deconstruction>b{font-size:.75rem;letter-spacing:.13em;color:#a4eaf7}.deconstruction p{margin:8px 0;line-height:1.45}.deconstruction p:last-child{font-size:.78rem;opacity:.7}.lab-hypothesis{padding:18px;margin:16px 0;border:1px solid #a5d1f0;border-radius:15px;background:linear-gradient(120deg,rgba(23,42,79,.85),rgba(12,27,43,.95))}.lab-hypothesis>b{font-size:.77rem;letter-spacing:.15em;color:#a6eaff}.lab-hypothesis h4{margin:10px 0;color:#e5f8ff}.lab-hypothesis p{line-height:1.5}</style></head><body><main><header><div class="brand">◈ DIGITAL ALCHEMY <span>LUMORA STRATEGY / DISCOVERY COCKPIT</span></div><a class="engineering" href="decision-lab.html">Engine room ↗</a></header>
+<section class="hero"><div class="eyebrow">PROMETHEUS / POSSIBILITY ENGINE</div><h1>One question.<br><em>Three ways forward.</em></h1><p>Describe a business challenge, investment decision or idea. Prometheus will construct three different strategic approaches, each with a practical implementation plan.</p></section>
+<section class="input-shell"><label for="question">WHAT WOULD YOU LIKE TO CHANGE, CREATE OR SOLVE?</label><textarea id="question" maxlength="3500" placeholder="For example: I want to grow a real estate business without hiring a large team. What unconventional but practical approaches could work?"></textarea><div class="controls"><button id="generate">Generate three strategies →</button><span class="subtle" id="status">No budget or technical settings required.</span></div></section>
+<section class="results" id="results" hidden><div class="section-label">PROMETHEUS / STRATEGIC BRIEFINGS</div><h2>Three possible futures</h2><p class="intro">These are different decision priorities applied to the same illustrative strategy library. They are structured planning hypotheses, not independently researched business plans.</p><div class="plans" id="plans"></div><div class="actions"><button id="export" class="secondary">Export all three plans ↓</button><button id="again" class="secondary">Refine the question ↑</button></div><div class="boundary">PROTOTYPE BOUNDARY: The engine currently uses a deterministic library of illustrative initiatives and synthetic model scores. Costs are examples, not quotations. It does not yet research your market, forecast actual returns or validate a business case. Verify legal, financial and operational assumptions before acting.</div></section>
+<footer>Digital Alchemy · Lumora Strategy · A prototype for structured exploration, not professional advice.</footer></main>
+<script>
+(function(){
+const datasets={
+construction:[
+{id:"planning",name:"Short daily planning check-ins",cost:2500,impact:68,risk:12,speed:92,cat:"coordination",desc:"A 15-minute review of upcoming work to expose blockers before they stall the site."},
+{id:"procurement",name:"Critical-material procurement buffer",cost:7000,impact:76,risk:18,speed:64,cat:"supply",desc:"Identify long-lead items and create a small, targeted buffer for critical materials."},
+{id:"training",name:"Crew cross-skilling",cost:4800,impact:62,risk:14,speed:57,cat:"people",desc:"Train key crew members to cover predictable bottlenecks and absences."},
+{id:"qa",name:"Digital quality checklists",cost:3800,impact:64,risk:9,speed:81,cat:"quality",desc:"Standardise inspection points and capture defects before work is covered."},
+{id:"plant",name:"Preventive plant maintenance",cost:6200,impact:71,risk:8,speed:69,cat:"equipment",desc:"Schedule maintenance around production windows to reduce avoidable downtime."},
+{id:"safety",name:"Pre-task safety refresh",cost:1800,impact:42,risk:31,speed:95,cat:"safety",desc:"Focused toolbox refresh on the highest-risk recurring tasks."},
+{id:"forecast",name:"Two-week labour and cost forecast",cost:3200,impact:59,risk:11,speed:83,cat:"planning",desc:"A rolling forecast makes labour clashes and cost drift visible earlier."},
+{id:"supplier",name:"Supplier performance review",cost:2200,impact:48,risk:10,speed:79,cat:"supply",desc:"Review delivery reliability and agree escalation points with key suppliers."},
+{id:"survey",name:"Site layout and logistics review",cost:5400,impact:66,risk:15,speed:48,cat:"coordination",desc:"Reduce double-handling and travel through a targeted site logistics redesign."},
+{id:"handover",name:"Handover and close-out pack",cost:2800,impact:45,risk:7,speed:88,cat:"quality",desc:"Standardise records, sign-offs and owner handover to reduce end-stage rework."},
+{id:"contingency",name:"Ring-fenced contingency",cost:5000,impact:40,risk:35,speed:99,cat:"resilience",desc:"Retain a controlled reserve for unexpected cost or delivery shocks."},
+{id:"sensor",name:"Targeted equipment telemetry pilot",cost:9500,impact:78,risk:16,speed:38,cat:"equipment",desc:"Pilot basic usage and fault monitoring on one critical asset."},
+{id:"mentor",name:"Working supervisor coaching",cost:4200,impact:57,risk:10,speed:52,cat:"people",desc:"Coach supervisors on escalation, sequencing and clear daily handovers."},
+{id:"change",name:"Variation and change-control routine",cost:2600,impact:55,risk:13,speed:76,cat:"planning",desc:"Make scope changes visible, priced and approved before they disrupt delivery."}
+],
+business:[
+{id:"cash",name:"13-week cash-flow forecast",cost:900,impact:65,risk:8,speed:95,cat:"finance",desc:"Track expected receipts and payments to surface cash pressure before it arrives."},
+{id:"crm",name:"Lightweight customer follow-up system",cost:3200,impact:68,risk:13,speed:76,cat:"customers",desc:"Create a consistent process for enquiries, quotes and follow-up."},
+{id:"automation",name:"Automate repetitive admin",cost:4800,impact:77,risk:15,speed:65,cat:"operations",desc:"Automate one high-volume workflow after mapping its current steps."},
+{id:"pricing",name:"Quote and margin review",cost:1800,impact:71,risk:7,speed:91,cat:"finance",desc:"Review pricing, delivery assumptions and margin leakage on common work."},
+{id:"training",name:"Team cross-training",cost:2600,impact:54,risk:12,speed:58,cat:"people",desc:"Reduce dependence on one person for important repeatable tasks."},
+{id:"web",name:"Website conversion improvements",cost:3900,impact:59,risk:18,speed:67,cat:"customers",desc:"Improve service clarity, enquiry paths and proof points on key pages."},
+{id:"qa",name:"Document core operating procedures",cost:2100,impact:58,risk:8,speed:83,cat:"operations",desc:"Write short checklists for the tasks where mistakes or rework are common."},
+{id:"supplier",name:"Supplier and expense review",cost:1300,impact:49,risk:9,speed:86,cat:"finance",desc:"Check recurring costs, supplier terms and low-value spend."},
+{id:"retention",name:"Customer retention check-in",cost:1700,impact:61,risk:10,speed:82,cat:"customers",desc:"Contact existing customers with a structured service and repeat-work review."},
+{id:"security",name:"Account access and backup audit",cost:2400,impact:47,risk:29,speed:73,cat:"resilience",desc:"Review account access, recovery methods and backup restoration."},
+{id:"dashboard",name:"Weekly performance dashboard",cost:3500,impact:63,risk:11,speed:62,cat:"operations",desc:"Track a small set of measures that connect activity to delivery and cash."},
+{id:"capacity",name:"Capacity and workload planning",cost:2800,impact:60,risk:10,speed:64,cat:"people",desc:"Make demand, workload and bottlenecks visible before overcommitment."},
+{id:"offer",name:"Clarify highest-value service offer",cost:1500,impact:66,risk:13,speed:87,cat:"customers",desc:"Focus the offer around the work customers value and the business delivers well."},
+{id:"continuity",name:"Basic continuity plan",cost:2200,impact:45,risk:27,speed:55,cat:"resilience",desc:"Define how essential work continues if a key person or system is unavailable."}
+]
+,
+finance:[
+{id:"forecast",name:"13-week cash-flow forecast",cost:900,impact:82,risk:8,speed:94,cat:"cash",desc:"Model expected receipts and payments weekly to spot cash shortfalls early."},
+{id:"receivables",name:"Receivables and overdue-invoice sprint",cost:1200,impact:76,risk:12,speed:90,cat:"cash",desc:"Segment overdue invoices, assign owners and set a consistent follow-up cadence."},
+{id:"workingcapital",name:"Working-capital cycle review",cost:2400,impact:78,risk:11,speed:65,cat:"cash",desc:"Map inventory, billing and payment timing to identify cash tied up in operations."},
+{id:"pricing",name:"Margin and pricing analysis",cost:1800,impact:80,risk:9,speed:86,cat:"profit",desc:"Check contribution margin by service or product and test price sensitivity."},
+{id:"spend",name:"Recurring-spend audit",cost:1100,impact:61,risk:7,speed:88,cat:"profit",desc:"Review subscriptions, supplier contracts and low-value recurring expenditure."},
+{id:"terms",name:"Supplier payment-term review",cost:1600,impact:67,risk:13,speed:58,cat:"cash",desc:"Explore fair payment terms that improve cash timing without damaging supplier relationships."},
+{id:"debt",name:"Debt and interest-cost review",cost:2200,impact:69,risk:19,speed:53,cat:"funding",desc:"Inventory debt, rates, fees and maturity dates before discussing options with a qualified adviser."},
+{id:"capex",name:"Capital-expenditure decision gates",cost:1900,impact:64,risk:10,speed:74,cat:"investment",desc:"Require a business case, alternatives and downside scenario before major spending."},
+{id:"reserve",name:"Liquidity-reserve policy",cost:1300,impact:62,risk:6,speed:80,cat:"resilience",desc:"Set a transparent method for deciding how much accessible cash the business needs."},
+{id:"dashboard",name:"Monthly finance dashboard",cost:2700,impact:65,risk:8,speed:63,cat:"visibility",desc:"Connect cash, margin, debtors and forecast variance in one concise review."},
+{id:"billing",name:"Billing and reconciliation automation",cost:4200,impact:73,risk:14,speed:61,cat:"operations",desc:"Reduce manual billing and reconciliation after documenting controls and exceptions."},
+{id:"scenario",name:"Downside and runway scenarios",cost:1500,impact:71,risk:5,speed:82,cat:"resilience",desc:"Stress-test lower revenue, late receipts and higher costs against available runway."},
+{id:"credit",name:"Customer credit-control rules",cost:1400,impact:58,risk:17,speed:77,cat:"cash",desc:"Define proportionate credit checks, deposit triggers and escalation rules."},
+{id:"tax",name:"Tax and filing readiness check",cost:1700,impact:53,risk:16,speed:68,cat:"compliance",desc:"Organise records and questions for a qualified accountant or tax professional."}
+],
+investing:[
+{id:"thesis",name:"Write an investment policy and thesis",cost:900,impact:68,risk:8,speed:88,cat:"discipline",desc:"Record goals, time horizon, liquidity needs and decision rules before selecting assets."},
+{id:"diversify",name:"Concentration and diversification review",cost:1400,impact:79,risk:7,speed:73,cat:"risk",desc:"Map exposure by issuer, sector, geography and asset class to reveal concentration."},
+{id:"fees",name:"Total-fee comparison",cost:700,impact:65,risk:5,speed:95,cat:"cost",desc:"Compare management fees, spreads, platform charges and other recurring costs."},
+{id:"downside",name:"Downside and drawdown stress test",cost:1200,impact:75,risk:4,speed:79,cat:"risk",desc:"Test how a hypothetical portfolio behaves under several adverse scenarios."},
+{id:"liquidity",name:"Liquidity and time-horizon check",cost:800,impact:72,risk:5,speed:91,cat:"liquidity",desc:"Separate near-term cash needs from capital that can tolerate volatility."},
+{id:"benchmark",name:"Benchmark and performance review",cost:1100,impact:58,risk:9,speed:82,cat:"measurement",desc:"Choose a suitable benchmark and compare results over consistent periods."},
+{id:"rebalance",name:"Document rebalancing rules",cost:950,impact:61,risk:8,speed:76,cat:"discipline",desc:"Set review intervals and thresholds rather than reacting impulsively to headlines."},
+{id:"currency",name:"Currency exposure assessment",cost:1300,impact:57,risk:15,speed:59,cat:"risk",desc:"Identify how foreign-currency exposure could affect outcomes and volatility."},
+{id:"leverage",name:"Leverage and borrowing risk review",cost:1600,impact:66,risk:25,speed:62,cat:"risk",desc:"Stress-test repayment obligations and loss scenarios before considering leverage."},
+{id:"tax",name:"Tax implications question list",cost:850,impact:49,risk:12,speed:83,cat:"compliance",desc:"Prepare asset-specific questions for a qualified tax professional."},
+{id:"due",name:"Independent due-diligence checklist",cost:1800,impact:70,risk:6,speed:66,cat:"research",desc:"Check assumptions, incentives, liquidity, fees and downside evidence independently."},
+{id:"advice",name:"Independent advice decision gate",cost:1000,impact:55,risk:5,speed:80,cat:"governance",desc:"Define when complexity or downside warrants a licensed, independent adviser."},
+{id:"behavior",name:"Decision journal and cooling-off rule",cost:500,impact:54,risk:7,speed:97,cat:"discipline",desc:"Record the reason for a decision and a review date to reduce impulsive changes."},
+{id:"alternatives",name:"Compare alternatives against one framework",cost:1250,impact:67,risk:8,speed:75,cat:"research",desc:"Use consistent criteria to compare options without treating past returns as a promise."}
+],
+property:[
+{id:"due",name:"Independent property due diligence",cost:2600,impact:83,risk:6,speed:62,cat:"purchase",desc:"Coordinate title, inspection, legal, insurance and other property-specific checks."},
+{id:"yield",name:"Rental yield and cash-flow model",cost:1800,impact:79,risk:9,speed:82,cat:"finance",desc:"Model rent, vacancy, rates, insurance, maintenance, financing and tax assumptions."},
+{id:"inspection",name:"Building inspection and defect review",cost:1200,impact:76,risk:5,speed:88,cat:"condition",desc:"Identify condition risks and likely near-term repairs before committing."},
+{id:"maintenance",name:"Preventive maintenance plan",cost:2200,impact:65,risk:7,speed:74,cat:"operations",desc:"Prioritise maintenance by urgency, asset condition and cost of deferral."},
+{id:"vacancy",name:"Vacancy and tenant-turnover plan",cost:1300,impact:63,risk:11,speed:81,cat:"income",desc:"Review tenant experience, realistic reletting time and turnover costs."},
+{id:"insurance",name:"Insurance cover and exclusions review",cost:900,impact:60,risk:17,speed:87,cat:"risk",desc:"Check sums insured, excesses, exclusions and property-specific risks with a qualified broker."},
+{id:"finance",name:"Finance structure and rate stress test",cost:1900,impact:72,risk:21,speed:65,cat:"finance",desc:"Test repayments under rate and income changes before discussing options with a lender or adviser."},
+{id:"compliance",name:"Healthy-homes and legal compliance check",cost:1500,impact:68,risk:15,speed:71,cat:"compliance",desc:"List applicable obligations and verify current requirements with authoritative sources."},
+{id:"management",name:"Property-management performance review",cost:1400,impact:57,risk:10,speed:78,cat:"operations",desc:"Review communication, maintenance response, arrears and transparent fees."},
+{id:"capital",name:"Long-term capital works forecast",cost:2300,impact:70,risk:8,speed:60,cat:"condition",desc:"Plan larger repairs and renewals to reduce surprise costs and deferred maintenance."},
+{id:"location",name:"Location and demand evidence pack",cost:2100,impact:73,risk:13,speed:58,cat:"research",desc:"Compare local demand indicators, transport, services and downside assumptions using current evidence."},
+{id:"exit",name:"Hold-versus-sell scenario framework",cost:1700,impact:66,risk:12,speed:69,cat:"strategy",desc:"Compare holding, selling and alternative uses using consistent assumptions and transaction costs."},
+{id:"records",name:"Property records and document system",cost:1000,impact:48,risk:8,speed:90,cat:"operations",desc:"Keep leases, inspections, maintenance, insurance and compliance records accessible."},
+{id:"buffer",name:"Repairs and vacancy reserve policy",cost:900,impact:61,risk:6,speed:94,cat:"resilience",desc:"Set a reasoned reserve method for periods without rent and unexpected repairs."}
+]};
+
+function objective(item,priority){if(priority==="impact")return item.impact;if(priority==="risk")return (35-item.risk)*1.35+item.impact*.35;if(priority==="speed")return item.speed*.62+item.impact*.30+(35-item.risk)*.08;return item.impact*.7+item.speed*.15+(35-item.risk)*.15}
+function solve(items,budget,maxItems,priority,stressSeverity){
+let best=null,checks=0,feasible=0;const n=items.length,limit=1<<n;
+for(let mask=0;mask<limit;mask++){checks++;let cost=0,count=0,base=0,stressBase=0,selected=[],cats=new Set();
+for(let i=0;i<n;i++)if(mask&(1<<i)){const it=items[i];cost+=it.cost;count++;base+=objective(it,priority);const impactFactor=1-stressSeverity/100;const riskBump=Math.round(stressSeverity/5);const speedFactor=1-stressSeverity/200;const stressed={...it,impact:it.impact*impactFactor,risk:Math.min(35,it.risk+riskBump),speed:it.speed*speedFactor};stressBase+=objective(stressed,priority);selected.push(it);cats.add(it.cat)}
+if(cost>budget||count>maxItems)continue;feasible++;
+const diversity=Math.max(0,cats.size-1)*3.2;
+const baselineScore=base+diversity,stressScore=stressBase+diversity;
+const score=baselineScore*.65+stressScore*.35;
+if(!best||score>best.score||(score===best.score&&cost<best.cost))best={selected,cost,score,base,diversity,categories:cats.size,baselineScore,stressScore,stressDelta:stressScore-baselineScore};
+}
+return {...best,checks,feasible};
+}
+
+function escHtml(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-NZ',{style:'currency',currency:'NZD',maximumFractionDigits:0}).format(n);
+const inventionLabs={
+ engineering:{name:'ENGINEERING LAB',focus:'Physical constraints, design alternatives, materials and buildability',mechanisms:['Modularise a repeated physical component','Replace a material or assembly with a performance-equivalent alternative','Reorder construction to eliminate a dependency'],checks:['Structural and safety compliance','Material performance and durability','Whole-life cost and constructability']},
+ systems:{name:'SYSTEMS LAB',focus:'Flows, bottlenecks, coordination and resource utilisation',mechanisms:['Decouple steps that need not happen sequentially','Move decisions closer to where reliable information appears','Pool underused capacity across participants'],checks:['End-to-end throughput and queue time','Failure propagation and operational resilience','Accountability, incentives and unintended consequences']}
+};
+function detectInventionLab(q){
+ const s=q.toLowerCase();
+ if(/construction|building|material|structure|engineering|concrete|fabricat|prefab|site|foundation|bridge|insulation|design a physical/.test(s))return 'engineering';
+ if(/system|logistics|supply chain|bottleneck|workflow|infrastructure|queue|transport|coordination|process|distribution|operations/.test(s))return 'systems';
+ return null;
+}
+const mechanismLibrary=[
+ {id:'modular',name:'Modular substitution',origin:'Manufacturing',labs:['engineering','systems'],tags:['building','construction','material','housing','assembly','repeat','waste','process'],idea:'Replace one-off work with independently testable interchangeable modules.',measure:'Time and defects per completed module',risk:'Interfaces may transfer failure between modules'},
+ {id:'feedback',name:'Local feedback loops',origin:'Control theory',labs:['engineering','systems'],tags:['system','logistics','queue','delay','coordination','transport','quality','flow'],idea:'Move measurement and adjustment closer to the point where failures emerge.',measure:'Detection delay and correction cycle time',risk:'Local optimisation may harm the whole system'},
+ {id:'reuse',name:'Circular resource flow',origin:'Industrial ecology',labs:['engineering','systems'],tags:['waste','material','cost','resource','building','freight','empty','reuse'],idea:'Treat unused output or idle capacity as an input to another step.',measure:'Recovered resource value net of handling costs',risk:'Recovery can cost more than it saves'},
+ {id:'parallel',name:'Parallelise independent steps',origin:'Scheduling theory',labs:['engineering','systems'],tags:['time','speed','delay','construction','workflow','build','bottleneck','queue'],idea:'Identify dependent and independent tasks; overlap only those with safe interfaces.',measure:'Critical-path duration and rework',risk:'Premature parallelism creates costly rework'},
+ {id:'buffer',name:'Adaptive buffering',origin:'Queueing theory',labs:['systems','engineering'],tags:['logistics','queue','demand','bottleneck','capacity','supply','transport'],idea:'Place small adjustable buffers only where variability causes system-wide disruption.',measure:'Throughput, waiting time and buffer cost',risk:'Buffers can hide persistent faults'},
+ {id:'distributed',name:'Distributed execution',origin:'Network architecture',labs:['systems','engineering'],tags:['remote','distribution','transport','logistics','construction','site','infrastructure'],idea:'Separate central coordination from independent local execution.',measure:'Delivery time, handoff errors and resilience',risk:'Accountability and interface failures'}
+];
+const compatibilityRules=[
+ {pair:['modular','parallel'],status:'conditional',reason:'Parallel assembly depends on frozen module interfaces; late changes can multiply rework.',test:'Freeze one interface specification and measure integration defects.'},
+ {pair:['modular','reuse'],status:'conditional',reason:'Recovered materials may vary in dimensions and performance, undermining interchangeable modules.',test:'Test material tolerances, provenance and structural suitability before reuse.'},
+ {pair:['feedback','distributed'],status:'conditional',reason:'Local decisions need shared signals and escalation rules to avoid inconsistent actions.',test:'Simulate delayed or conflicting signals across two execution sites.'},
+ {pair:['buffer','parallel'],status:'conditional',reason:'Extra work-in-progress may increase waiting and congestion instead of reducing critical-path time.',test:'Compare total lead time at two buffer limits.'},
+ {pair:['buffer','feedback'],status:'promising',reason:'Feedback can adjust buffer levels as variability changes, if sensors and response times are adequate.',test:'Model a bounded demand spike and measure recovery time.'},
+ {pair:['reuse','distributed'],status:'conditional',reason:'Transport and handling may erase recovered-resource savings.',test:'Calculate delivered recovery cost against virgin supply.'}
+];
+function compatibilityAssessment(a,b,question,lab){
+ const ids=[a.id,b.id].sort(),rule=compatibilityRules.find(r=>r.pair.slice().sort().join('|')===ids.join('|'));
+ const constraints=[];
+ if(/no budget|zero budget|without spending|free only/i.test(question))constraints.push('Cost constraint: verify that the pilot needs no purchases or paid services.');
+ if(/without hiring|no hiring|no new staff/i.test(question))constraints.push('Capacity constraint: do not assume additional personnel.');
+ if(/safety|structural|load.bearing|bridge|foundation/i.test(question)&&lab==='engineering')constraints.push('Safety-critical application: require qualified engineering review before physical testing.');
+ if(/without new roads|no new infrastructure/i.test(question))constraints.push('Infrastructure constraint: use existing physical assets.');
+ const status=rule?rule.status:'unverified';
+ return {status,reason:rule?rule.reason:'No specific compatibility rule exists for this pair. Shared inputs, interfaces and competing resource demands remain untested.',test:rule?rule.test:'Map both mechanisms on one process diagram and test their shared interfaces.',constraints};
+}
+function deriveMechanismCandidates(question,lab){
+ const tokens=new Set(question.toLowerCase().match(/[a-z]{3,}/g)||[]);
+ const ranked=mechanismLibrary.filter(m=>m.labs.includes(lab)).map(m=>({...m,score:m.tags.filter(t=>tokens.has(t)).length}));
+ ranked.sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+ const pairs=[];
+ for(let i=0;i<ranked.length;i++)for(let j=i+1;j<ranked.length;j++){
+  const a=ranked[i],b=ranked[j];
+  const compatibility=compatibilityAssessment(a,b,question,lab);
+  pairs.push({a,b,compatibility,score:a.score+b.score+(a.origin!==b.origin?1:0)+(compatibility.status==='promising'?2:compatibility.status==='conditional'?0:-2),key:[a.id,b.id].sort().join('+')});
+ }
+ pairs.sort((a,b)=>b.score-a.score||a.key.localeCompare(b.key));
+ return pairs.slice(0,3);
+}
+function labHypothesisMarkup(question,index){
+ const lab=detectInventionLab(question);
+ if(!lab)return '';
+ const d=inventionLabs[lab],candidate=deriveMechanismCandidates(question,lab)[index];
+ if(!candidate)return '';
+ const a=candidate.a,b=candidate.b,compat=candidate.compatibility;
+ return '<div class="lab-hypothesis"><b>'+escHtml(d.name)+' / CROSS-DISCIPLINE EXPERIMENT '+(index+1)+'</b><h4>'+escHtml(a.name)+' × '+escHtml(b.name)+'</h4><p><b>Borrowed from:</b> '+escHtml(a.origin)+' + '+escHtml(b.origin)+'</p><p><b>Combined mechanism:</b> '+escHtml(a.idea)+' '+escHtml(b.idea)+'</p><p><b>What to measure:</b> '+escHtml(a.measure)+'; '+escHtml(b.measure)+'</p><p><b>Potential failure modes:</b> '+escHtml(a.risk)+'; '+escHtml(b.risk)+'</p><p><b>Compatibility:</b> '+escHtml(compat.status.toUpperCase())+' — '+escHtml(compat.reason)+'</p><p><b>Interface test:</b> '+escHtml(compat.test)+'</p>'+(compat.constraints.length?'<p><b>Constraints to honour:</b> '+escHtml(compat.constraints.join(' '))+'</p>':'')+'<p><b>Relevance signal:</b> '+candidate.score+' heuristic points from keyword matches and cross-discipline diversity. Not a feasibility or novelty score.</p><p>Concept exploration only. Validate safety, legal requirements, engineering performance and real costs before implementation.</p></div>';
+}
+
+function detectDomain(q){
+ const s=q.toLowerCase();
+ const rules=[['property',/real estate|property|rental|tenant|landlord|housing/],['investing',/invest|portfolio|shares|funds|asset allocation/],['finance',/finance|cash flow|debt|receivable|working capital|margin/],['construction',/construction|building|site|crew|contractor|project delivery/]];
+ return (rules.find(r=>r[1].test(s))||['business'])[0];
+}
+const intentSignals=[
+ {id:'capacity',words:['capacity','overwhelmed','overload','busy','scale','scaling','grow','growth','hire','staff'],problem:'The current delivery capacity may limit growth.',metric:'Completed work per person-hour and backlog age',experiment:'Run a two-week capacity audit before expanding workload.',guardrail:'Monitor quality and staff workload as throughput changes.'},
+ {id:'demand',words:['customer','customers','client','clients','sales','leads','demand','market','revenue'],problem:'Demand, conversion or customer fit may be the binding constraint.',metric:'Qualified demand, conversion and contribution per customer',experiment:'Interview five target customers and test one measurable offer.',guardrail:'Avoid counting interest or clicks as confirmed revenue.'},
+ {id:'delay',words:['delay','delays','slow','waiting','bottleneck','handoff','late','schedule'],problem:'Waiting and handoffs may be consuming delivery time.',metric:'Elapsed time per completed work item and time waiting',experiment:'Map ten recent jobs and pilot one earlier handoff signal.',guardrail:'Track rework and safety, not only speed.'},
+ {id:'cost',words:['cost','costs','expensive','budget','spend','margin','cash','debt','profit'],problem:'Unverified cost or cash assumptions may dominate feasibility.',metric:'Verified cost per delivered unit and cash exposure',experiment:'Reconstruct costs for ten representative transactions or jobs.',guardrail:'Include recurring costs, tax and contingency.'},
+ {id:'risk',words:['risk','uncertain','uncertainty','compliance','safety','loss','downside'],problem:'Exposure to adverse outcomes may constrain the decision.',metric:'Probability, severity and reversibility of major failure modes',experiment:'Run a failure-mode workshop and design a reversible pilot.',guardrail:'Do not bypass regulatory, safety or professional review.'},
+ {id:'automation',words:['automate','automation','automated','software','ai','digital','system','systems'],problem:'Manual repetition may offer an opportunity for selective automation.',metric:'Manual touches, exception rate and hours per transaction',experiment:'Shadow one repeated workflow and automate only a reversible step.',guardrail:'Require human review for consequential decisions.'}
+];
+function interpretQuestion(question){
+ const tokens=new Set((String(question).toLowerCase().match(/[a-z]+/g)||[]));
+ const ranked=intentSignals.map((signal,index)=>({...signal,score:signal.words.reduce((sum,word)=>sum+(tokens.has(word)?1:0),0),index})).filter(s=>s.score>0).sort((a,b)=>b.score-a.score||a.index-b.index);
+ const primary=ranked[0]||null,secondary=ranked[1]||null;
+ return {primary,secondary,matched:ranked.length,confidence:ranked.length?'Keyword signals only; problem and context require verification.':'No recognised problem signals; recommendations remain generic until the question is clarified.'};
+}
+const constraintPatterns=[
+ {id:'no_hiring',pattern:/\b(without|no|avoid|cannot|can't|dont|don't)\s+(?:any\s+|more\s+)?(?:hiring|hire|recruiting|recruitment|staff|employees)\b/i,label:'Avoid increasing headcount',check:'Compare labour hours and contractor dependence before scaling.'},
+ {id:'low_budget',pattern:/\b(?:little|limited|minimal|low|small|no|zero)\s+(?:available\s+)?(?:budget|money|capital|funding|cash)\b/i,label:'Constrain initial spending',check:'Set an explicit cash ceiling and reject proposals that exceed it.'},
+ {id:'no_code',pattern:/\b(?:without|no|avoid)\s+(?:writing\s+)?(?:code|coding|programming)\b/i,label:'Avoid custom coding',check:'Confirm a no-code path before recommending implementation.'},
+ {id:'time',pattern:/\b(?:within|in|before)\s+(\d{1,3})\s+(days?|weeks?|months?)\b/i,label:'Meet the stated delivery window',check:'Verify dependencies and the critical path before committing.'},
+ {id:'remote',pattern:/\b(?:remote|remotely|online|from home)\b/i,label:'Support remote delivery',check:'Validate remote operations, customer access and regulatory requirements.'}
+];
+function extractQuestionContext(question){
+ const constraints=constraintPatterns.filter(x=>x.pattern.test(question)).map(x=>({id:x.id,label:x.label,check:x.check}));
+ const clauses=String(question).split(/[.!?;\n]+/).map(x=>x.trim()).filter(Boolean).slice(0,8);
+ const wants=clauses.filter(x=>/\b(?:want|need|goal|aim|trying|hope|looking|improve|create|build|reduce|increase)\b/i.test(x)).slice(0,2);
+ return {constraints,goals:wants.map(x=>x.slice(0,200)),ambiguous:constraints.length===0&&wants.length===0};
+}
+function contextMarkup(context){
+ const constraints=context.constraints.map(x=>'<li><b>'+escHtml(x.label)+':</b> '+escHtml(x.check)+'</li>').join('');
+ return '<section><h4>Requirements captured from your question</h4>'+(context.goals.length?'<p><b>Stated goals:</b> '+context.goals.map(escHtml).join(' / ')+'</p>':'<p>No explicit goal clause identified; confirm the intended outcome.</p>')+(constraints?'<ul>'+constraints+'</ul>':'<p>No explicit budget, staffing or delivery constraints detected. The system will not assume they are absent.</p>')+'<p>These are literal text-pattern matches, not verified intent or a full language understanding model.</p></section>';
+}
+function renderQuestionDiagnosis(diagnosis){
+ const p=diagnosis.primary,s=diagnosis.secondary;
+ return '<div class="question-diagnosis"><div class="section-label">QUESTION INTERPRETATION / UNVERIFIED</div><h3>What we think the problem might be</h3><p>'+(p?escHtml(p.problem):'The underlying constraint is not yet clear from the question.')+'</p>'+(s?'<p><b>Possible second constraint:</b> '+escHtml(s.problem)+'</p>':'')+'<p><b>Evidence to collect:</b> '+escHtml(p?p.metric:'A baseline, target outcome and major constraint')+'</p><small>'+escHtml(diagnosis.confidence)+'</small></div>';
+}
+const variants=[
+{name:'The repeatable system',priority:'balanced',goal:'Build a standardised repeatable operating model with measurable unit economics.',why:'This route tests consistency and internal capability.'},
+{name:'The partnership network',priority:'impact',goal:'Create value by coordinating complementary external partners and distribution.',why:'This route tests network leverage instead of building every capability.'},
+{name:'The specialist wedge',priority:'risk',goal:'Prove one narrowly defined high-value problem before scaling.',why:'This route prioritises specialist focus and reversible experiments.'}
+];
+const modelPlaybooks={
+business:[['Recurring customers','Standardised service or product','Direct niche acquisition','Price per unit or recurring agreement; verify contribution margin','Three comparable customer pilots'],['Customers reached by partners','Joint offer with clear delivery responsibilities','One distribution or referral partner','Document revenue share, billing and service costs','One partner trial tracking referrals and conversion'],['A small urgent customer niche','Solve one costly problem exceptionally well','Direct interviews and scoped trials','Price per bounded engagement; verify willingness to pay','Two customer pilots with defined success criteria']],
+construction:[['Project teams with repeatable tasks','Reusable delivery workflow and accountable handoffs','One site followed by similar work packages','Verified rework and delay savings','One work-package pilot measuring delays'],['Contractors and subcontractors','Shared handoff protocol across firms','One contractor-subcontractor partnership','Contractually validated savings or fees','Measure handoff delays on one dependency'],['One recurring costly defect','Targeted diagnostic and corrective intervention','Demonstrate on one project stage','Scoped costs and measured defect avoidance','Track one defect category and rework']],
+finance:[['Internal finance teams','Repeatable forecast and exception controls','Finance leadership and weekly reviews','Working-capital improvement or borrowing savings','Pilot a 13-week forecast'],['Suppliers and customers','Coordinate payment and collection terms','One voluntary counterparty agreement','Net financing savings after concessions','Measure days-to-cash and total cost'],['One cash leakage category','Bounded transaction diagnostic','Start with largest verified variance','Verified recovery net of costs','Audit a sample of transactions']],
+investing:[['Investor or investment committee','Rules-based policy and risk limits','Consistent internal decision process','Net outcome after fees and tax, no promises','Paper-test adverse scenarios'],['Investor requiring expert input','Separate advice, research and custody','Compare regulated provider disclosures','Net benefit after advice fees','Independent review of one proposal'],['Investor with a defined exposure','Focused due diligence before commitment','One asset class or risk factor','No assumed profit; quantify downside','No-money scenario and rejection gates']],
+property:[['Property owners','Standardised due diligence and operations','Trial one property before replication','Net operating income after all costs','Full operating model for one property'],['Owners and service providers','Coordinated property service network','One property management partnership','Transparent fees and owner net income','Measure one service handoff'],['One evidenced property niche','Focused acquisition or management proposition','Interview owners, tenants and agents','Cash flow after vacancy, finance and tax','Analyse three comparable properties']]
+};
+const domainGuidance={
+ business:{market:'Interview five prospective customers or operational stakeholders. Document the problem frequency, existing alternatives and willingness to pay or adopt.',economics:'Estimate contribution margin, customer acquisition effort, repeat purchase or retention, and cash conversion cycle.',constraints:'Check employment obligations, privacy handling, contractual dependencies and customer service capacity.',measure:'Contribution per customer, time saved per transaction, conversion rate and repeat demand.'},
+ construction:{market:'Confirm the project type, contract structure, delivery constraints and the parties who control critical dependencies.',economics:'Measure labour hours, rework, programme slippage, subcontractor variation and material waste against a baseline.',constraints:'Check site safety, consenting, building-code obligations, contractual notice requirements and supplier lead times.',measure:'Schedule variance, rework hours, safety incidents and cost to complete.'},
+ finance:{market:'Map cash inflows and outflows by week and identify concentration in customers, suppliers and funding sources.',economics:'Build a rolling 13-week cash forecast and compare liquidity headroom under base and adverse assumptions.',constraints:'Confirm lending covenants, tax obligations, payment terms and access controls before changing cash practices.',measure:'Cash runway, overdue receivables, forecast variance and financing cost.'},
+ investing:{market:'Write an investment policy defining purpose, horizon, liquidity needs and acceptable loss before comparing options.',economics:'Model fees, taxes, concentration, drawdown scenarios and liquidity; do not assume a future return.',constraints:'Check product disclosures, regulatory warnings, diversification and suitability with a qualified adviser where appropriate.',measure:'Exposure by asset, fees, liquidity coverage and drawdown against the risk limit.'},
+ property:{market:'Research comparable rents, vacancies, location demand and building condition using dated, attributable sources.',economics:'Model net yield after rates, insurance, maintenance, management, vacancy, finance and tax assumptions.',constraints:'Check tenancy law, Healthy Homes requirements, due diligence, insurance exclusions and finance conditions.',measure:'Net operating cash flow, vacancy days, maintenance reserve and debt-service coverage.'}
+};
+function evidenceChecklist(domain,selected){
+ const focus=selected[0];
+ return '<li>Verify the problem with at least one primary source and record the date.</li><li>Replace illustrative implementation costs with dated supplier quotes or internal cost records.</li><li>Collect a baseline for '+escHtml(focus?focus.name.toLowerCase():'the proposed intervention')+' before starting.</li><li>Ask an independent reviewer to challenge the central assumption and the failure scenario.</li>';
+}
+const causalRoutes=[
+ {mechanism:'Standardisation reduces variation and rework',assumption:'The repeated work is similar enough to follow a common process.',observation:'Compare cycle time, defects and labour hours for matched jobs before and after the pilot.',falsifier:'Variation or rework increases, or staff must routinely bypass the standard process.',test:'Run a controlled pilot on one repeatable workflow.'},
+ {mechanism:'Partners increase reach without equivalent fixed capacity',assumption:'Qualified partners can deliver reliably and incentives can be aligned.',observation:'Track partner-sourced qualified demand, delivery quality, contribution margin and coordination effort.',falsifier:'Partner acquisition costs or coordination losses exceed incremental value.',test:'Pilot one partner channel with explicit quality and exit conditions.'},
+ {mechanism:'Narrow focus improves fit and lowers the cost of learning',assumption:'A distinct high-value segment has an urgent, measurable problem.',observation:'Measure willingness to pay, conversion, delivery effort and outcomes in one defined segment.',falsifier:'The segment does not convert or the specialised offer cannot be delivered economically.',test:'Test a narrowly scoped paid or committed pilot before scaling.'}
+];
+function causalMarkup(index,diagnosis){
+ const route=causalRoutes[index],signal=diagnosis.primary;
+ const extra=signal?'<p><b>Problem-specific causal check:</b> '+escHtml(signal.problem)+' Use '+escHtml(signal.metric)+' as a leading indicator, and compare against '+escHtml(signal.guardrail)+'</p>':'<p><b>Unknown constraint:</b> The question has not established which problem actually limits performance. Interview the decision owner before interpreting the pilot.</p>';
+ return '<section><h4>Why this could work, and how to disprove it</h4><p><b>Proposed mechanism:</b> '+escHtml(route.mechanism)+'</p><p><b>Critical assumption:</b> '+escHtml(route.assumption)+'</p><p><b>Evidence to collect:</b> '+escHtml(route.observation)+'</p><p><b>What would disprove it:</b> '+escHtml(route.falsifier)+'</p><p><b>Smallest useful test:</b> '+escHtml(route.test)+'</p>'+extra+'<p><b>Confidence:</b> Untested hypothesis. These are rule-based causal proposals, not verified findings.</p></section>';
+}
+const economicsDrivers={
+ capacity:{unit:'hours recovered per month',value:'verified hours saved × fully loaded hourly cost',cost:'training, tooling and supervision',source:'Timesheets and matched workflow samples'},
+ demand:{unit:'additional paying customers per month',value:'incremental customers × contribution per customer',cost:'acquisition, fulfilment and retention',source:'Conversion records and realised customer margins'},
+ delay:{unit:'days of delay avoided',value:'avoidable delay × documented daily economic exposure',cost:'coordination, rework and transition',source:'Job histories and documented cost of waiting'},
+ cost:{unit:'cost avoided per transaction',value:'verified unit-cost reduction × monthly transaction volume',cost:'implementation and ongoing controls',source:'Invoices, transaction samples and ledger'},
+ risk:{unit:'expected loss avoided',value:'baseline loss probability × severity minus residual expected loss',cost:'controls, assurance and residual exposure',source:'Incident records and expert risk review'},
+ automation:{unit:'manual hours removed per month',value:'verified net hours saved × fully loaded hourly cost',cost:'software, exceptions, maintenance and human oversight',source:'Workflow observations and exception logs'}
+};
+function economicsMarkup(index,run,diagnosis,domain){
+ const d=economicsDrivers[diagnosis.primary?.id]||economicsDrivers.demand;
+ const route=['standardised delivery','partner-led delivery','specialist delivery'][index];
+ const setup=Number(run.cost)||0;
+ const costNote=setup>0?'The engine’s illustrative setup-cost placeholder is '+money(setup)+'. It is synthetic and must not be treated as a quote.':'The engine has not supplied a usable implementation cost.';
+ return '<section><h4>Question-specific economic model</h4><p><b>Model:</b> '+escHtml(route)+'; '+escHtml(d.unit)+'.</p><p><b>Gross monthly benefit:</b> '+escHtml(d.value)+'.</p><p><b>Subtract:</b> '+escHtml(d.cost)+'.</p><p><b>Net monthly benefit:</b> Verified gross monthly benefit − verified incremental monthly costs.</p><p><b>Break-even months:</b> Verified upfront investment ÷ positive net monthly benefit. If net benefit is zero or negative, the model does not break even.</p><p><b>12-month net value:</b> (Net monthly benefit × 12) − upfront investment. Adjust for ramp-up, timing and tax before a real decision.</p><p><b>Inputs to collect:</b> '+escHtml(d.source)+'; baseline, volume, price or wage, margin, confidence range and pilot results.</p><p><b>Scenario test:</b> Recalculate using conservative, central and optimistic *verified* inputs. Reject a strategy if it only works under an optimistic assumption.</p><p><b>Prototype cost:</b> '+escHtml(costNote)+'</p><p><b>Current output:</b> Formula and evidence checklist only. No fabricated ROI or payback claim.</p></section>';
+}
+function questionSpecificIntervention(index,diagnosis,domain){
+ const primary=diagnosis.primary,secondary=diagnosis.secondary;
+ const routes=[
+  {action:'Map the repeated work, identify the most variable step and standardise only that step.',pilot:'Compare ten similar cases before and after the change.',tradeoff:'Consistency may reduce flexibility for unusual cases.'},
+  {action:'Identify a complementary delivery or distribution partner and design a limited shared offer.',pilot:'Run one partner-assisted transaction with a defined responsibility matrix.',tradeoff:'Reach may improve while coordination costs and dependence rise.'},
+  {action:'Choose one narrowly defined user group and solve its most expensive recurring problem.',pilot:'Ask five qualified users for a concrete commitment before building.',tradeoff:'Focus may improve conversion but cap the initial market.'}
+ ][index];
+ const adaptation=primary?{
+  capacity:'Protect staff time by measuring throughput and backlog before adding new commitments.',
+  demand:'Require qualified customer intent rather than relying on general expressions of interest.',
+  delay:'Track queue time separately from hands-on work so the true bottleneck is visible.',
+  cost:'Include fully loaded delivery costs and cash timing, not just headline spending.',
+  risk:'Identify the worst credible failure and keep the first experiment reversible.',
+  automation:'Record exception rates and human oversight needs before removing manual steps.'
+ }[primary.id]:'First establish the outcome, baseline and limiting constraint.';
+ const link=secondary?'The secondary concern is '+secondary.id+'; track '+secondary.metric+'.':'No secondary constraint has been established.';
+ return '<section><h4>Tailored intervention design</h4><p><b>Proposed move:</b> '+escHtml(routes.action)+'</p><p><b>Adaptation to your question:</b> '+escHtml(adaptation)+'</p><p><b>Low-cost proof:</b> '+escHtml(routes.pilot)+'</p><p><b>Trade-off:</b> '+escHtml(routes.tradeoff)+'</p><p><b>Additional check:</b> '+escHtml(link)+'</p><p><b>Scope:</b> '+escHtml(domain)+' scenario. This intervention is assembled from rule-based patterns and still requires local validation.</p></section>';
+}
+function assessConstraints(index,context){
+ const ids=context.constraints.map(x=>x.id),notes=[];
+ if(ids.includes('no_hiring'))notes.push(index===1?'Verify partner labour does not create an unacceptable dependency.':'Design the pilot around existing team capacity.');
+ if(ids.includes('low_budget'))notes.push('Do not proceed without a verified low-cost pilot budget.');
+ if(ids.includes('no_code'))notes.push('Prototype using existing tools before commissioning software.');
+ if(ids.includes('time'))notes.push('Check that the experiment fits the stated deadline.');
+ if(ids.includes('remote'))notes.push('Verify remote delivery is practical.');
+ return notes;
+}
+function constraintGateMarkup(index,context){
+ const notes=assessConstraints(index,context);
+ return '<section><h4>Constraint compatibility</h4>'+(notes.length?'<ul>'+notes.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul>':'<p>No explicit constraints identified; do not assume the strategy is feasible.</p>')+'<p>These are screening conditions, not proof of feasibility.</p></section>';
+}
+function composeAlchemyMechanisms(index,context){
+ const ids=new Set(context.constraints.map(x=>x.id)),options=[];
+ if(ids.has('no_hiring'))options.push({name:index===1?'Scoped external fulfilment':'Capacity-neutral workflow',mechanism:index===1?'Buy a defined result instead of adding permanent staffing.':'Remove unnecessary work before increasing output.',test:'Measure staff hours per completed delivery.'});
+ if(ids.has('low_budget'))options.push({name:index===2?'Customer-funded proof':'Asset-light prototype',mechanism:index===2?'Seek customer commitments before investing.':'Use existing or shared resources for the first test.',test:'Record upfront cash exposure.'});
+ if(ids.has('no_code'))options.push({name:'Manual technology substitute',mechanism:'Deliver the workflow using existing tools and human oversight.',test:'Track time per case and exceptions.'});
+ if(ids.has('remote'))options.push({name:'Distributed delivery',mechanism:'Separate remote coordination from physical fulfilment.',test:'Validate handoff quality and accountability.'});
+ if(ids.has('time'))options.push({name:'Deadline-bounded proof',mechanism:'Replace full launch with one measurable experiment.',test:'Verify evidence before the deadline.'});
+ if(options.length<2)return null;
+ const parts=options;
+ return {concept:parts.map(x=>x.name).join(' + '),hypothesis:parts.map(x=>x.mechanism).join(' '),test:parts.map(x=>x.test).join(' ')};
+}
+function evaluateAlchemyConcept(index,context){
+ const concept=composeAlchemyMechanisms(index,context);
+ if(!concept)return null;
+ const ids=new Set(context.constraints.map(x=>x.id));
+ const checks=[
+ {name:'Cash exposure',state:ids.has('low_budget')?'Requires verified cost ceiling':'Unverified',action:'Estimate upfront spend and monthly obligations.'},
+ {name:'Delivery capacity',state:ids.has('no_hiring')?'Must work without payroll growth':'Unverified',action:'Measure actual labour hours and dependencies.'},
+ {name:'Implementation speed',state:ids.has('time')?'Deadline-sensitive':'Unverified',action:'Map the critical path and pilot duration.'},
+ {name:'Technical complexity',state:ids.has('no_code')?'Avoid custom development':'Unverified',action:'Prove the workflow with existing tools.'},
+ {name:'Operating model',state:ids.has('remote')?'Remote fulfilment must be tested':'Unverified',action:'Test accountability and service quality.'}
+ ];
+ return {checks,verdict:'UNVERIFIED: pilot required',next:checks.filter(x=>x.state!=='Unverified').map(x=>x.action).slice(0,3)};
+}
+function alchemyCompositionMarkup(index,context){
+ const result=composeAlchemyMechanisms(index,context);
+ if(!result)return '';
+ const assessment=evaluateAlchemyConcept(index,context);
+ return '<section><h4>Combined alchemy concept</h4><p><b>Candidate:</b> '+escHtml(result.concept)+'</p><p><b>Mechanism:</b> '+escHtml(result.hypothesis)+'</p><p><b>Validation:</b> '+escHtml(result.test)+'</p><p><b>Interaction risk:</b> Combined mechanisms can introduce hidden cost and operational dependencies. Validate before implementation.</p><p><b>Feasibility:</b> '+escHtml(assessment.verdict)+'</p><ul>'+assessment.checks.map(x=>'<li><b>'+escHtml(x.name)+':</b> '+escHtml(x.state)+'; '+escHtml(x.action)+'</li>').join('')+'</ul><p>This is a rule-generated hypothesis, not a proven invention.</p></section>';
+}
+function transformConstraint(index,context,domain){
+ const ids=new Set(context.constraints.map(x=>x.id));
+ const transformations=[];
+ if(ids.has('no_hiring'))transformations.push(index===1?['More staff','Outcome-based specialist partnerships','Trade fixed payroll expansion for scoped external capacity; verify oversight and unit economics.']:['More staff','Reduce work per delivered unit','Simplify, standardise or narrow the service before increasing throughput.']);
+ if(ids.has('low_budget'))transformations.push(index===2?['Capital-heavy launch','Pre-commitment before investment','Test willingness to pay or signed demand before purchasing assets.']:['Capital-heavy launch','Borrow or share existing infrastructure','Use a small reversible pilot instead of buying a full operating stack.']);
+ if(ids.has('no_code'))transformations.push(['Custom software','Manual concierge prototype','Validate the workflow with existing tools and human review before automating.']);
+ if(ids.has('remote'))transformations.push(['Location-dependent service','Remote coordination and local fulfilment','Separate customer access from physical execution and validate accountability.']);
+ if(ids.has('time'))transformations.push(['Full launch before deadline','Time-boxed evidence milestone','Deliver one decision-grade experiment before the deadline rather than promising a complete rollout.']);
+ if(!transformations.length)transformations.push(['Assumed default solution','Test the limiting assumption','Identify which resource, step or customer commitment is truly necessary before choosing a model.']);
+ return '<section><h4>Alchemy transformation hypotheses</h4><p>Rather than simply discard a constrained idea, test a different mechanism:</p><ul>'+transformations.map(x=>'<li><b>'+escHtml(x[0])+' → '+escHtml(x[1])+':</b> '+escHtml(x[2])+'</li>').join('')+'</ul><p><b>Validation:</b> These are generated design hypotheses, not new inventions or confirmed feasibility. Test the substitution against actual cost, demand, safety and delivery requirements.</p></section>';
+}
+function deconstructProblem(question,context){
+ const words=question.toLowerCase(),constraints=context.constraints.map(x=>x.id);
+ const goal=words.match(/(?:how (?:can|could|do) (?:i|we)|i want to|we need to|help me|create|build|improve|reduce)\s+([^?.!]{8,160})/i);
+ const goalText=(goal?goal[1]:question).trim().slice(0,180);
+ const assumptions=[
+ {trigger:/hire|staff|employees|capacity|scale|grow/,claim:'More output requires proportionally more employees.',reversal:'What if the work per completed outcome fell instead?'},
+ {trigger:/budget|capital|fund|invest|expensive|cost/,claim:'Money must be committed before value can be demonstrated.',reversal:'What if demand or benefit could be proven before spending?'},
+ {trigger:/software|app|automate|code|digital/,claim:'A technical system must exist before the workflow can be tested.',reversal:'What if a human-operated simulation established the value first?'},
+ {trigger:/remote|location|office|site|travel/,claim:'Coordination and physical delivery must happen in the same place.',reversal:'What if these activities were separated?'},
+ {trigger:/customer|sales|market|client|demand/,claim:'The offer must be fully built before customers can evaluate it.',reversal:'What if customers could commit to a measurable result first?'}
+ ].filter(x=>x.trigger.test(words));
+ if(!assumptions.length)assumptions.push({claim:'The conventional sequence of work is necessary.',reversal:'Which step could be removed, inverted or delegated?'});
+ return {goal:goalText,assumptions:assumptions.slice(0,4),constraints};
+}
+function deconstructionMarkup(question,context,index){
+ const d=deconstructProblem(question,context),assumption=d.assumptions[index%d.assumptions.length];
+ return '<div class="deconstruction"><b>ASSUMPTION UNDER TEST</b><p>'+escHtml(assumption.claim)+'</p><p><b>Inversion:</b> '+escHtml(assumption.reversal)+'</p><p><b>Goal interpreted:</b> '+escHtml(d.goal)+'</p><p>These are keyword-derived hypotheses. Confirm they match the real problem before acting.</p></div>';
+}
+function inventionLead(index,context,domain){
+ const combination=composeAlchemyMechanisms(index,context);
+ const directions=[
+ {label:'RECONFIGURE',name:'Remove the bottleneck, not just its symptoms',mechanism:'Separate the desired outcome from the usual steps. Remove, reorder or simplify the expensive step before adding capacity.',proof:'Compare the same outcome before and after one process change.'},
+ {label:'RECOMBINE',name:'Turn external capabilities into one service',mechanism:'Connect existing participants and resources in a new delivery sequence instead of building every capability yourself.',proof:'Test one end-to-end delivery with clear accountability.'},
+ {label:'INVERT',name:'Sell the proof before building the system',mechanism:'Reverse the normal build-then-sell sequence. Validate a narrowly defined result before committing major resources.',proof:'Obtain a real customer commitment or measurable adoption signal.'}
+ ];
+ const d=directions[index],core=combination?combination.concept:d.name;
+ return '<div class="invention-lead"><div class="invention-tag">ALCHEMY / '+d.label+'</div><h4>'+escHtml(core)+'</h4><p><b>What changes:</b> '+escHtml(d.mechanism)+'</p>'+(combination?'<p><b>Combined mechanisms:</b> '+escHtml(combination.hypothesis)+'</p>':'')+'<p><b>Smallest proof:</b> '+escHtml(combination?combination.test:d.proof)+'</p><p class="invention-caveat">Generated design hypothesis. Novelty, feasibility and market demand have not been independently verified.</p></div>';
+}
+function planMarkup(v,run,index,question,domain,diagnosis){
+ const p=modelPlaybooks[domain][index];
+ const signal=diagnosis.primary,secondary=diagnosis.secondary;
+ const context=extractQuestionContext(question);
+ const selected=run.selected||[],g=domainGuidance[domain]||domainGuidance.business;
+ const screening=run.screening;
+ const screeningNote=screening&&screening.excluded.length?'<p><b>Constraint screening:</b> '+screening.excluded.length+' illustrative initiatives were excluded before optimisation. Screening is provisional and may reject viable alternatives.</p>':'';
+ const steps=selected.map((x,i)=>'<li><strong>'+escHtml(x.name)+':</strong> '+escHtml(x.desc)+' <span class="step-note">Pilot this as workstream '+(i+1)+'; define a responsible owner and measurable output.</span></li>').join('');
+ const owners=selected.map(x=>'<li>Assign a delivery owner for '+escHtml(x.name.toLowerCase())+', with a weekly review and escalation route.</li>').join('');
+ const risks=selected.map(x=>'<li>Test whether '+escHtml(x.name.toLowerCase())+' introduces hidden costs, dependencies or unintended consequences.</li>').join('');
+ const initial=selected[0];
+ const choice=initial?'Start with '+initial.name.toLowerCase()+', because it is the highest-ranked selected action under this strategic priority.':'No initiative was selected by the model.';
+ return '<article class="plan"><div class="plan-index">STRATEGY 0'+(index+1)+' / '+escHtml(v.priority.toUpperCase())+'</div><h3>'+escHtml(v.name)+'</h3>'+labHypothesisMarkup(question,index)+deconstructionMarkup(question,context,index)+inventionLead(index,context,domain)+'<p><b>Executive recommendation.</b> '+escHtml(v.goal)+' '+escHtml(v.why)+'</p><p><b>First decision:</b> '+escHtml(choice)+'</p><div class="model-thesis"><h4>Distinct business model</h4><p><b>Who benefits:</b> '+escHtml(p[0])+'</p><p><b>Value proposition:</b> '+escHtml(p[1])+'</p><p><b>Distribution or adoption:</b> '+escHtml(p[2])+'</p><p><b>Economic logic:</b> '+escHtml(p[3])+'</p><p><b>First proof:</b> '+escHtml(p[4])+'</p>'+(signal?'<p><b>Adapted to your question:</b> '+escHtml(signal.problem)+' Test: '+escHtml(signal.experiment)+'</p>':'')+'</div><details class="plan-deep-dive"><summary>Explore the full strategy <span>Implementation, evidence, economics and feasibility</span></summary><div class="plan-grid">'+screeningNote+contextMarkup(context)+constraintGateMarkup(index,context)+transformConstraint(index,context,domain)+alchemyCompositionMarkup(index,context)+questionSpecificIntervention(index,diagnosis,domain)+causalMarkup(index,diagnosis)+'<section><h4>Opportunity and strategic logic</h4><p>'+escHtml(g.market)+'</p><p>For the question <i>“'+escHtml(question.slice(0,280))+(question.length>280?'…':'')+'”</i>, the proposed approach emphasises '+escHtml(v.priority)+' rather than claiming a universal best answer.</p></section><section><h4>Recommended workstreams</h4><ol>'+steps+'</ol></section><section><h4>90-day implementation plan</h4><ol><li><b>Days 1–14, discovery:</b> Define the decision owner, success metric, constraints and baseline. Interview stakeholders and verify the central problem.</li><li><b>Days 15–30, design:</b> Price the proposed workstreams, document dependencies and create a small, reversible pilot.</li><li><b>Days 31–60, pilot:</b> Test the first workstream with a comparison group or prior-period baseline. Record real delivery effort and unintended effects.</li><li><b>Days 61–90, decision:</b> Compare observed outcomes against predefined thresholds; scale, redesign or stop.</li></ol></section><section><h4>Business case and financial model</h4><p>Illustrative implementation cost across selected workstreams: <b>'+money(run.cost||0)+'</b>. These figures are synthetic, not quotes or a funding recommendation.</p><p>'+escHtml(g.economics)+'</p><p><b>Break-even logic:</b> Estimate the total verified benefit over the decision horizon, subtract incremental operating costs and compare the remainder with the validated implementation cost. Do not calculate ROI until those inputs exist.</p></section>'+economicsMarkup(index,run,diagnosis,domain)+'<section><h4>People, operations and governance</h4><ul>'+owners+'</ul><p>Appoint one accountable sponsor. Set a fortnightly decision review and keep a written change log covering assumptions, evidence and approvals.</p></section><section><h4>Risks, compliance and stop conditions</h4><ul>'+risks+'<li>'+escHtml(g.constraints)+'</li><li>Pause if a pilot creates material safety, legal, financial or customer harm, or if the measurement is too weak to interpret.</li></ul></section><section><h4>Success measures</h4><p>Primary and supporting indicators to tailor: '+escHtml(g.measure)+'</p><p>Before launching, record current values, measurement frequency, a realistic target and the person responsible for verification.</p>'+(signal?'<p><b>Question-specific primary measure:</b> '+escHtml(signal.metric)+'</p><p><b>Safeguard:</b> '+escHtml(signal.guardrail)+'</p>':'')+(secondary?'<p><b>Secondary measure:</b> '+escHtml(secondary.metric)+'</p>':'')+'</section><section><h4>Evidence required before investment</h4><ul>'+evidenceChecklist(domain,selected)+'</ul><p><b>Decision gate:</b> Advance only when the pilot has a documented result, cost estimate, owner and acceptable downside.</p></section></div></details><div class="plan-conclusion"><b>Recommended next move</b><p>'+escHtml(initial?'Within seven days, meet the operational owner for '+initial.name.toLowerCase()+', confirm the baseline and design a reversible test.':'First define the problem and constraints, then rerun the model.')+'</p></div></article>';
+}
+function compareStrategies(plans,diagnosis){
+ const names=plans.map(p=>p.v.name);
+ const checks=[
+ ['Evidence strength','None of the strategies has verified customer, cost or outcome evidence.','Unverified for all three'],
+ ['Economic viability','Break-even cannot be calculated until real costs, volumes and benefits are entered.','Unverified for all three'],
+ ['Downside exposure','Each strategy has a different failure mechanism; assess reversibility and maximum affordable loss.','Unverified for all three']
+ ];
+ const rows=checks.map(([name,why,status])=>'<tr><th scope="row">'+escHtml(name)+'</th>'+names.map(()=>'<td>'+escHtml(status)+'</td>').join('')+'</tr>').join('');
+ const signal=diagnosis.primary;
+ const experiments=[
+ ['The repeatable system','Measure cycle time, errors and fully loaded cost on matched jobs.','Reject if process variation or rework increases.'],
+ ['The partnership network','Test one partner channel and calculate net contribution after coordination.','Reject if partner economics or quality fail.'],
+ ['The specialist wedge','Test one defined segment for committed demand and delivery margin.','Reject if customers do not commit or delivery costs exceed value.']
+ ];
+ const trials=experiments.map((x,i)=>'<li><b>'+escHtml(x[0])+':</b> '+escHtml(x[1])+' <b>Disconfirm:</b> '+escHtml(x[2])+'</li>').join('');
+ return '<section class="model-thesis" aria-label="Strategy comparison"><h3>Decision arena: three competing strategies</h3><p>Prometheus does not yet have verified evidence to declare a winner. These are competing hypotheses, not ranked investment recommendations. The model’s synthetic optimisation scores are deliberately excluded from this decision.</p><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;text-align:left"><thead><tr><th scope="col">Decision gate</th>'+names.map(n=>'<th scope="col">'+escHtml(n)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div><p><b>Fastest route to a defensible choice:</b> Run comparable low-cost tests, use the same decision horizon and record the actual evidence for each strategy.</p><ol>'+trials+'</ol>'+(signal?'<p><b>Shared question-specific success measure:</b> '+escHtml(signal.metric)+'. Ensure each pilot reports this alongside its own economics and risks.</p>':'')+'<p><b>Decision rule:</b> Eliminate strategies that breach safety, legal or loss limits. Of those remaining, prefer the one with the strongest verified net benefit and acceptable downside. If none pass, do not invest yet.</p></section>';
+}
+function evidenceWorkbench(){
+ return '<div class="evidence-workbench"><h3>Optional: test your numbers</h3><p>Enter your own estimates for each strategy. Leave fields blank if unknown. Figures are not independently verified.</p><div class="evidence-fields">'+variants.map((v,i)=>'<fieldset><legend>'+escHtml(v.name)+'</legend><label>Upfront investment ($)<input type="number" min="0" step="any" data-model="'+i+'" data-field="upfront" placeholder="Unknown"></label><label>Monthly gross benefit ($)<input type="number" min="0" step="any" data-model="'+i+'" data-field="benefit" placeholder="Unknown"></label><label>Monthly added costs ($)<input type="number" min="0" step="any" data-model="'+i+'" data-field="monthly" placeholder="Unknown"></label></fieldset>').join('')+'</div><button type="button" id="calculate-evidence" class="secondary">Compare my figures</button><div id="evidence-output" aria-live="polite"></div></div>';
+}
+function calculateEvidence(){
+ const cards=variants.map((v,i)=>{
+  const fields=['upfront','benefit','monthly'].map(k=>document.querySelector('[data-model="'+i+'"][data-field="'+k+'"]'));
+  const raw=fields.map(el=>el?.value.trim()??'');
+  if(raw.some(x=>x===''))return {name:v.name,valid:false,reason:'Missing figures'};
+  const numbers=raw.map(Number);
+  if(numbers.some(n=>!Number.isFinite(n)||n<0))return {name:v.name,valid:false,reason:'Use non-negative finite figures'};
+  const [upfront,benefit,monthly]=numbers,net=benefit-monthly;
+  return {name:v.name,valid:true,net,annual:12*net-upfront,payback:net>0?upfront/net:null};
+ });
+ const valid=cards.filter(x=>x.valid),winner=valid.length===3?[...valid].sort((a,b)=>b.annual-a.annual)[0]:null;
+ const rows=cards.map(x=>'<li><b>'+escHtml(x.name)+':</b> '+(x.valid?'Monthly net '+money(x.net)+'; 12-month net '+money(x.annual)+'; payback '+(x.payback===null?'not reached':x.payback.toFixed(1)+' months')+'.':escHtml(x.reason)+'.')+'</li>').join('');
+ $('evidence-output').innerHTML='<h4>Comparison using your inputs</h4><ul>'+rows+'</ul><p>'+(winner?'Highest 12-month net value from the entered figures: <b>'+escHtml(winner.name)+'</b>. This is a numerical comparison, not a verified recommendation.':'Enter all nine figures to compare the three strategies on the same basis.')+'</p><p>Assumes constant monthly benefits and costs, immediate delivery and no discounting, tax or ramp-up. Validate all inputs and safety constraints before acting.</p>';
+}
+function selectConstraintAware(items,context,priority){
+ const ids=new Set(context.constraints.map(x=>x.id));
+ let candidates=items.map(x=>({...x}));
+ const exclusions=[];
+ if(ids.has('low_budget')){
+  const ceiling=3000;
+  candidates=candidates.filter(x=>{if(x.cost>ceiling){exclusions.push(x.name+' exceeds the illustrative low-cash screening ceiling');return false}return true});
+ }
+ if(ids.has('no_hiring')){
+  candidates=candidates.filter(x=>{if(x.cat==='people'){exclusions.push(x.name+' relies on people-capacity investment');return false}return true});
+ }
+ if(ids.has('no_code')){
+  candidates=candidates.filter(x=>{if(/software|digital|automation|app|platform/i.test(x.name+' '+x.desc)){exclusions.push(x.name+' may require a technology implementation');return false}return true});
+ }
+ if(ids.has('time'))candidates=candidates.filter(x=>{if(x.speed<60){exclusions.push(x.name+' has a slower synthetic speed score');return false}return true});
+ const result=solve(candidates,Infinity,3,priority,28);
+ return {...result,screening:{excluded:exclusions,remaining:candidates.length,illustrative:true}};
+}
+function generate(){
+ const question=$('question').value.trim();
+ if(question.length<15){$('status').textContent='Please describe your question in a little more detail.';return}
+ $('generate').disabled=true;$('status').textContent='Constructing three strategic briefings…';
+ try{
+ const domain=detectDomain(question),items=datasets[domain].map(x=>({...x})),diagnosis=interpretQuestion(question);
+ const context=extractQuestionContext(question);
+ const plans=variants.map((v,i)=>({v,run:selectConstraintAware(items,context,v.priority),i}));
+ $('plans').innerHTML=plans.map(p=>planMarkup(p.v,p.run,p.i,question,domain,diagnosis)).join('')+'<details class="advanced-analysis"><summary>Explore deeper analysis <span>Optional: assumptions, evidence and strategy comparison</span></summary>'+renderQuestionDiagnosis(diagnosis)+compareStrategies(plans,diagnosis)+evidenceWorkbench()+'</details>';
+ $('results').hidden=false;$('status').textContent='Three strategies generated · '+domain+' scenario';
+ $('results').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(e){$('status').textContent='Unable to build strategies. Please try again.';console.error(e)}
+ finally{$('generate').disabled=false}
+}
+$('plans').addEventListener('click',event=>{if(event.target?.id==='calculate-evidence')calculateEvidence()});
+$('generate').addEventListener('click',generate);
+$('again').addEventListener('click',()=>{$('question').focus();$('question').scrollIntoView({behavior:'smooth'})});
+$('export').addEventListener('click',()=>{
+ const text=['DIGITAL ALCHEMY / THREE STRATEGIC BRIEFINGS','Question: '+$('question').value,'Generated: '+new Date().toISOString(),'','ILLUSTRATIVE PROTOTYPE: synthetic costs and deterministic strategies; not verified business plans.','',$('plans').innerText].join('\n');
+ const blob=new Blob([text],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='digital-alchemy-three-strategies.txt';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+});
+try{const q=new URLSearchParams(location.search).get('question');if(q)$('question').value=q.slice(0,3500)}catch(e){}
+})();
+</script></body></html>
