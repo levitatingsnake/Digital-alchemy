@@ -236,6 +236,17 @@ function constraintGateMarkup(index,context){
  const notes=assessConstraints(index,context);
  return '<section><h4>Constraint compatibility</h4>'+(notes.length?'<ul>'+notes.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul>':'<p>No explicit constraints identified; do not assume the strategy is feasible.</p>')+'<p>These are screening conditions, not proof of feasibility.</p></section>';
 }
+function transformConstraint(index,context,domain){
+ const ids=new Set(context.constraints.map(x=>x.id));
+ const transformations=[];
+ if(ids.has('no_hiring'))transformations.push(index===1?['More staff','Outcome-based specialist partnerships','Trade fixed payroll expansion for scoped external capacity; verify oversight and unit economics.']:['More staff','Reduce work per delivered unit','Simplify, standardise or narrow the service before increasing throughput.']);
+ if(ids.has('low_budget'))transformations.push(index===2?['Capital-heavy launch','Pre-commitment before investment','Test willingness to pay or signed demand before purchasing assets.']:['Capital-heavy launch','Borrow or share existing infrastructure','Use a small reversible pilot instead of buying a full operating stack.']);
+ if(ids.has('no_code'))transformations.push(['Custom software','Manual concierge prototype','Validate the workflow with existing tools and human review before automating.']);
+ if(ids.has('remote'))transformations.push(['Location-dependent service','Remote coordination and local fulfilment','Separate customer access from physical execution and validate accountability.']);
+ if(ids.has('time'))transformations.push(['Full launch before deadline','Time-boxed evidence milestone','Deliver one decision-grade experiment before the deadline rather than promising a complete rollout.']);
+ if(!transformations.length)transformations.push(['Assumed default solution','Test the limiting assumption','Identify which resource, step or customer commitment is truly necessary before choosing a model.']);
+ return '<section><h4>Alchemy transformation hypotheses</h4><p>Rather than simply discard a constrained idea, test a different mechanism:</p><ul>'+transformations.map(x=>'<li><b>'+escHtml(x[0])+' → '+escHtml(x[1])+':</b> '+escHtml(x[2])+'</li>').join('')+'</ul><p><b>Validation:</b> These are generated design hypotheses, not new inventions or confirmed feasibility. Test the substitution against actual cost, demand, safety and delivery requirements.</p></section>';
+}
 function planMarkup(v,run,index,question,domain,diagnosis){
  const p=modelPlaybooks[domain][index];
  const signal=diagnosis.primary,secondary=diagnosis.secondary;
