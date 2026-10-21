@@ -112,6 +112,7 @@ input,textarea,select{accent-color:var(--jade)}
 <div class="metric-row"><div class="metric"><span>Records</span><strong id="expCount">0</strong></div><div class="metric"><span>Mean absolute error</span><strong id="expMae">—</strong></div><div class="metric"><span>Mean abs. % error</span><strong id="expMape">—</strong></div></div>
 <p class="muted" style="margin-top:12px">Error summaries are shown only for records with numeric predictions and actuals. Different metrics or units should not be combined into a single performance judgement. Use this as a personal experiment diary, not an automatic model-training claim.</p>
 <div id="expAlerts" class="notice" role="status" aria-live="polite" style="margin-top:12px">No target-based review flags yet. Add a threshold to an experiment to make its success rule explicit.</div>
+<div class="source-list" id="repeatReview" aria-live="polite"><p class="muted">Repeated-test consistency will appear when comparable experiments are recorded.</p></div>
 <div id="experimentList" class="source-list"><p class="muted">No outcomes recorded yet. Start with a small, safe test.</p></div>
 </article>
 </section>
@@ -139,8 +140,41 @@ let experiments=[];
 try{experiments=JSON.parse(localStorage.getItem(EXP_KEY)||"[]");if(!Array.isArray(experiments))experiments=[]}catch(e){experiments=[]}
 const expEsc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function expSave(){try{localStorage.setItem(EXP_KEY,JSON.stringify(experiments))}catch(e){alert("Browser storage is unavailable. Export the log and keep a copy.")}expRender()}
+function renderRepeatability(rows){
+const groups=new Map();
+const norm=v=>String(v??"").trim().toLocaleLowerCase();
+rows.forEach(r=>{
+const key=[norm(r.decision),norm(r.metric),norm(r.unit)].join("\\u001f");
+if(!norm(r.decision)||!norm(r.metric))return;
+if(!groups.has(key))groups.set(key,{decision:r.decision.trim(),metric:r.metric.trim(),unit:String(r.unit??"").trim(),rows:[]});
+groups.get(key).rows.push(r);
+});
+const comparable=[...groups.values()].filter(g=>g.rows.length>=2);
+if(!comparable.length){
+$("repeatReview").innerHTML='<p class="muted">Not enough repeated tests yet. Record at least two outcomes for the same decision, measurable outcome and unit. Different units or metrics are kept separate.</p>';
+return;
+}
+$("repeatReview").innerHTML='<h3 style="font-size:13px;margin:8px 0">Consistency across repeated tests</h3>'+comparable.map(g=>{
+const rules=g.rows.map(r=>r.target!==null&&Number.isFinite(r.target)&&r.direction?String(r.target)+"|"+r.direction:null);
+const sameRule=rules.every(v=>v!==null&&v===rules[0]);
+let conclusion,detail;
+if(!sameRule){
+conclusion="Success rules differ or are missing";
+detail="Define the same numeric threshold and direction before comparing pass/miss consistency. Recorded outcomes: "+g.rows.length+".";
+}else{
+const outcomes=g.rows.map(r=>r.direction==="higher"?r.actual>=r.target:r.actual<=r.target);
+const passed=outcomes.filter(Boolean).length,missed=outcomes.length-passed;
+conclusion=passed===outcomes.length?"Repeated results all met the recorded target":missed===outcomes.length?"Repeated results all missed the recorded target":"Mixed results: the target was met in some tests and missed in others";
+detail=passed+" met and "+missed+" missed the same target ("+g.rows[0].direction+" is better; target "+g.rows[0].target+(g.unit?" "+g.unit:"")+").";
+}
+const vals=g.rows.map(r=>r.actual).filter(Number.isFinite);
+const spread=vals.length?"Observed values ranged from "+Math.min(...vals)+" to "+Math.max(...vals)+(g.unit?" "+g.unit:"")+". ":"";
+return '<article class="source"><strong>'+expEsc(g.decision)+'</strong><span>'+expEsc(g.metric)+(g.unit?' ('+expEsc(g.unit)+')':'')+' · '+g.rows.length+' recorded tests</span><small><strong>'+expEsc(conclusion)+'</strong></small><small>'+expEsc(detail)+'</small><small>'+expEsc(spread)+'Descriptive only: small samples, changing conditions and other factors can affect repeatability. This does not establish causation.</small></article>';
+}).join("");
+}
 function expRender(){
 $("expCount").textContent=experiments.length;
+renderRepeatability(experiments);
 const valid=experiments.filter(r=>Number.isFinite(r.predicted)&&Number.isFinite(r.actual));
 const mae=valid.length?valid.reduce((a,r)=>a+Math.abs(r.actual-r.predicted),0)/valid.length:null;
 const percent=valid.filter(r=>r.predicted!==0);
