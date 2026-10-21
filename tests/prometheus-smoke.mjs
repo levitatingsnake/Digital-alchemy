@@ -107,3 +107,16 @@ for(const name of ['The repeatable system','The partnership network','The specia
 assert.ok(cockpitSource.includes('const p=modelPlaybooks[domain][index]'),'model-specific domain playbook used');
 for(const label of ['Who benefits:','Value proposition:','Distribution or adoption:','Economic logic:','First proof:'])assert.ok(cockpitSource.includes(label),'model differentiation includes '+label);
 console.log('PASS three distinct business-model pathways');
+
+assert.ok(cockpitSource.includes('function interpretQuestion(question)'),'question interpreter exists');
+assert.ok(cockpitSource.includes('renderQuestionDiagnosis(diagnosis)'),'question interpretation shown to user');
+assert.ok(cockpitSource.includes('planMarkup(p.v,p.run,p.i,question,domain,diagnosis)'),'diagnosis passed to all strategies');
+for(const signal of ['capacity','demand','delay','cost','risk','automation'])assert.ok(cockpitSource.includes("id:'"+signal+"'"),'intent signal '+signal);
+const interpreterStart=cockpitSource.indexOf('const intentSignals=');
+const interpreterEnd=cockpitSource.indexOf('const variants=',interpreterStart);
+assert.ok(interpreterStart>=0&&interpreterEnd>interpreterStart);
+const interpret=runInNewContext(cockpitSource.slice(interpreterStart,interpreterEnd)+'\ninterpretQuestion',{Set,String});
+assert.equal(interpret('We need to grow without hiring more staff').primary.id,'capacity','capacity identified from user problem');
+assert.equal(interpret('Improve the customer sales funnel').primary.id,'demand','demand identified from user problem');
+assert.equal(interpret('A timely business decision').matched,0,'substring matches excluded');
+console.log('PASS question-specific interpretation and safeguards');
