@@ -70,7 +70,7 @@
 
 ## Optional extension: Decision Lab (30–45 seconds)
 
-If the audience wants a more familiar business example, open the [Decision Lab](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html). Load the construction scenario, run it with the NZ$30,000 budget, then change the objective to risk reduction or lower the budget and rerun.
+If the audience wants a more familiar applied-decision example, open the [Decision Lab](https://levitatingsnake.github.io/Digital-alchemy/decision-lab.html). Try Improve cash flow, Investment review or Real-estate decision. Switch to Optimise a budget if you want to demonstrate a hard constraint. The five scenario libraries use fixed synthetic assumptions, not live market data or professional advice. If you want a familiar construction example, load Construction delays and run it without a budget cap. budget, then change the objective to risk reduction or lower the budget and rerun.
 
 **Say:**
 “This is a separate constrained-choice prototype built alongside the symbolic engine. It exhaustively compares combinations of illustrative initiatives against budget and item-count constraints, then shows the scoring and trade-offs. The costs and scores are demonstration inputs, not a real contractor estimate or a validated recommendation.”
