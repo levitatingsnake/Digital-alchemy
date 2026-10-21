@@ -130,8 +130,74 @@ input,select,textarea{accent-color:var(--gold)}
  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
 
+
+/* XENOLAB ART DIRECTION: asymmetry, specimen geometry, instrument typography */
+.xeno-hero{
+ position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(290px,.92fr);
+ min-height:390px;margin:0 0 22px;border:1px solid rgba(104,244,255,.3);
+ background:linear-gradient(112deg,rgba(6,16,29,.98) 0%,rgba(8,23,39,.94) 54%,rgba(17,14,39,.97) 100%);
+ clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,0 100%);
+ box-shadow:0 24px 70px rgba(0,0,0,.28),inset 0 0 50px rgba(62,172,211,.035);
+}
+.xeno-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,transparent 49.8%,rgba(104,244,255,.11) 50%,transparent 50.2%),linear-gradient(rgba(104,244,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(104,244,255,.035) 1px,transparent 1px);background-size:100% 100%,27px 27px,27px 27px;mask-image:linear-gradient(120deg,black,transparent 95%)}
+.xeno-copy{padding:clamp(24px,4vw,48px) 0 34px clamp(22px,4vw,44px);align-self:center;z-index:2}
+.xeno-kicker{display:flex;align-items:center;gap:9px;color:#8daec4;font-size:9px;font-weight:800;letter-spacing:.24em}
+.xeno-live{width:6px;height:6px;border-radius:50%;background:#b7ff6a;box-shadow:0 0 12px #b7ff6a}
+.xeno-copy h2{font-size:clamp(32px,4.4vw,58px)!important;line-height:.99;letter-spacing:-.065em!important;margin:24px 0 17px!important;font-weight:780;max-width:620px}
+.xeno-copy h2 em{font-style:normal;color:#68f4ff;text-shadow:0 0 30px rgba(104,244,255,.18)}
+.xeno-copy>p{max-width:435px;font-size:13px;line-height:1.8;color:#9cb5c8;margin:0}
+.xeno-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+.xeno-actions a{display:inline-flex;align-items:center;gap:22px;padding:12px 15px;text-decoration:none;background:#68f4ff;color:#04111a;border:1px solid #8cf8ff;font-size:11px;font-weight:850;letter-spacing:.04em}
+.xeno-actions a span{font-size:15px}
+.xeno-actions a.xeno-secondary{background:rgba(6,16,29,.7);color:#dff9ff;border-color:rgba(104,244,255,.3)}
+.xeno-readout{display:flex;flex-wrap:wrap;gap:18px;margin-top:28px;padding-top:14px;border-top:1px solid rgba(104,244,255,.15);max-width:490px}
+.xeno-readout span{font-size:8px;color:#64849b;letter-spacing:.14em}
+.xeno-readout b{display:block;color:#b8d8e8;font-size:9px;margin-top:5px;letter-spacing:.1em}
+.xeno-specimen{position:relative;min-height:330px;display:grid;place-items:center;overflow:hidden}
+.xeno-specimen:before{content:"";position:absolute;width:75%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(104,244,255,.12),rgba(89,67,190,.08) 32%,transparent 68%);filter:blur(10px)}
+.xeno-orbit{position:absolute;left:50%;top:47%;border:1px solid rgba(104,244,255,.43);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 18px rgba(104,244,255,.04),inset 0 0 15px rgba(104,244,255,.035)}
+.xeno-orbit-a{width:235px;height:235px}
+.xeno-orbit-b{width:300px;height:145px;transform:translate(-50%,-50%) rotate(-34deg);border-color:rgba(176,139,255,.55)}
+.xeno-orbit-c{width:300px;height:145px;transform:translate(-50%,-50%) rotate(48deg);border-color:rgba(104,244,255,.28)}
+.xeno-core{position:relative;width:100px;height:100px;display:grid;place-items:center;background:radial-gradient(circle at 40% 35%,#203d5a,#081321 68%);border:1px solid #68f4ff;transform:rotate(45deg);box-shadow:0 0 24px rgba(104,244,255,.24),inset 0 0 22px rgba(104,244,255,.13)}
+.xeno-core:before,.xeno-core:after{content:"";position:absolute;inset:9px;border:1px solid rgba(104,244,255,.45)}
+.xeno-core:after{inset:-9px;border-color:rgba(176,139,255,.55)}
+.xeno-core span{transform:rotate(-45deg);font-size:39px;font-weight:300;color:#b7fffb;text-shadow:0 0 20px #68f4ff}
+.xeno-cross{position:absolute;background:#68f4ff;opacity:.6}
+.xeno-cross-a{width:1px;height:84%;left:50%;top:8%}
+.xeno-cross-b{height:1px;width:84%;top:47%;left:8%}
+.xeno-coordinate{position:absolute;color:#6e9ab2;font-size:8px;letter-spacing:.13em;background:rgba(5,13,24,.7);padding:5px 7px;border-left:1px solid #68f4ff}
+.xeno-coordinate-a{top:17%;right:10%}.xeno-coordinate-b{bottom:20%;right:7%}.xeno-coordinate-c{bottom:13%;left:11%;border-color:#b08bff}
+.xeno-edge{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px 18px;border-top:1px solid rgba(104,244,255,.16);background:rgba(2,8,16,.48);color:#54768b;font-size:8px;letter-spacing:.14em}
+@media(max-width:700px){
+ .xeno-hero{grid-template-columns:1fr;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,0 100%)}
+ .xeno-copy{padding:25px 21px 8px}
+ .xeno-copy h2{font-size:37px!important;margin:19px 0 14px!important}
+ .xeno-specimen{min-height:260px}
+ .xeno-orbit-a{width:180px;height:180px}.xeno-orbit-b,.xeno-orbit-c{width:235px;height:115px}
+ .xeno-core{width:78px;height:78px}
+ .xeno-edge{padding:10px 13px;font-size:7px}
+}
+
 </style></head><body><main class="wrap">
 <header class="top"><div class="brand"><div class="sigil">⚗</div><div><div class="eyebrow">Computational transformation</div><h1>Digital Alchemy</h1></div></div><div class="status" id="saveStatus"><span class="dot"></span><span>Saved on this device</span></div></header>
+<section class="xeno-hero" aria-label="XenoLab research interface">
+ <div class="xeno-copy">
+  <div class="xeno-kicker"><span class="xeno-live"></span> XENOLAB / FIELD SESSION 001</div>
+  <h2>Reality is a<br><em>system to interrogate.</em></h2>
+  <p>Set a target. Generate possible transformations. Attack the strongest hypothesis. Keep the evidence, not the mythology.</p>
+  <div class="xeno-actions"><a href="#intentionPanel">Initiate experiment <span>↗</span></a><a class="xeno-secondary" href="#evidencePanel">Open evidence bay <span>⌁</span></a></div>
+  <div class="xeno-readout"><span>MODE <b>SYMBOLIC</b></span><span>ENGINE <b>LOCAL</b></span><span>CLAIMS <b>BOUNDED</b></span></div>
+ </div>
+ <div class="xeno-specimen" aria-hidden="true">
+  <div class="xeno-orbit xeno-orbit-a"></div><div class="xeno-orbit xeno-orbit-b"></div><div class="xeno-orbit xeno-orbit-c"></div>
+  <div class="xeno-cross xeno-cross-a"></div><div class="xeno-cross xeno-cross-b"></div>
+  <div class="xeno-core"><span>Δ</span></div>
+  <div class="xeno-coordinate xeno-coordinate-a">S-04 / ACTIVE</div><div class="xeno-coordinate xeno-coordinate-b">FIELD STABILITY 0.82</div>
+  <div class="xeno-coordinate xeno-coordinate-c">UNCLASSIFIED PATTERN</div>
+ </div>
+ <div class="xeno-edge"><span>LAB NOTE 001</span><span>OBSERVE → TRANSFORM → CHALLENGE</span><span>LOCAL INSTANCE / NO CLOUD CLAIM</span></div>
+</section>
 <p class="intro"><strong>A laboratory for exploring change.</strong> Choose an outcome, test symbolic operations, and let the route finder look for a sequence that moves the current state toward your goal. Your state and experiments save automatically in this browser.</p>
 <section class="panel" aria-labelledby="portfolioDemoTitle" style="margin-bottom:18px">
   <div class="row"><div><div class="eyebrow">Portfolio demonstration</div><h2 id="portfolioDemoTitle">Quick proof run</h2><p class="sub">Run two independent software checks, then get a compact evidence summary. This does not change your current substrate or saved rules.</p></div><div class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="smallbtn" id="runEvidenceChain" style="flex:0 0 auto">Run discovery chain</button><button class="primary smallbtn" id="runPortfolioDemo" style="flex:0 0 auto">Run proof demo</button></div></div>
@@ -744,16 +810,24 @@ function compareAgainstBaseline(){
 }
 function runPrometheusTrial(){
  const root=document.getElementById('prometheusResults');
- if(!state.learnedRules.length){root.innerHTML='<div class="routebox"><b>No preserved rules to challenge yet.</b><p class="sub" style="margin:5px 0 0">Discover or synthesize rules first, then run Prometheus again.</p></div>';showToast('Prometheus needs at least one saved rule');return}
+ if(!root){showToast('Prometheus output panel is missing');return}
+ const autoCandidates=[
+  {name:'Ephemeral candidate / balanced',delta:[4,-4,0,0],ds:1},
+  {name:'Ephemeral candidate / stabilising',delta:[-4,0,4,-4],ds:2},
+  {name:'Ephemeral candidate / concentration',delta:[8,4,-4,0],ds:-1},
+  {name:'Ephemeral candidate / conservative',delta:[0,-4,4,-4],ds:1}
+ ];
+ const usingTemporaryCandidates=!state.learnedRules.length;
+ const rulesToChallenge=usingTemporaryCandidates?autoCandidates:state.learnedRules.slice();
  const samples=buildPrometheusHoldout();
- const results=state.learnedRules.map(rule=>{
+ const results=rulesToChallenge.map(rule=>{
   const measured=measurePrometheusRule(rule,samples),inSample=validateRule(rule,64),gap=+(measured.mean-inSample.mean).toFixed(2);
   const verdict=measured.mean>0&&measured.winRate>=55&&measured.worst>=-8?'ROBUST IN THIS TEST':measured.mean>0?'PROMISING, FRAGILE':'DOES NOT GENERALISE';
   return {name:rule.name,inSampleMean:inSample.mean,inSampleWinRate:inSample.winRate,holdoutMean:measured.mean,holdoutWinRate:measured.winRate,worst:measured.worst,generalisationGap:gap,verdict,counterexample:measured.counterexample};
  }).sort((a,b)=>b.holdoutMean-a.holdoutMean||b.holdoutWinRate-a.holdoutWinRate);
  const report={id:Date.now().toString(36),type:'prometheus-trial',timestamp:new Date().toISOString(),goal:state.goal,target:goalConfig().target.slice(),targetStability:goalConfig().stab,sampleCount:samples.length,seed:'0x5EEDC0DE',results};
  state.prometheusReports.unshift(report);state.prometheusReports=state.prometheusReports.slice(0,20);persist();
- root.innerHTML='<div class="routebox"><b>Prometheus trial complete · '+samples.length+' held-out synthetic states per rule</b><p class="sub" style="margin:5px 0 0">Goal: '+esc(goalConfig().label)+' · reproducible seed '+report.seed+' · '+esc(new Date(report.timestamp).toLocaleString())+'. The holdout generator differs from the original fixed-sequence training generator. This is a controlled synthetic test, not proof of real-world generalisation.</p></div>'+results.map((x,i)=>'<div class="traceitem"><b>#'+(i+1)+' · '+esc(x.name)+' · '+esc(x.verdict)+'</b><p>Original sample: '+(x.inSampleMean>=0?'+':'')+x.inSampleMean+' mean gain, '+x.inSampleWinRate+'% wins</p><p><b>Held-out:</b> '+(x.holdoutMean>=0?'+':'')+x.holdoutMean+' mean gain · '+x.holdoutWinRate+'% wins · worst loss '+x.worst+' · generalisation gap '+(x.generalisationGap>=0?'+':'')+x.generalisationGap+'</p><p><b>Adversarial counterexample:</b> starting state '+x.counterexample.state.join(' / ')+' · stability '+x.counterexample.stability+' produced '+(x.counterexample.gain>=0?'+':'')+x.counterexample.gain+' alignment gain. Resulting state '+x.counterexample.next.join(' / ')+' · stability '+x.counterexample.nextStability+'.</p></div>').join('')+'<div class="routebox"><b>Previous Prometheus trials</b>'+(state.prometheusReports.length>1?state.prometheusReports.slice(1,6).map(p=>'<p class="sub" style="margin:6px 0 0">'+esc(new Date(p.timestamp).toLocaleString())+' · '+p.results.length+' rules · '+esc(p.goal)+'</p>').join(''):'<p class="sub" style="margin:5px 0 0">This is the first saved Prometheus trial on this device.</p>')+'</div>';
+ root.innerHTML='<div class="routebox"><b>Prometheus trial complete · '+samples.length+' held-out synthetic states per rule</b><p class="sub" style="margin:5px 0 0">Goal: '+esc(goalConfig().label)+' · reproducible seed '+report.seed+' · '+esc(new Date(report.timestamp).toLocaleString())+'. '+(usingTemporaryCandidates?'No saved rules existed, so four temporary candidate rules were generated for this run. They were not added to your library. ':'')+'The holdout generator differs from the original fixed-sequence training generator. This is a controlled synthetic test, not proof of real-world generalisation.</p></div>'+results.map((x,i)=>'<div class="traceitem"><b>#'+(i+1)+' · '+esc(x.name)+' · '+esc(x.verdict)+'</b><p>Original sample: '+(x.inSampleMean>=0?'+':'')+x.inSampleMean+' mean gain, '+x.inSampleWinRate+'% wins</p><p><b>Held-out:</b> '+(x.holdoutMean>=0?'+':'')+x.holdoutMean+' mean gain · '+x.holdoutWinRate+'% wins · worst loss '+x.worst+' · generalisation gap '+(x.generalisationGap>=0?'+':'')+x.generalisationGap+'</p><p><b>Adversarial counterexample:</b> starting state '+x.counterexample.state.join(' / ')+' · stability '+x.counterexample.stability+' produced '+(x.counterexample.gain>=0?'+':'')+x.counterexample.gain+' alignment gain. Resulting state '+x.counterexample.next.join(' / ')+' · stability '+x.counterexample.nextStability+'.</p></div>').join('')+'<div class="routebox"><b>Previous Prometheus trials</b>'+(state.prometheusReports.length>1?state.prometheusReports.slice(1,6).map(p=>'<p class="sub" style="margin:6px 0 0">'+esc(new Date(p.timestamp).toLocaleString())+' · '+p.results.length+' rules · '+esc(p.goal)+'</p>').join(''):'<p class="sub" style="margin:5px 0 0">This is the first saved Prometheus trial on this device.</p>')+'</div>';
  showToast('Prometheus challenged '+results.length+' rules on held-out states');
 }
 function auditLawForgeAdaptation(){
