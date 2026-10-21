@@ -56,6 +56,8 @@ for(const fn of ['probeExperimentalSensitivity','renderExperimentalSensitivity',
 }
 assert.match(labSource,/runExperimentalPortfolio\(\)/,'comparison button wired');
 assert.match(labSource,/exportExperimentalReport\(\)/,'export button wired');
+assert.ok(labSource.includes('function buildEvidenceNextStep('),'actionable evidence plan exists');
+assert.ok(labSource.includes('buildEvidenceNextStep(probe)'),'evidence plan wired into sensitivity readout');
 const sensitivityStart=labSource.indexOf('function probeExperimentalSensitivity(');
 const sensitivityEnd=labSource.indexOf('function renderExperimentalSensitivity(',sensitivityStart);
 assert.ok(sensitivityStart>=0&&sensitivityEnd>sensitivityStart);
