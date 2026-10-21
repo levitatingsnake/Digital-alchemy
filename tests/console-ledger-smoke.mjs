@@ -13,6 +13,10 @@ assert.match(html, /id="expTarget"/, 'Ledger should allow an explicit success th
 assert.match(html, /id="expReview"/, 'Ledger should capture the human decision after reviewing an outcome');
 assert.match(html, /id="expReviewReason"/, 'Ledger should record why a follow-up decision was chosen');
 assert.match(html, /id="repeatReview"/, 'Ledger should show consistency across comparable repeated tests');
+assert.match(html, /id="expConditions"/, 'Ledger should record the conditions in which a test ran');
+assert.match(html, /id="conditionReview"/, 'Ledger should compare the same outcome under different conditions');
+assert.match(match[1], /renderConditionComparison/, 'Ledger should summarize results by recorded condition');
+assert.match(match[1], /does not establish causation/, 'Condition comparisons must disclose their limits');
 assert.match(match[1], /renderRepeatability/, 'Ledger should group repeated outcomes for consistency review');
 assert.match(match[1], /Success rules differ or are missing/, 'Ledger should warn when success thresholds are not comparable');
 assert.match(match[1], /Mixed results: the target was met in some tests and missed in others/, 'Ledger should flag conflicting repeated outcomes');
@@ -65,6 +69,7 @@ for (const [id, value] of Object.entries({
   expPredicted: '2',
   expActual: '1.5',
   expUnit: 'hours/week',
+  expConditions: 'Baseline week',
   expTarget: '1.8',
   expDirection: 'higher',
   expDate: '2026-10-21',
@@ -86,6 +91,7 @@ assert.equal(records[0].error, -0.5);
 assert.equal(records[0].absolutePercentageError, 25);
 assert.equal(records[0].target, 1.8);
 assert.equal(records[0].direction, 'higher');
+assert.equal(records[0].conditions, 'Baseline week');
 assert.equal(records[0].review, 'adjust');
 assert.equal(records[0].reviewReason, 'Target missed; reduce scope and retest');
 assert.match(getElement('experimentList').innerHTML, /Adjust and retest/);
@@ -98,6 +104,7 @@ for (const [id, value] of Object.entries({
   expPredicted: '2',
   expActual: '2.2',
   expUnit: 'hours/week',
+  expConditions: 'High-demand week',
   expTarget: '1.8',
   expDirection: 'higher',
   expDate: '2026-10-22',
@@ -109,6 +116,9 @@ for (const [id, value] of Object.entries({
 handlers['experimentForm:submit']({ preventDefault() {} });
 assert.match(getElement('repeatReview').innerHTML, /Mixed results: the target was met in some tests and missed in others/, 'Conflicting outcomes with the same success rule should be flagged');
 assert.match(getElement('repeatReview').innerHTML, /2 recorded tests/, 'Only comparable repeated tests should form a group');
+assert.match(getElement('conditionReview').innerHTML, /Baseline week/, 'Condition comparison should show the baseline label');
+assert.match(getElement('conditionReview').innerHTML, /High-demand week/, 'Condition comparison should show the contrasting condition');
+assert.match(getElement('conditionReview').innerHTML, /average 1\.50 hours\/week/, 'Condition comparison should calculate observed averages');
 for (const [id, value] of Object.entries({
   expDecision: 'Pilot customer follow-up',
   expHypothesis: 'A prompt follow-up saves time',
@@ -126,4 +136,4 @@ for (const [id, value] of Object.entries({
 })) getElement(id).value = value;
 handlers['experimentForm:submit']({ preventDefault() {} });
 assert.match(getElement('repeatReview').innerHTML, /2 recorded tests/, 'Different units must not be merged into an existing repeatability group');
-console.log('PASS: Console syntax, experiment ledger, local persistence, error metrics, target review and repeated-test consistency.');
+console.log('PASS: Console syntax, experiment ledger, local persistence, error metrics, target review, repeated-test consistency and condition comparisons.');
