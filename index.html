@@ -179,6 +179,18 @@ input,select,textarea{accent-color:var(--gold)}
  .xeno-edge{padding:10px 13px;font-size:7px}
 }
 
+
+/* OBSIDIAN BRIDGE */
+.obsidian-bridge{margin:0 0 18px;border-color:#5c4a86;background:linear-gradient(120deg,rgba(29,23,53,.97),rgba(9,20,34,.98))}
+.obsidian-bridge .bridge-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.obsidian-bridge .bridge-mark{font-size:25px;color:#c8a8ff;border:1px solid #5c4a86;border-radius:13px;padding:7px 11px;flex-shrink:0}
+.obsidian-bridge .bridge-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:end}
+.obsidian-bridge input{width:100%;min-width:0;background:#080f1b;color:var(--text);border:1px solid #5c4a86;border-radius:10px;padding:11px}
+.obsidian-bridge .bridge-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.obsidian-bridge .bridge-actions button{flex:1;min-width:180px}
+.obsidian-bridge .bridge-note{font-size:12px;color:var(--muted);margin:10px 0 0}
+@media(max-width:520px){.obsidian-bridge .bridge-controls{grid-template-columns:1fr}.obsidian-bridge .bridge-actions button{min-width:100%}}
+
 </style></head><body><main class="wrap">
 <header class="top"><div class="brand"><div class="sigil">⚗</div><div><div class="eyebrow">Computational transformation</div><h1>Digital Alchemy</h1></div></div><div class="status" id="saveStatus"><span class="dot"></span><span>Saved on this device</span></div></header>
 <section class="xeno-hero" aria-label="XenoLab research interface">
@@ -199,6 +211,14 @@ input,select,textarea{accent-color:var(--gold)}
  <div class="xeno-edge"><span>LAB NOTE 001</span><span>OBSERVE → TRANSFORM → CHALLENGE</span><span>LOCAL INSTANCE / NO CLOUD CLAIM</span></div>
 </section>
 <p class="intro"><strong>A laboratory for exploring change.</strong> Choose an outcome, test symbolic operations, and let the route finder look for a sequence that moves the current state toward your goal. Your state and experiments save automatically in this browser.</p>
+
+<section class="panel wide obsidian-bridge" id="obsidianBridge" aria-labelledby="obsidianBridgeTitle">
+  <div class="bridge-head"><div><div class="eyebrow">Research memory / Obsidian bridge</div><h2 id="obsidianBridgeTitle">Keep the discoveries</h2><p class="sub">Send the latest saved experiment straight into an Obsidian note, or export your full experiment archive as Markdown.</p></div><span class="bridge-mark" aria-hidden="true">⌘</span></div>
+  <div class="bridge-controls"><div><label class="field-label" for="obsidianVaultName">Your Obsidian vault name</label><input id="obsidianVaultName" type="text" value="Digital Alchemy" autocomplete="off" autocapitalize="words" placeholder="Exact vault name"></div><button class="primary" id="saveToObsidian">Send latest experiment ↗</button></div>
+  <div class="bridge-actions"><button class="ghost" id="exportObsidianLog">Export full research log (.md)</button></div>
+  <p class="bridge-note" id="obsidianBridgeStatus" aria-live="polite">First: create a vault with this exact name. Sending a note opens Obsidian for you to confirm. Nothing is sent in the background.</p>
+</section>
+
 <section class="panel" aria-labelledby="portfolioDemoTitle" style="margin-bottom:18px">
   <div class="row"><div><div class="eyebrow">Portfolio demonstration</div><h2 id="portfolioDemoTitle">Quick proof run</h2><p class="sub">Run two independent software checks, then get a compact evidence summary. This does not change your current substrate or saved rules.</p></div><div class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="smallbtn" id="runEvidenceChain" style="flex:0 0 auto">Run discovery chain</button><button class="primary smallbtn" id="runPortfolioDemo" style="flex:0 0 auto">Run proof demo</button></div></div>
   <div id="portfolioDemoResults" aria-live="polite"><div class="empty">Ready to check numeric bounds, repeatability, and deterministic test-sample generation.</div></div>
@@ -1274,6 +1294,40 @@ function buildResearchReport(current,goalSettings,createdAt){
  );
  return lines.join('\n');
 }
+
+function experimentMarkdown(h){
+ const stamp=h.time||new Date().toLocaleString();
+ const start=h.start||{},end=h.end||{};
+ const fmt=(snap)=>'Sulphur '+(snap.values?.[0]??'?')+' / Mercury '+(snap.values?.[1]??'?')+' / Salt '+(snap.values?.[2]??'?')+' / Void '+(snap.values?.[3]??'?')+' / Stability '+(snap.stability??'?');
+ return '## '+(h.title||'Experiment')+'\n\n- **Date:** '+stamp+'\n- **Goal:** '+(h.goal||state.goal)+'\n- **Operations:** '+((h.ops||[]).join(' → ')||'Not recorded')+'\n- **Goal alignment:** '+(Number.isFinite(h.score)?h.score+'%':'Not recorded')+'\n- **Starting state:** '+fmt(start)+'\n- **Ending state:** '+fmt(end)+'\n\n> Interpretation: this result describes Digital Alchemy’s symbolic model only. It is not evidence of a real-world physical or chemical effect.\n\n---\n\n';
+}
+function exportFullObsidianLog(){
+ const lines=['# Digital Alchemy · Experiment Log','','Exported: '+new Date().toISOString(),'','> Results are from the app’s symbolic model. They are not validated real-world scientific findings.',''];
+ if(!state.history.length) lines.push('No saved experiments yet. Run an operation or recipe, then export again.','');
+ else state.history.forEach(h=>lines.push(experimentMarkdown(h)));
+ if(state.trace.length){lines.push('## Recent trace','','| Time | Operation | Alignment |','|---|---|---:|');state.trace.slice().reverse().forEach(t=>lines.push('| '+String(t.time||'').replace(/\|/g,'\\|')+' | '+String(t.op||'').replace(/\|/g,'\\|')+' | '+(Number.isFinite(t.score)?t.score+'%':'')+' |'));lines.push('');}
+ if(state.learnedRules.length){lines.push('## Preserved candidate rules','');state.learnedRules.forEach(r=>lines.push('- **'+r.name+'**: delta ['+r.delta.join(', ')+'], stability delta '+r.ds));lines.push('');}
+ const blob=new Blob([lines.join('\n')],{type:'text/markdown;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='digital-alchemy-experiment-log.md';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+ const status=document.getElementById('obsidianBridgeStatus');
+ status.textContent='Log exported. On iPhone, open the downloaded .md file, tap Share, then save it into your Obsidian vault folder in Files.';
+ showToast('Full research log exported');
+}
+const vaultField=document.getElementById('obsidianVaultName');
+try{vaultField.value=localStorage.getItem('digital-alchemy-obsidian-vault')||'Digital Alchemy'}catch(e){}
+vaultField.addEventListener('change',()=>{try{localStorage.setItem('digital-alchemy-obsidian-vault',vaultField.value.trim())}catch(e){}});
+document.getElementById('saveToObsidian').addEventListener('click',()=>{
+ const vault=vaultField.value.trim();
+ const status=document.getElementById('obsidianBridgeStatus');
+ if(!vault){status.textContent='Enter the exact name of your Obsidian vault first.';return}
+ if(!state.history.length){status.textContent='No saved experiment yet. Run an operation or execute a route, then send it here.';showToast('Run an experiment first');return}
+ const h=state.history[state.history.length-1];
+ const params=new URLSearchParams({vault,file:'Digital Alchemy Experiment Log.md',content:experimentMarkdown(h),append:'true'});
+ status.textContent='Opening Obsidian to append the latest experiment. If iOS asks, allow it to open Obsidian.';
+ try{window.location.href='obsidian://new?'+params.toString();showToast('Opening Obsidian…')}catch(e){status.textContent='Could not open Obsidian automatically. Export the full research log instead.'}
+});
+document.getElementById('exportObsidianLog').addEventListener('click',exportFullObsidianLog);
+
 document.getElementById('exportReport').addEventListener('click',()=>{
  const now=new Date().toISOString();
  const markdown=buildResearchReport(state,goalConfig(),now);
