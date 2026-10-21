@@ -40,7 +40,7 @@ vm.runInNewContext(match[1], { document, Intl, Math, Number, String, Set, JSON }
 assert.equal(typeof handlers.run, 'function', 'Run button must be wired');
 handlers.run();
 assert.equal(elements.status.textContent, 'RUN COMPLETE', 'Default scenario must run');
-assert.match(elements.results.innerHTML, /Recommended initiatives/, 'Output must show a plan');
+assert.match(elements.results.innerHTML, /Suggested actions/, 'Output must show a plan');
 assert.match(elements.results.innerHTML, /THE ANSWER \/ PLAIN ENGLISH/, 'Output must include a clear executive summary');
 assert.match(elements.results.innerHTML, /What this result means/, 'Summary must explain the recommendation in ordinary language');
 assert.match(elements.results.innerHTML, /What to do next/, 'Summary must give practical next steps');
@@ -56,7 +56,7 @@ assert.match(html, /id="exportDecisionReport"/, 'Decision Lab must expose a deci
 assert.match(match[1], /\$\("exportDecisionReport"\)\.addEventListener\("click"/, 'Decision brief export control must be wired');
 assert.match(match[1], /digital-alchemy-decision-brief\.txt/, 'Decision brief must have a clear export filename');
 assert.match(elements.results.innerHTML, /SUBSETS_EVALUATED/, 'Output must expose search evidence');
-assert.match(elements.results.innerHTML, /Downside scenario check/, 'Output must show the stress-test scenario');
+assert.match(elements.results.innerHTML, /What if conditions get worse\?/, 'Output must show the stress-test scenario');
 assert.match(elements.results.innerHTML, /STRESS_SCORE/, 'Run record must include stress score');
 assert.match(elements.results.innerHTML, /STRESS_SEVERITY: 40% impact reduction/, 'Run record must preserve the selected stress severity');
 assert.match(elements.results.innerHTML, /External evidence to verify/, 'Output must offer external evidence sources');
