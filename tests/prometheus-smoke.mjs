@@ -88,7 +88,7 @@ assert.ok(cockpitSource.includes('Three ways forward.'),'three-plan proposition'
 assert.ok(cockpitSource.includes('function generate(){'),'customer generation action');
 assert.ok(cockpitSource.includes('function planMarkup('),'detailed plan renderer');
 assert.ok(cockpitSource.includes('decision-lab.html'),'engineering view remains accessible');
-const cockpitScript=cockpitSource.match(/<script>([\\s\\S]*?)<\\/script>/);
+const cockpitScript=cockpitSource.split('<script>')[1]?.split('</script>')[0];
 assert.ok(cockpitScript,'cockpit has embedded script');
-new Script(cockpitScript[1],{filename:'cockpit.html'});
+new Script(cockpitScript,{filename:'cockpit.html'});
 console.log('PASS simplified customer cockpit structure and JavaScript syntax');
