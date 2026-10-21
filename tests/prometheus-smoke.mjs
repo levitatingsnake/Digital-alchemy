@@ -67,3 +67,15 @@ assert.ok(scan.findings.every(f=>f.tests.length>=1&&f.tests.length<=4),'bounded 
 assert.ok(scan.findings.every(f=>f.tests.every(t=>Number.isFinite(t.score))),'finite scores');
 assert.ok(scan.baseline.selected.every(it=>it.id!=='new'),'baseline excludes hypothetical candidate');
 console.log('PASS experimental sensitivity scan and baseline isolation');
+
+assert.ok(scan.findings.every(f=>new Set(f.tests.map(t=>t.value)).size===f.tests.length),'no duplicate boundary probes');
+assert.ok(scan.findings.every(f=>!f.changed||Number.isFinite(f.relativeShift)),'changed assumptions have finite relative sensitivity');
+const mechanismStart=labSource.indexOf('function generateMechanismHypotheses(');
+const mechanismEnd=labSource.indexOf('function buildMechanismLab(',mechanismStart);
+assert.ok(mechanismStart>=0&&mechanismEnd>mechanismStart,'mechanism generator available');
+const generate=runInNewContext(labSource.slice(mechanismStart,mechanismEnd)+'\ngenerateMechanismHypotheses',{Set,String});
+const delayed=generate(sample,'How can we reduce waiting and delays?','balanced');
+assert.equal(delayed[0].mechanism,'event-triggered handoff','waiting signal prioritised');
+const misleading=generate(sample,'How to improve timely workflows?','balanced');
+assert.ok(misleading[0].origin.includes('Fallback'),'substring time in timely does not count as an intent signal');
+console.log('PASS mechanism matching and evidence-priority regression checks');
