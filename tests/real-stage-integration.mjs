@@ -19,7 +19,7 @@ function makeElement() {
     addEventListener() {}, removeEventListener() {},
     appendChild(child) { this.children.push(child); return child; },
     remove() {}, click() {}, focus() {}, setAttribute() {},
-    getAttribute() { return null; }, querySelectorAll() { return []; }, closest() { return null; },
+    getAttribute() { return null; }, querySelectorAll() { return []; }, closest() { return makeElement(); },
     classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } }
   };
   return new Proxy(base, {
