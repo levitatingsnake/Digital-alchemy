@@ -3,7 +3,7 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 const html=readFileSync('cockpit.html','utf8');
 const slice=(start,end)=>{const a=html.indexOf(start),b=html.indexOf(end,a);if(a<0||b<0)throw Error('Missing engine section: '+start);return html.slice(a,b)};
-const source=slice('const intentSignals=','function renderQuestionDiagnosis(')+slice('const constraintPatterns=','function renderQuestionDiagnosis(');
+const source=slice('const intentSignals=','function renderQuestionDiagnosis(');
 const ctx=runInNewContext(source+'\n({interpretQuestion,extractQuestionContext})');
 const scenarios=[
  ['I want to grow without hiring more staff, on a minimal budget, within 3 months.',['no_hiring','low_budget','time'],'capacity'],
