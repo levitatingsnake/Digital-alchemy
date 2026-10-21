@@ -50,7 +50,7 @@ The depth-three search evaluated 33,600 candidate transitions in the benchmark. 
 
 These results support a narrow claim: **deeper search improves the current model's own objective on this fixed benchmark, and state deduplication preserved the measured result**. They do not establish that the objective is a good proxy for real-world outcomes or that the approach generalises to other domains.
 
-The overnight workflow also checks route replay integrity, repeatability, boundary behaviour, workspace preservation, and three deliberately introduced model faults. See the [latest successful run](https://github.com/levitatingsnake/Digital-alchemy/actions/runs/39545380031) for the run's logs and generated report artifacts.
+The overnight workflow also checks route replay integrity, repeatability, boundary behaviour, workspace preservation, and three deliberately introduced model faults. A separate constrained-selection benchmark now tests a different toy optimisation problem: a greedy value-to-cost heuristic is compared against exact enumeration of every valid subset. This provides an independently measurable comparison on another problem formulation, not proof that the symbolic model generalises. Its report is generated at `reports/transfer-task-latest.md` and included with the [latest workflow run](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml).
 
 ## Research and engineering features
 
@@ -87,6 +87,7 @@ The overnight benchmark writes `reports/overnight-latest.json` and `reports/over
 - `tests/adversarial-boundaries.mjs`: checks edge and mixed states across goals and operations.
 - `tests/mutation-check.mjs`: verifies selected invariants catch three intentionally introduced faults.
 - `tests/overnight-benchmark.mjs`: fixed-case baseline comparison, search-depth analysis, determinism, deduplication equivalence, and route replay.
+- `tests/transfer-task-benchmark.mjs`: separate constrained-selection problem comparing a greedy heuristic with exact enumeration.
 - `.github/workflows/overnight-lab.yml`: scheduled and on-demand verification workflow.
 - `WORKBOOK.md`: detailed project history, design decisions, acceptance gates, and limitations.
 
