@@ -1,4 +1,4 @@
-# Decision Lab: bounded business and construction choices
+# Decision Lab: multi-domain business decision exploration
 
 **Status:** working prototype, October 2026  
 **Brand:** developed under the proposed Lumora Strategy working name  
@@ -6,14 +6,14 @@
 
 ## What it demonstrates
 
-The Decision Lab is a small, inspectable interface for turning a business or construction prompt into a bounded portfolio-selection task. A visitor can choose improvement discovery, problem-solving exploration or constrained optimisation, then select a scenario family, objective and initiative limit. Budget is optional: when enabled, it becomes a hard constraint; otherwise the model compares initiatives without a spending cap. The visitor can inspect the selected actions and evidence behind the choice.
+The Decision Lab is a small, inspectable interface for turning a prompt into a bounded decision-support exercise across small-business operations, construction, business finance, investment-process review and real-estate decisions. A visitor can choose improvement discovery, problem-solving exploration or constrained optimisation, then select a scenario family, objective and initiative limit. Budget is optional: when enabled, it becomes a hard constraint; otherwise the model compares initiatives without a spending cap. The visitor can inspect the selected actions and evidence behind the choice.
 
 It is deliberately built alongside, rather than presented as the same thing as, Digital Alchemy's original symbolic state-transition engine. It is a practical demonstration of explainable constrained optimisation, not an LLM that understands arbitrary natural-language requests.
 
 ## How it works
 
 1. The visitor enters a prompt and selects a scenario family. Simple keyword hints can suggest the domain and read a budget written in NZD; they are not full natural-language understanding.
-2. The interface loads one of two fixed illustrative candidate libraries: small-business operations or construction operations.
+2. The interface loads one of five fixed illustrative candidate libraries: small-business operations, construction operations, business finance, investment-process review or real-estate decisions. Each library contains 14 candidate initiatives.
 3. Each candidate has an illustrative cost, impact score, risk factor, implementation-speed score and category.
 4. The visitor chooses a mode and scoring objective: improvement discovery, problem-solving exploration or constrained optimisation, with balanced improvement, maximum impact, risk reduction or implementation speed.
 5. The solver enumerates every subset of the 14 candidates (2^14 = 16,384 combinations), rejecting combinations that exceed the optional budget cap or maximum initiative count.
@@ -23,7 +23,7 @@ The risk objective rewards lower risk-factor values; it does not reward taking m
 
 ## Evidence and checks
 
-The dedicated smoke test checks that the inline JavaScript parses, the Run button is wired, a budget-free default scenario completes, the run trace and limitation notice appear, a budget-constrained portfolio stays inside its budget, and the improvement, construction, resilience and budget sample buttons work.
+The dedicated smoke test checks that the inline JavaScript parses, the Run button is wired, a budget-free default scenario completes, the run trace and limitation notice appear, a budget-constrained portfolio stays inside its budget, all five domain models execute, and the improvement, finance, investment, property, construction, resilience and budget sample buttons work.
 
 Reproduce locally with:
 
@@ -35,11 +35,12 @@ The repository's GitHub Actions workflow runs this check alongside the existing 
 
 ## Limitations
 
-- Costs and scores are illustrative inputs, not estimates validated against a real business, contractor, job site or dataset.
+- Costs and scores are illustrative inputs, not estimates validated against a real business, contractor, job site, investment portfolio, property or dataset.
+- Finance, investment and property scenarios use synthetic assumptions and no live market data. Investment outputs focus on decision process, fees, concentration and risk checks, not specific assets or buy/sell calls.
 - The interface uses a fixed scenario catalogue and simple keyword hints. It does not reliably interpret arbitrary questions.
 - The scores are a transparent model objective, not probabilities, forecasts or proof of savings.
 - The optimiser finds the best portfolio according to the specified toy objective, not a universally best real-world decision.
-- It does not call an LLM, browse live prices, inspect project documents or provide legal, safety, engineering, financial or construction advice.
+- It does not call an LLM, browse live prices, inspect project documents or provide legal, safety, engineering, financial, investment, property or construction advice.
 - The result must be checked by people with relevant domain knowledge before any real decision is made.
 
 ## Next evaluation gates
