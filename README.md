@@ -50,7 +50,7 @@ The depth-three search evaluated 33,600 candidate transitions in the benchmark. 
 
 These results support a narrow claim: **deeper search improves the current model's own objective on this fixed benchmark, and state deduplication preserved the measured result**. They do not establish that the objective is a good proxy for real-world outcomes or that the approach generalises to other domains.
 
-The overnight workflow also checks route replay integrity, repeatability, boundary behaviour, workspace preservation, and three deliberately introduced model faults. A separate constrained-selection benchmark now tests a different toy optimisation problem: a greedy value-to-cost heuristic is compared against exact enumeration of every valid subset. This provides an independently measurable comparison on another problem formulation, not proof that the symbolic model generalises. Its report is generated at `reports/transfer-task-latest.md` and included with the [latest workflow run](https://github.com/levitatingsnake/Digital-alchemy/actions/workflows/overnight-lab.yml).
+The overnight workflow also checks route replay integrity, repeatability, boundary behaviour, workspace preservation, and three deliberately introduced model faults. A separate constrained-selection benchmark now tests a different toy optimisation problem: a greedy value-to-cost heuristic is compared against exact enumeration of every valid subset. This provides an independently measurable comparison on another problem formulation, not proof that the symbolic model generalises. See the [versioned constrained-selection report](reports/transfer-task-2026-10-21.md); the latest run also publishes generated JSON and Markdown artifacts.
 
 ## Research and engineering features
 
