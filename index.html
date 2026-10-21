@@ -28,14 +28,15 @@ body::before{
  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  background-image:linear-gradient(rgba(81,202,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(81,202,255,.045) 1px,transparent 1px);
  background-size:34px 34px;
+ z-index:0;
  mask-image:linear-gradient(to bottom,black,transparent 86%);
 }
 body::after{
- content:"";position:fixed;inset:0;z-index:8;pointer-events:none;opacity:.13;
+ content:"";position:fixed;inset:0;z-index:8;pointer-events:none;opacity:.07;
  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(105,220,255,.09) 4px);
  mix-blend-mode:screen;
 }
-.wrap{max-width:1220px;padding:26px 22px 60px}
+.wrap{max-width:1220px;padding:26px 22px 60px;position:relative;z-index:1}
 .top{padding:0 0 17px;border-bottom:1px solid rgba(104,244,255,.22);margin-bottom:24px}
 .brand{gap:14px}
 .sigil{
