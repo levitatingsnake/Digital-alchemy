@@ -163,3 +163,8 @@ assert.ok(cockpitSource.includes('function assessConstraints(index,context)'),'c
 assert.ok(cockpitSource.includes('constraintGateMarkup(index,context)+questionSpecificIntervention'),'constraint checks appear in each plan');
 for(const term of ['no_hiring','low_budget','no_code','time','remote'])assert.ok(cockpitSource.includes("ids.includes('"+term+"')"),'constraint affects recommendations: '+term);
 console.log('PASS constraint-aware strategy screening');
+
+assert.ok(cockpitSource.includes('function selectConstraintAware(items,context,priority)'),'constraint-aware candidate selection');
+assert.ok(cockpitSource.includes('run:selectConstraintAware(items,context,v.priority)'),'optimisation uses screened candidates');
+for(const term of ['low_budget','no_hiring','no_code','time'])assert.ok(cockpitSource.includes("ids.has('"+term+"')"),'selection responds to '+term);
+console.log('PASS constraints alter candidate selection before optimisation');
