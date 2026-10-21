@@ -38,8 +38,8 @@ assert.equal(elements.status.textContent, 'RUN COMPLETE', 'Default scenario must
 assert.match(elements.results.innerHTML, /Recommended initiatives/, 'Output must show a plan');
 assert.match(elements.results.innerHTML, /SUBSETS_EVALUATED/, 'Output must expose search evidence');
 assert.match(elements.results.innerHTML, /Important boundary/, 'Output must state limitations');
-assert.match(elements.results.innerHTML, /COST: (\\d+) NZD/, 'Output must log the total cost');
-const firstCost = Number(elements.results.innerHTML.match(/COST: (\\d+) NZD/)[1]);
+assert.match(elements.results.innerHTML, /COST: (\d+) NZD/, 'Output must log the total cost');
+const firstCost = Number(elements.results.innerHTML.match(/COST: (\d+) NZD/)[1]);
 assert.ok(firstCost <= 30000, 'Selected plan must obey the budget');
 
 elements.domain.value = 'business';
@@ -49,7 +49,7 @@ elements.maxItems.value = '3';
 handlers.run();
 assert.equal(elements.status.textContent, 'RUN COMPLETE', 'Risk scenario must run');
 assert.match(elements.results.innerHTML, /OBJECTIVE: risk/, 'Run record must retain selected objective');
-const secondCost = Number(elements.results.innerHTML.match(/COST: (\\d+) NZD/)[1]);
+const secondCost = Number(elements.results.innerHTML.match(/COST: (\d+) NZD/)[1]);
 assert.ok(secondCost <= 8000, 'Risk-focused plan must obey the budget');
 
 handlers.construction();
