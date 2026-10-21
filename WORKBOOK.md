@@ -336,3 +336,11 @@ The result supports a limited conclusion: deeper search improves the current mod
 - Added `ARCHITECTURE.md` with a Mermaid system map, current component boundaries, evidence flow, benchmark method, and explicit non-goals.
 - These documents describe the current implementation and do not present planned work as already implemented.
 - Portfolio work remaining: record a short screen demonstration, write a concise technical case study, and test whether the approach generalises beyond its current hand-defined objective.
+
+
+### Technical case study (2026-10-21)
+
+- Added `CASE_STUDY.md` describing the problem framing, current architecture, measured benchmark results, validation design, lessons, limitations, and next experiment.
+- Linked the case study from the README.
+- The case study uses the latest verified benchmark and identifies the next meaningful research step as evaluation on a genuinely different task or objective, rather than adding more features without external evidence.
+- The short screen-recorded demonstration remains outstanding.
