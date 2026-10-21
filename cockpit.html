@@ -244,7 +244,7 @@ function composeAlchemyMechanisms(index,context){
  if(ids.has('remote'))options.push({name:'Distributed delivery',mechanism:'Separate remote coordination from physical fulfilment.',test:'Validate handoff quality and accountability.'});
  if(ids.has('time'))options.push({name:'Deadline-bounded proof',mechanism:'Replace full launch with one measurable experiment.',test:'Verify evidence before the deadline.'});
  if(options.length<2)return null;
- const parts=options.slice(0,3);
+ const parts=options;
  return {concept:parts.map(x=>x.name).join(' + '),hypothesis:parts.map(x=>x.mechanism).join(' '),test:parts.map(x=>x.test).join(' ')};
 }
 function evaluateAlchemyConcept(index,context){
