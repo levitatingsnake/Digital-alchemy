@@ -128,11 +128,11 @@ if(!best||score>best.score||(score===best.score&&cost<best.cost))best={selected,
 }
 return {...best,checks,feasible};
 }
-function stabilityScan(items,budget,maxItems,priority){
+function stabilityScan(items,budget,maxItems,priority,currentSelected){
 const levels=[10,20,30,40,50],runs=levels.map(level=>({level,...solve(items,budget,maxItems,priority,level)}));
 const counts=new Map(items.map(item=>[item.id,0]));
 runs.forEach(run=>(run.selected||[]).forEach(item=>counts.set(item.id,(counts.get(item.id)||0)+1)));
-const selectedNow=runs[2].selected||[];
+const selectedNow=currentSelected||[];
 const stableItems=[...selectedNow].map(item=>({...item,stability:counts.get(item.id)||0})).sort((a,b)=>b.stability-a.stability||objective(b,priority)-objective(a,priority));
 const intersection=runs.reduce((n,run)=>n+((run.selected||[]).length===selectedNow.length&&selectedNow.every(item=>(run.selected||[]).some(other=>other.id===item.id))?1:0),0);
 return {levels,runs,stableItems,intersection};
@@ -152,7 +152,7 @@ const q=$("question").value.toLowerCase(),domain=$("domain").value,budgetMode=$(
 if(budgetMode==="set"&&budget===0){$("status").textContent="CHECK BUDGET";$("results").innerHTML='<p class="summary">Enter a budget greater than zero, or choose “No fixed budget”.</p>';return}
 $("status").textContent="SEARCHING";$("run").disabled=true;
 try{
-const items=datasets[domain].map(x=>({...x}));const res=solve(items,budget,maxItems,priority,stressSeverity);const stability=stabilityScan(items,budget,maxItems,priority);const chosen=res.selected||[];const spent=res.cost||0;const remain=budgetMode==="set"?budget-spent:null;
+const items=datasets[domain].map(x=>({...x}));const res=solve(items,budget,maxItems,priority,stressSeverity);const stability=stabilityScan(items,budget,maxItems,priority,res.selected||[]);const chosen=res.selected||[];const spent=res.cost||0;const remain=budgetMode==="set"?budget-spent:null;
 const names=chosen.map(x=>x.name).join(", ");
 const sorted=[...chosen].sort((a,b)=>objective(b,priority)-objective(a,priority));
 const rejected=items.filter(x=>!chosen.some(y=>y.id===x.id)).sort((a,b)=>{const fa=budgetMode==="set"&&a.cost>remain?1:0,fb=budgetMode==="set"&&b.cost>remain?1:0;return fa-fb||objective(b,priority)/b.cost-objective(a,priority)/a.cost}).slice(0,3);
