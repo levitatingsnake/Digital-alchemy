@@ -64,6 +64,7 @@ The overnight workflow also checks route replay integrity, repeatability, bounda
 - **Ten-stage Discovery Cycle:** runs a chain of analysis and evidence-building stages, records stage failures, and audits freshness and workspace preservation.
 - **Research export:** builds a Markdown snapshot from evidence saved in the current browser without inventing missing results.
 - **Outcome threshold review:** the browser-local experiment ledger can store an explicit numeric success threshold and whether higher or lower is better, flag misses for human review, and preserve the rule beside the observed result. A flag triggers reconsideration; it does not prove causation or automatically change the engine's recommendation.
+- **Human decision review:** after recording an outcome, the ledger can preserve an explicit next step (continue cautiously, adjust and retest, stop, or gather more evidence) and the reason for it. The readout counts unresolved reviews and shows the chosen next step beside the observation.
 - **Automated tests and benchmark:** static/dynamic smoke checks, real-stage integration, adversarial boundaries, targeted mutation checks, deterministic benchmark, and route replay assertions.
 
 ## Run the checks locally
