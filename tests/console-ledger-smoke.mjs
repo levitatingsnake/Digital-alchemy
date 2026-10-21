@@ -10,6 +10,8 @@ assert.match(html, /id="experimentLedger"/, 'Console must expose the experiment 
 assert.match(match[1], /lumora-experiment-ledger-v1/, 'Experiment data must have a versioned local schema');
 assert.match(match[1], /absolutePercentageError/, 'Stored records must include prediction error');
 assert.match(html, /id="expTarget"/, 'Ledger should allow an explicit success threshold');
+assert.match(html, /id="expPrefillNotice"/, 'Console should explain when an experiment is carried over from Decision Lab');
+assert.match(match[1], /params\.get\("experiment"\)/, 'Console should accept a decision action from the recommendation link');
 assert.match(match[1], /TARGET MISSED/, 'Ledger should flag outcomes that miss their target');
 assert.match(match[1], /review the assumptions, context and next step/i, 'A missed target should prompt a review, not claim causation');
 assert.match(match[1], /digital-alchemy-experiment-ledger\.csv/, 'Experiment records must be exportable as CSV');
@@ -40,8 +42,12 @@ const localStorage = {
   getItem(k) { return stored.has(k) ? stored.get(k) : null; },
   setItem(k, v) { stored.set(k, String(v)); }
 };
-vm.runInNewContext(match[1], { document, localStorage, alert() {}, confirm() { return true; }, Date, Math, JSON, Number, String, Set, URL, Blob });
+vm.runInNewContext(match[1], { document, localStorage, alert() {}, confirm() { return true; }, Date, Math, JSON, Number, String, Set, URL, URLSearchParams, Blob, window: { location: { search: '?experiment=Cash-flow%20forecast&hypothesis=Test%20cash%20visibility&metric=Weekly%20forecast%20error' } } });
 assert.equal(getElement('expCount').textContent, '0', 'Ledger should start empty');
+assert.equal(getElement('expDecision').value, 'Cash-flow forecast', 'Decision Lab action should prefill the experiment name');
+assert.equal(getElement('expHypothesis').value, 'Test cash visibility', 'Decision Lab hypothesis should carry into the ledger');
+assert.equal(getElement('expMetric').value, 'Weekly forecast error', 'Suggested metric should carry into the ledger');
+assert.equal(getElement('expPrefillNotice').hidden, false, 'Console should disclose the carried-over draft');
 for (const [id, value] of Object.entries({
   expDecision: 'Pilot customer follow-up',
   expHypothesis: 'A prompt follow-up saves 2 hours per week',
