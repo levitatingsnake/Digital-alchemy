@@ -49,3 +49,21 @@ assert.ok(stress.stableItems.every(x=>x.stability>=0&&x.stability<=5),'stability
 const speed=model.solve(sample,250,1,'speed',28);
 assert.equal(speed.selected[0].id,'a','speed priority selects fast option');
 console.log('PASS model constraints, exact enumeration, stress sensitivity, and objective switching');
+
+const labSource=readFileSync('decision-lab.html','utf8');
+for(const fn of ['probeExperimentalSensitivity','renderExperimentalSensitivity','exportExperimentalReport','runExperimentalPortfolio','generateMechanismHypotheses']){
+ assert.equal((labSource.match(new RegExp('function '+fn+'\\\\(','g'))||[]).length,1,fn+' declared once');
+}
+assert.match(labSource,/runExperimentalPortfolio\(\)/,'comparison button wired');
+assert.match(labSource,/exportExperimentalReport\(\)/,'export button wired');
+const sensitivityStart=labSource.indexOf('function probeExperimentalSensitivity(');
+const sensitivityEnd=labSource.indexOf('function renderExperimentalSensitivity(',sensitivityStart);
+assert.ok(sensitivityStart>=0&&sensitivityEnd>sensitivityStart);
+const probe=runInNewContext(labSource.slice(sensitivityStart,sensitivityEnd)+'\nprobeExperimentalSensitivity',{solve:model.solve,Math,Number});
+const candidate={id:'new',name:'New approach',cost:75,impact:80,risk:5,speed:80,cat:'experimental'};
+const scan=probe(sample,candidate,250,2,'balanced',28);
+assert.equal(scan.findings.length,4,'four assumption dimensions tested');
+assert.ok(scan.findings.every(f=>f.tests.length>=1&&f.tests.length<=4),'bounded local probes');
+assert.ok(scan.findings.every(f=>f.tests.every(t=>Number.isFinite(t.score))),'finite scores');
+assert.ok(scan.baseline.selected.every(it=>it.id!=='new'),'baseline excludes hypothetical candidate');
+console.log('PASS experimental sensitivity scan and baseline isolation');
