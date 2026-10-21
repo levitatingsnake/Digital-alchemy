@@ -49,8 +49,9 @@ Say: “Those results are internal to this symbolic model, so I’m not claiming
 
 - **It is:** a browser-based, deterministic symbolic search and experiment prototype with a distinctive UI, research tools, evidence export and automated tests.
 - **It is not:** an LLM-powered natural-language reasoner, a chemistry simulator, a validated scientific discovery system, or proof of general intelligence.
-- **The benchmark shows:** how search strategies compare under the current model's scoring function on a fixed synthetic suite.
-- **The benchmark does not show:** real-world accuracy, generalisation to unrelated tasks, or wall-clock speed improvements.
+- **The symbolic benchmark shows:** how search strategies compare under the current model's scoring function on a fixed synthetic suite.
+- **A separate benchmark shows:** how a greedy heuristic compares with an exact optimum on 100 small constrained-selection cases. Mean relative gap: 1.396%, with zero budget violations. [Read the report](reports/transfer-task-2026-10-21.md).
+- **Neither benchmark shows:** real-world accuracy or generalisation to unrelated real-world tasks. Transition counts are not wall-clock speed measurements.
 - **Your role:** you conceived and directed the project, made product decisions, tested the live app and used AI assistance in building it. Be transparent about the collaboration.
 
 ## Three good questions for a technical person
