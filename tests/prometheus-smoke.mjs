@@ -194,3 +194,9 @@ assert.ok(cockpitSource.includes('function inventionLead(index,context,domain)')
 assert.ok(cockpitSource.includes('inventionLead(index,context,domain)'), 'invention visible in strategies');
 assert.ok(!cockpitSource.includes('planning huddles'),'planning jargon removed');
 console.log('PASS invention-first presentation and plain language');
+
+assert.ok(cockpitSource.includes('const mechanismLibrary=['),'cross-domain mechanism library');
+assert.ok(cockpitSource.includes('function deriveMechanismCandidates(question,lab)'),'ranked pair generation');
+assert.ok(cockpitSource.includes('deriveMechanismCandidates(question,lab)[index]'),'three different candidate pairs');
+assert.ok(cockpitSource.includes('Not a feasibility or novelty score'),'heuristic limitations disclosed');
+console.log('PASS cross-disciplinary invention hypotheses');
