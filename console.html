@@ -117,6 +117,7 @@ input,textarea,select{accent-color:var(--jade)}
 <div id="expAlerts" class="notice" role="status" aria-live="polite" style="margin-top:12px">No target-based review flags yet. Add a threshold to an experiment to make its success rule explicit.</div>
 <div class="source-list" id="repeatReview" aria-live="polite"><p class="muted">Repeated-test consistency will appear when comparable experiments are recorded.</p></div>
 <div class="source-list" id="conditionReview" aria-live="polite"><p class="muted">Condition comparisons will appear when the same decision and measure have been tested under different recorded conditions.</p></div>
+<div class="source-list" id="nextExperimentReview" aria-live="polite"><p class="muted">Suggested follow-up tests will appear when the ledger contains enough comparable observations to identify a useful evidence gap.</p></div>
 <div id="experimentList" class="source-list"><p class="muted">No outcomes recorded yet. Start with a small, safe test.</p></div>
 </article>
 </section>
@@ -199,10 +200,27 @@ const stats=sets.map(s=>{const vals=s.rows.map(r=>r.actual);const mean=vals.redu
 return '<article class="source"><strong>'+expEsc(g.decision)+'</strong><span>'+expEsc(g.metric)+(g.unit?' ('+expEsc(g.unit)+')':'')+' · '+stats.length+' conditions</span>'+stats.map(s=>'<small><strong>'+expEsc(s.label)+'</strong> · '+s.count+' test(s); average '+s.mean.toFixed(2)+(g.unit?' '+expEsc(g.unit):'')+'; observed range '+s.min+'–'+s.max+(g.unit?' '+expEsc(g.unit):'')+'. '+expEsc(s.targetNote)+'.</small>').join('')+'<small>Interpret carefully: condition labels are user-entered, samples may be small, and other factors may differ. This comparison does not establish causation.</small></article>';
 }).join("");
 }
+
+function renderNextExperiment(rows){
+const norm=v=>String(v??"").trim().toLocaleLowerCase(),groups=new Map();
+rows.forEach(r=>{const decision=norm(r.decision),metric=norm(r.metric),unit=norm(r.unit);if(!decision||!metric||!Number.isFinite(r.actual))return;const key=[decision,metric,unit].join("\\u001f");if(!groups.has(key))groups.set(key,{decision:r.decision.trim(),metric:r.metric.trim(),unit:String(r.unit??"").trim(),rows:[]});groups.get(key).rows.push(r)});
+const candidates=[...groups.values()].filter(g=>g.rows.length>=2).sort((a,b)=>b.rows.length-a.rows.length).slice(0,3);
+if(!candidates.length){$("nextExperimentReview").innerHTML='<h3 style="font-size:13px;margin:8px 0">Next experiment to run</h3><article class="source"><strong>Build a comparable baseline</strong><small>Evidence gap: there are not yet two recorded outcomes for the same decision, measure and unit.</small><small>Suggested test: record the next real outcome using the same measure and unit. Add the conditions, a clear success threshold and the main factors that could affect the result.</small><small>What could change the next step: a second comparable result lets you check whether the first result repeats. One result alone is not enough to judge reliability.</small><small>Rule-based suggestion, not an autonomous conclusion.</small></article>';return}
+$("nextExperimentReview").innerHTML='<h3 style="font-size:13px;margin:8px 0">Next experiment to run</h3>'+candidates.map(g=>{
+const conds=new Map();g.rows.forEach(r=>{const key=norm(r.conditions);if(key){if(!conds.has(key))conds.set(key,{label:String(r.conditions).trim(),rows:[]});conds.get(key).rows.push(r)}});
+const sets=[...conds.values()].sort((a,b)=>a.rows.length-b.rows.length),rules=g.rows.map(r=>r.target!==null&&Number.isFinite(r.target)&&r.direction?String(r.target)+"|"+r.direction:null),consistent=rules.every(v=>v!==null&&v===rules[0]);let gap,test,hold,change;
+if(sets.length<2){gap="Recorded conditions are missing or use only one label, so results cannot yet be compared across conditions.";test="Repeat this measure under a clearly named condition, then reuse that label for later comparable tests.";hold="Keep the decision, metric, unit and measurement method the same. Record major factors that changed.";change="Once at least two condition labels have comparable observations, compare sample counts and outcomes. Do not infer cause from a difference alone."}
+else if(!consistent){gap="Success thresholds are missing or inconsistent across the recorded tests.";test="Choose one explicit success threshold and direction, then repeat the least-tested condition using that same rule.";hold="Keep the decision, metric, unit, measurement method and success rule consistent; note other major differences.";change="A consistent rule lets you count target hits meaningfully. If the rule changes, analyse the periods separately."}
+else if(sets[0].rows.length<Math.max(...sets.map(s=>s.rows.length))){gap=sets[0].label+" has fewer observations ("+sets[0].rows.length+") than the other recorded condition(s).";test="Collect one more valid observation under “"+sets[0].label+"” before drawing a comparison.";hold="Keep the metric, unit, success rule and measurement method unchanged; record unusual circumstances.";change="Recheck averages, observed ranges and target-hit counts. If results still differ, repeat under comparable conditions."}
+else{gap="The recorded conditions have similar sample counts, but small samples and other factors can still mislead.";test="Run one more observation under each recorded condition, as close together in time and method as practical.";hold="Keep the decision, metric, unit, success threshold and measurement method fixed. Record factors you cannot hold constant.";change="Check whether the direction and size of the difference persist across repeats. A reversal or wide overlap is a reason to gather more evidence, not declare a winner."}
+return '<article class="source"><strong>'+expEsc(g.decision)+'</strong><span>'+expEsc(g.metric)+(g.unit?' ('+expEsc(g.unit)+')':'')+' · '+g.rows.length+' recorded outcomes</span><small><strong>Evidence gap:</strong> '+expEsc(gap)+'</small><small><strong>Smallest useful next test:</strong> '+expEsc(test)+'</small><small><strong>Hold steady:</strong> '+expEsc(hold)+'</small><small><strong>What would change the next step:</strong> '+expEsc(change)+'</small><small>Rule-based suggestion based on your entries, not an autonomous conclusion. Samples may be small; this does not establish causation.</small></article>'
+}).join("")}
+
 function expRender(){
 $("expCount").textContent=experiments.length;
 renderRepeatability(experiments);
 renderConditionComparison(experiments);
+renderNextExperiment(experiments);
 const valid=experiments.filter(r=>Number.isFinite(r.predicted)&&Number.isFinite(r.actual));
 const mae=valid.length?valid.reduce((a,r)=>a+Math.abs(r.actual-r.predicted),0)/valid.length:null;
 const percent=valid.filter(r=>r.predicted!==0);
