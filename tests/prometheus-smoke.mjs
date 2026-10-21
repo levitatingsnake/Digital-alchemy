@@ -81,3 +81,14 @@ assert.equal(delayed[0].mechanism,'event-triggered handoff','waiting signal prio
 const misleading=generate(sample,'How to improve timely workflows?','balanced');
 assert.ok(misleading[0].origin.includes('Fallback'),'substring time in timely does not count as an intent signal');
 console.log('PASS mechanism matching and evidence-priority regression checks');
+
+const cockpitSource=readFileSync('cockpit.html','utf8');
+assert.ok(cockpitSource.includes('One question.'),'customer cockpit headline');
+assert.ok(cockpitSource.includes('Three ways forward.'),'three-plan proposition');
+assert.ok(cockpitSource.includes('function generate(){'),'customer generation action');
+assert.ok(cockpitSource.includes('function planMarkup('),'detailed plan renderer');
+assert.ok(cockpitSource.includes('decision-lab.html'),'engineering view remains accessible');
+const cockpitScript=cockpitSource.match(/<script>([\\s\\S]*?)<\\/script>/);
+assert.ok(cockpitScript,'cockpit has embedded script');
+new Script(cockpitScript[1],{filename:'cockpit.html'});
+console.log('PASS simplified customer cockpit structure and JavaScript syntax');
