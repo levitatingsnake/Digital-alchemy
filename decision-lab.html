@@ -38,6 +38,7 @@ button{border-radius:4px 10px 4px 10px;background:#102738;border-color:#315367;t
 .plain-list>strong,.plain-next>strong,.plain-columns article>strong{font-size:12px;color:var(--mint)}
 .plain-list ol,.plain-next ol{padding-left:22px;margin:10px 0 0}.plain-list li,.plain-next li{padding:5px 0;color:#d4e1e6;font-size:13px;line-height:1.65}.plain-cost{color:var(--gold);font-size:12px}
 .plain-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.plain-foot{font-size:11px!important;color:var(--muted)!important;margin-top:13px!important}
+.plain-question{padding:13px 15px;border:1px solid #294755;border-radius:4px 11px 4px 11px;background:#06101a;margin:10px 0 13px}.plain-question>strong{font-size:12px;color:var(--mint)}.plain-question p{white-space:pre-wrap;overflow-wrap:anywhere;margin:7px 0 0;color:#e1edf1}.plain-question small{display:block;color:var(--muted);font-size:11px;line-height:1.6;margin-top:8px}
 /* Replace internal jargon with ordinary labels */
 .hero .eyebrow{letter-spacing:.12em}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.field textarea#question{min-height:260px;height:260px;padding:15px}.plain-summary{padding:15px}.plain-columns{grid-template-columns:1fr}}
@@ -239,6 +240,7 @@ function buildPlainSummary(question,domain,sorted,rejected,budgetMode,budget,str
  let out='<section class="plain-summary"><div class="eyebrow">THE ANSWER / PLAIN ENGLISH</div><h3>What this result means</h3>';
  if(!sorted.length){out+='<p>No plan met the current limits. Increase the budget, allow more actions, or change the goal and run it again.</p></section>';return out}
  out+='<p class="plain-lead">For '+escHtml(areas[domain]||domain)+', the model suggests starting with <strong>'+escHtml(first.name)+'</strong>'+(second?' and then considering <strong>'+escHtml(second.name)+'</strong> if the first step proves useful':'')+'. It searched the available combinations and chose this set because it scored best for '+escHtml(objectives[priority]||"the selected goal")+'.</p>';
+ out+='<div class="plain-question"><strong>Your question</strong><p>'+escHtml((question||"").trim())+'</p><small>This is a structured decision model, not a general-purpose AI answer. It ranks predefined actions using the selected area, objective, budget setting and downside assumptions. It does not fully interpret every detail in your wording or verify real-world facts.</small></div>';
  out+='<div class="plain-list"><strong>What the suggested actions involve</strong><ol>';
  sorted.forEach((item,i)=>{out+='<li><b>'+escHtml(item.name)+'</b> <span class="plain-cost">('+fmt(item.cost)+' illustrative cost)</span><br>'+escHtml(item.desc)+'</li>'});
  out+='</ol></div>';
